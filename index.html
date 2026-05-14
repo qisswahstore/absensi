@@ -4,25 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#0D5C4A">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="SekolahKu">
+    <title>SekolahKu - Sistem Manajemen Sekolah (Optimized)</title>
     
-    <!-- MANIFEST -->
-    <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22SekolahKu%22,%22short_name%22:%22Sekolah%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%230D5C4A%22,%22theme_color%22:%22%230D5C4A%22,%22icons%22:[{%22src%22:%22https://img.icons8.com/color/192/school.png%22,%22sizes%22:%22192x192%22,%22type%22:%22image/png%22},{%22src%22:%22https://img.icons8.com/color/512/school.png%22,%22sizes%22:%22512x512%22,%22type%22:%22image/png%22}]}">
-    
-    <link rel="icon" href="https://img.icons8.com/color/96/school.png">
-    <link rel="apple-touch-icon" href="https://img.icons8.com/color/192/school.png">
-    
-    <title>SekolahKu - Sistem Manajemen Sekolah/Pesantren</title>
-    
-    <!-- CRITICAL: Load libraries with timeout and fallback -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" onerror="this.onerror=null; console.warn('Leaflet CSS failed')"/>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" onerror="this.onerror=null; console.warn('FontAwesome failed')"/>
+    <!-- OPTIMIZED: Async loading of external resources -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" media="print" onload="this.media='all'" onerror="console.warn('Leaflet CSS gagal dimuat')"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" media="print" onload="this.media='all'" onerror="console.warn('FontAwesome gagal dimuat')"/>
     
     <style>
-        /* FIXED VERSION - CSS optimized for faster loading */
+        /* OPTIMIZED VERSION - Performance First */
         :root {
             --primary: #0D5C4A;
             --primary-dark: #0A3D31;
@@ -33,8 +22,12 @@
             --green: #10B981;
             --orange: #F59E0B;
             --blue: #3B82F6;
+            --purple: #8B5CF6;
+            --teal: #14B8A6;
+            --wa: #25D366;
             --dark: #1E293B;
             --gray: #64748B;
+            --gray-light: #F1F5F9;
         }
         
         * {
@@ -48,10 +41,21 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: var(--bg);
             color: var(--dark);
+            padding-bottom: 80px;
+            transition: background 0.3s ease;
             overflow-x: hidden;
         }
         
-        /* IMPROVED SPLASH SCREEN - No stuck */
+        /* Dark Mode */
+        body.dark-mode {
+            --bg: #121212;
+            --white: #1E1E2E;
+            --dark: #E2E2E2;
+            --gray: #A0A0A0;
+            --gray-light: #2D2D3D;
+        }
+        
+        /* ANTI-STUCK: Improved Splash Screen */
         #splashScreen {
             position: fixed;
             top: 0;
@@ -64,122 +68,154 @@
             align-items: center;
             justify-content: center;
             z-index: 9999;
-            transition: opacity 0.5s ease;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
         }
         
         #splashScreen.hide {
             opacity: 0;
+            visibility: hidden;
             pointer-events: none;
+        }
+        
+        .splash-content {
+            text-align: center;
+            animation: fadeInUp 0.6s ease;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         
         .splash-logo {
             font-size: 80px;
             margin-bottom: 20px;
-            animation: bounce 1s ease infinite;
+            animation: bounce 1.5s ease infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
         }
         
         .splash-title {
             color: white;
-            font-size: 32px;
+            font-size: 36px;
             font-weight: bold;
             margin-bottom: 10px;
+            letter-spacing: -1px;
         }
         
         .splash-subtitle {
-            color: rgba(255,255,255,0.8);
+            color: rgba(255,255,255,0.85);
             font-size: 16px;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
         }
         
-        /* LOADING INDICATOR */
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+        
         .loading-spinner {
             width: 50px;
             height: 50px;
-            border: 4px solid rgba(255,255,255,0.3);
+            border: 4px solid rgba(255,255,255,0.2);
             border-top-color: white;
             border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        
-        .loading-text {
-            color: white;
-            margin-top: 20px;
-            font-size: 14px;
+            animation: spin 0.8s linear infinite;
         }
         
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
         
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
-        }
-        
-        /* ERROR MESSAGE */
-        .error-message {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--red);
+        .loading-text {
             color: white;
-            padding: 15px 25px;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            z-index: 10000;
-            display: none;
-            max-width: 90%;
-            text-align: center;
+            font-size: 14px;
+            min-height: 21px;
+            transition: opacity 0.3s;
         }
         
-        .error-message.show {
-            display: block;
-            animation: slideDown 0.3s ease;
+        .loading-progress {
+            width: 200px;
+            height: 4px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 2px;
+            overflow: hidden;
         }
         
-        @keyframes slideDown {
-            from { transform: translate(-50%, -100%); }
-            to { transform: translate(-50%, 0); }
+        .loading-bar {
+            height: 100%;
+            background: white;
+            width: 0%;
+            transition: width 0.3s ease;
         }
         
-        /* LOGIN PAGE */
+        /* Login Page */
         #login-page {
             min-height: 100vh;
-            display: flex;
+            display: none;
             align-items: center;
             justify-content: center;
             padding: 20px;
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            animation: fadeIn 0.4s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
         
         .login-card {
             background: white;
             padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             width: 100%;
             max-width: 400px;
+            animation: slideUp 0.5s ease;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         
         .login-logo {
             text-align: center;
-            font-size: 60px;
-            margin-bottom: 10px;
+            font-size: 70px;
+            margin-bottom: 15px;
         }
         
         .login-title {
             text-align: center;
-            font-size: 24px;
+            font-size: 28px;
             font-weight: bold;
             color: var(--primary);
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
         
         .login-subtitle {
             text-align: center;
             color: var(--gray);
             margin-bottom: 30px;
+            font-size: 14px;
         }
         
         .form-group {
@@ -190,220 +226,321 @@
             display: block;
             margin-bottom: 8px;
             color: var(--dark);
-            font-weight: 500;
+            font-weight: 600;
+            font-size: 14px;
         }
         
         .form-input {
             width: 100%;
-            padding: 12px 15px;
+            padding: 14px 16px;
             border: 2px solid #E5E7EB;
-            border-radius: 10px;
-            font-size: 16px;
-            transition: border-color 0.3s;
+            border-radius: 12px;
+            font-size: 15px;
+            transition: all 0.3s;
+            font-family: inherit;
         }
         
         .form-input:focus {
             outline: none;
             border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(13, 92, 74, 0.1);
         }
         
         .btn-login {
             width: 100%;
-            padding: 14px;
+            padding: 16px;
             background: var(--primary);
             color: white;
             border: none;
-            border-radius: 10px;
+            border-radius: 12px;
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
         
         .btn-login:hover {
             background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(13, 92, 74, 0.3);
+        }
+        
+        .btn-login:active {
+            transform: translateY(0);
         }
         
         .login-help {
-            text-align: center;
-            margin-top: 20px;
-            padding: 15px;
+            margin-top: 25px;
+            padding: 20px;
             background: #F3F4F6;
-            border-radius: 10px;
-            font-size: 14px;
+            border-radius: 12px;
+            font-size: 13px;
             color: var(--gray);
+            line-height: 1.6;
         }
         
         .login-help strong {
             color: var(--primary);
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            font-size: 14px;
         }
         
-        /* MAIN APP */
+        /* Main App Container */
         #main-app {
             display: none;
             min-height: 100vh;
-            padding-bottom: 80px;
         }
         
-        /* HEADER */
-        .header {
+        /* Header Premium */
+        .header-premium {
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            padding: 20px;
-            color: white;
-            border-radius: 0 0 20px 20px;
+            padding: 24px 20px 40px 20px;
+            border-radius: 0 0 28px 28px;
+            margin-bottom: -10px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .header-premium::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 200px;
+            height: 200px;
+            background: rgba(212, 175, 55, 0.1);
+            border-radius: 50%;
         }
         
         .header-top {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
+            position: relative;
+            z-index: 1;
             margin-bottom: 20px;
         }
         
+        .header-logo {
+            font-size: 24px;
+        }
+        
+        .header-info {
+            flex: 1;
+            margin-left: 15px;
+        }
+        
         .header-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 4px;
+        }
+        
+        .header-subtitle {
+            font-size: 13px;
+            color: rgba(255,255,255,0.85);
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .header-btn {
+            background: rgba(255,255,255,0.15);
+            border: none;
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: white;
+            font-size: 18px;
+        }
+        
+        .header-btn:hover {
+            background: rgba(255,255,255,0.25);
+            transform: scale(1.05);
+        }
+        
+        /* Stats Cards */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            padding: 0 20px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-mini-card {
+            background: white;
+            padding: 16px;
+            border-radius: 18px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            transition: transform 0.2s;
+        }
+        
+        .stat-mini-card:active {
+            transform: scale(0.97);
+        }
+        
+        .stat-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+        
+        .stat-value {
             font-size: 24px;
             font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 4px;
         }
         
-        .header-user {
-            font-size: 14px;
-            opacity: 0.9;
+        .stat-label {
+            font-size: 12px;
+            color: var(--gray);
+            font-weight: 500;
         }
         
-        .header-date {
-            font-size: 14px;
-            opacity: 0.8;
-        }
-        
-        /* MENU GRID */
-        .menu-grid {
+        /* Menu Grid */
+        .menu-grid-premium {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            padding: 20px;
-            max-width: 800px;
-            margin: 0 auto;
+            gap: 12px;
+            padding: 0 20px;
+            margin-bottom: 20px;
         }
         
-        .menu-item {
+        .menu-card-premium {
             background: white;
-            padding: 20px;
-            border-radius: 15px;
+            padding: 18px 12px;
+            border-radius: 18px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border: 1px solid rgba(0,0,0,0.02);
         }
         
-        .menu-item:active {
+        .menu-card-premium:active {
             transform: scale(0.95);
         }
         
         .menu-icon {
-            font-size: 36px;
+            font-size: 32px;
             margin-bottom: 10px;
         }
         
         .menu-label {
-            font-size: 13px;
-            font-weight: 500;
+            font-size: 12px;
+            font-weight: 600;
             color: var(--dark);
+            line-height: 1.3;
         }
         
-        /* BOTTOM NAV */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: white;
-            display: flex;
-            justify-content: space-around;
-            padding: 10px 0;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-            z-index: 1000;
-        }
-        
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 5px 15px;
-            cursor: pointer;
-            color: var(--gray);
-            transition: color 0.3s;
-        }
-        
-        .nav-item.active {
-            color: var(--primary);
-        }
-        
-        .nav-icon {
-            font-size: 24px;
-            margin-bottom: 5px;
-        }
-        
-        .nav-label {
-            font-size: 11px;
-        }
-        
-        /* PAGES */
+        /* Pages */
         .page {
             display: none;
-            padding: 20px;
-            max-width: 800px;
-            margin: 0 auto;
+            animation: fadeInPage 0.3s ease;
         }
         
         .page.active {
             display: block;
-            animation: fadeIn 0.3s ease;
         }
         
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes fadeInPage {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         
-        .page-title {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 20px;
-            color: var(--dark);
-        }
-        
-        /* CARDS */
-        .card {
+        /* Cards */
+        .card-premium {
             background: white;
+            border-radius: 20px;
             padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            margin-bottom: 15px;
+            margin: 16px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
         }
         
         .card-title {
             font-size: 18px;
             font-weight: bold;
-            margin-bottom: 10px;
+            color: var(--primary);
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--gray-light);
+        }
+        
+        /* Forms */
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #E2E8F0;
+            border-radius: 12px;
+            font-size: 14px;
+            font-family: inherit;
+            background: white;
+            transition: all 0.2s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(13, 92, 74, 0.1);
+        }
+        
+        .row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .row > div {
+            flex: 1;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 13px;
             color: var(--dark);
         }
         
-        .card-content {
-            color: var(--gray);
-            line-height: 1.6;
+        /* Buttons */
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
         
-        /* BUTTONS */
-        .btn {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s;
+        .btn:active {
+            transform: scale(0.97);
         }
         
         .btn-primary {
@@ -415,48 +552,203 @@
             background: var(--primary-dark);
         }
         
-        .btn-logout {
+        .btn-danger {
             background: var(--red);
             color: white;
-            width: 100%;
+        }
+        
+        .btn-blue {
+            background: var(--blue);
+            color: white;
+        }
+        
+        .btn-orange {
+            background: var(--orange);
+            color: white;
+        }
+        
+        .btn-small {
+            padding: 10px;
+            font-size: 12px;
+            border-radius: 10px;
+        }
+        
+        /* Data List */
+        .data-list {
             margin-top: 20px;
         }
         
-        /* STATS */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        
-        .stat-card {
+        .data-item {
             background: white;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 16px;
+            border-radius: 14px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
         }
         
-        .stat-value {
-            font-size: 32px;
-            font-weight: bold;
-            color: var(--primary);
-            margin-bottom: 5px;
+        .data-item-info h4 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 4px;
         }
         
-        .stat-label {
-            font-size: 14px;
+        .data-item-info p {
+            font-size: 13px;
             color: var(--gray);
         }
         
-        /* UTILITY */
-        .text-center { text-align: center; }
-        .mt-20 { margin-top: 20px; }
-        .mb-20 { margin-bottom: 20px; }
+        .action-buttons {
+            display: flex;
+            gap: 6px;
+            flex-shrink: 0;
+        }
         
-        /* RESPONSIVE */
+        .btn-edit, .btn-delete {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 600;
+        }
+        
+        .btn-edit {
+            background: var(--blue);
+            color: white;
+        }
+        
+        .btn-delete {
+            background: var(--red);
+            color: white;
+        }
+        
+        .empty-data {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--gray);
+            font-size: 14px;
+        }
+        
+        /* Bottom Navigation */
+        .bottom-nav-premium {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255,255,255,0.98);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            border-top: 1px solid rgba(0,0,0,0.06);
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            z-index: 100;
+        }
+        
+        .nav-item-premium {
+            text-align: center;
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 12px;
+            transition: all 0.2s;
+            flex: 1;
+            max-width: 90px;
+        }
+        
+        .nav-item-premium i {
+            font-size: 20px;
+            color: var(--gray);
+            display: block;
+            margin-bottom: 4px;
+            transition: all 0.2s;
+        }
+        
+        .nav-item-premium span {
+            font-size: 11px;
+            color: var(--gray);
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        
+        .nav-item-premium.active {
+            background: rgba(13, 92, 74, 0.08);
+        }
+        
+        .nav-item-premium.active i,
+        .nav-item-premium.active span {
+            color: var(--primary);
+        }
+        
+        /* Toast Notification */
+        .toast-premium {
+            position: fixed;
+            bottom: 90px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--dark);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 14px;
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 1000;
+            white-space: nowrap;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        
+        .toast-premium.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        
+        /* Error Message */
+        .error-banner {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--red);
+            color: white;
+            padding: 14px 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(239, 68, 68, 0.4);
+            z-index: 10000;
+            display: none;
+            max-width: 90%;
+            text-align: center;
+            animation: slideDown 0.3s ease;
+        }
+        
+        .error-banner.show {
+            display: block;
+        }
+        
+        @keyframes slideDown {
+            from {
+                transform: translate(-50%, -100%);
+                opacity: 0;
+            }
+            to {
+                transform: translate(-50%, 0);
+                opacity: 1;
+            }
+        }
+        
+        /* Responsive */
         @media (max-width: 480px) {
-            .menu-grid {
+            .menu-grid-premium {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .stats-row {
                 grid-template-columns: repeat(2, 1fr);
             }
             
@@ -464,24 +756,67 @@
                 padding: 30px 20px;
             }
         }
+        
+        /* Loading Overlay for Actions */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9998;
+        }
+        
+        .loading-overlay.show {
+            display: flex;
+        }
+        
+        .loading-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
 
-<!-- ERROR MESSAGE -->
-<div id="errorMessage" class="error-message"></div>
+<!-- ERROR BANNER -->
+<div id="errorBanner" class="error-banner"></div>
 
-<!-- SPLASH SCREEN -->
+<!-- TOAST NOTIFICATION -->
+<div id="toastPremium" class="toast-premium"></div>
+
+<!-- LOADING OVERLAY -->
+<div id="loadingOverlay" class="loading-overlay">
+    <div class="loading-content">
+        <div class="loading-spinner" style="margin: 0 auto 15px;"></div>
+        <p style="color: var(--dark); font-weight: 600;">Memproses...</p>
+    </div>
+</div>
+
+<!-- OPTIMIZED SPLASH SCREEN -->
 <div id="splashScreen">
-    <div class="splash-logo">🏫</div>
-    <div class="splash-title">SekolahKu</div>
-    <div class="splash-subtitle">Sistem Manajemen Sekolah</div>
-    <div class="loading-spinner"></div>
-    <div class="loading-text" id="loadingText">Memuat aplikasi...</div>
+    <div class="splash-content">
+        <div class="splash-logo">🏫</div>
+        <div class="splash-title">SekolahKu</div>
+        <div class="splash-subtitle">Sistem Manajemen Sekolah</div>
+        <div class="loading-container">
+            <div class="loading-spinner"></div>
+            <div class="loading-text" id="loadingText">Memuat aplikasi...</div>
+            <div class="loading-progress">
+                <div class="loading-bar" id="loadingBar"></div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- LOGIN PAGE -->
-<div id="login-page" style="display: none;">
+<div id="login-page">
     <div class="login-card">
         <div class="login-logo">🏫</div>
         <div class="login-title">SekolahKu</div>
@@ -489,23 +824,28 @@
         
         <form onsubmit="event.preventDefault(); doLogin();">
             <div class="form-group">
-                <label class="form-label">Username</label>
+                <label class="form-label">👤 Username</label>
                 <input type="text" id="login-username" class="form-input" placeholder="Masukkan username" required autocomplete="username">
             </div>
             
             <div class="form-group">
-                <label class="form-label">Password</label>
+                <label class="form-label">🔒 Password</label>
                 <input type="password" id="login-password" class="form-input" placeholder="Masukkan password" required autocomplete="current-password">
             </div>
             
-            <button type="submit" class="btn-login">🔐 Login</button>
+            <button type="submit" class="btn-login">
+                <i class="fas fa-sign-in-alt"></i>
+                <span>Login Sekarang</span>
+            </button>
         </form>
         
         <div class="login-help">
-            <strong>🔑 Akun Demo:</strong>
-            Admin: admin / 1234<br>
-            Guru: guru / 1234<br>
-            Siswa: siswa / 1234
+            <strong>🔑 Akun Demo untuk Testing:</strong>
+            <div style="margin-top: 8px;">
+                <div><code style="background: white; padding: 2px 8px; border-radius: 4px; font-size: 12px;">admin / 1234</code> - Administrator</div>
+                <div style="margin-top: 4px;"><code style="background: white; padding: 2px 8px; border-radius: 4px; font-size: 12px;">guru / 1234</code> - Guru/Pengajar</div>
+                <div style="margin-top: 4px;"><code style="background: white; padding: 2px 8px; border-radius: 4px; font-size: 12px;">siswa / 1234</code> - Siswa</div>
+            </div>
         </div>
     </div>
 </div>
@@ -513,75 +853,83 @@
 <!-- MAIN APP -->
 <div id="main-app">
     <!-- HEADER -->
-    <div class="header">
+    <div class="header-premium">
         <div class="header-top">
-            <div>
-                <div class="header-title">SekolahKu</div>
-                <div class="header-user" id="userName">User</div>
+            <div style="display: flex; align-items: center;">
+                <div class="header-logo">🏫</div>
+                <div class="header-info">
+                    <div class="header-title">SekolahKu</div>
+                    <div class="header-subtitle" id="userName">User</div>
+                </div>
             </div>
-            <div style="text-align: right;">
-                <div class="header-date" id="homeDate">-</div>
+            <div class="header-actions">
+                <button class="header-btn" onclick="toggleDarkMode()" title="Dark Mode">
+                    <i class="fas fa-moon" id="darkModeIcon"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Stats Row -->
+        <div class="stats-row">
+            <div class="stat-mini-card">
+                <div class="stat-icon">👥</div>
+                <div class="stat-value" id="statSiswa">0</div>
+                <div class="stat-label">Total Siswa</div>
+            </div>
+            <div class="stat-mini-card">
+                <div class="stat-icon">👨‍🏫</div>
+                <div class="stat-value" id="statGuru">0</div>
+                <div class="stat-label">Total Guru</div>
+            </div>
+            <div class="stat-mini-card">
+                <div class="stat-icon">🏛️</div>
+                <div class="stat-value" id="statKelas">0</div>
+                <div class="stat-label">Total Kelas</div>
+            </div>
+            <div class="stat-mini-card">
+                <div class="stat-icon">📚</div>
+                <div class="stat-value" id="statMapel">0</div>
+                <div class="stat-label">Mata Pelajaran</div>
             </div>
         </div>
     </div>
     
     <!-- HOME PAGE -->
     <div id="homePage" class="page active">
-        <div class="page-title">Dashboard</div>
-        
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-value" id="statSiswa">0</div>
-                <div class="stat-label">👥 Total Siswa</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="statGuru">0</div>
-                <div class="stat-label">👨‍🏫 Total Guru</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="statKelas">0</div>
-                <div class="stat-label">🏛️ Total Kelas</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="statMapel">0</div>
-                <div class="stat-label">📚 Mata Pelajaran</div>
-            </div>
-        </div>
-        
-        <div class="menu-grid">
-            <div class="menu-item" onclick="showPage('siswaPage')">
+        <div class="menu-grid-premium">
+            <div class="menu-card-premium" onclick="showPagePremium('siswaPage')">
                 <div class="menu-icon">👥</div>
                 <div class="menu-label">Data Siswa</div>
             </div>
-            <div class="menu-item" onclick="showPage('guruPage')">
+            <div class="menu-card-premium" onclick="showPagePremium('guruPage')">
                 <div class="menu-icon">👨‍🏫</div>
                 <div class="menu-label">Data Guru</div>
             </div>
-            <div class="menu-item" onclick="showPage('kelasPage')">
+            <div class="menu-card-premium" onclick="showPagePremium('kelasPage')">
                 <div class="menu-icon">🏛️</div>
                 <div class="menu-label">Data Kelas</div>
             </div>
-            <div class="menu-item" onclick="showPage('mapelPage')">
+            <div class="menu-card-premium" onclick="showPagePremium('mapelPage')">
                 <div class="menu-icon">📚</div>
                 <div class="menu-label">Mapel</div>
             </div>
-            <div class="menu-item" onclick="showPage('absensiPage')">
+            <div class="menu-card-premium" onclick="showPagePremium('absensiPage')">
                 <div class="menu-icon">✅</div>
                 <div class="menu-label">Absensi</div>
             </div>
-            <div class="menu-item" onclick="showPage('nilaiPage')">
+            <div class="menu-card-premium" onclick="showPagePremium('nilaiPage')">
                 <div class="menu-icon">📊</div>
                 <div class="menu-label">Nilai</div>
             </div>
-            <div class="menu-item" onclick="showPage('jadwalPage')">
+            <div class="menu-card-premium" onclick="showPagePremium('jadwalPage')">
                 <div class="menu-icon">📅</div>
                 <div class="menu-label">Jadwal</div>
             </div>
-            <div class="menu-item" onclick="showPage('pembayaranPage')">
+            <div class="menu-card-premium" onclick="showPagePremium('pembayaranPage')">
                 <div class="menu-icon">💰</div>
                 <div class="menu-label">Pembayaran</div>
             </div>
-            <div class="menu-item" onclick="showPage('laporanPage')">
+            <div class="menu-card-premium" onclick="showPagePremium('laporanPage')">
                 <div class="menu-icon">📑</div>
                 <div class="menu-label">Laporan</div>
             </div>
@@ -590,239 +938,591 @@
     
     <!-- SISWA PAGE -->
     <div id="siswaPage" class="page">
-        <div class="page-title">📋 Data Siswa</div>
-        <div class="card">
-            <div class="card-title">Daftar Siswa</div>
-            <div class="card-content">
-                Fitur manajemen data siswa akan ditampilkan di sini.
+        <div class="card-premium">
+            <div class="card-title">📋 Data Siswa</div>
+            
+            <div class="row">
+                <div>
+                    <label>Nama Lengkap</label>
+                    <input type="text" id="siswaNama" placeholder="Nama siswa">
+                </div>
             </div>
-            <button class="btn btn-primary mt-20" onclick="alert('Tambah siswa baru')">➕ Tambah Siswa</button>
+            
+            <div class="row">
+                <div>
+                    <label>NIS</label>
+                    <input type="text" id="siswaNIS" placeholder="Nomor Induk">
+                </div>
+                <div>
+                    <label>Kelas</label>
+                    <select id="siswaKelas">
+                        <option value="">Pilih Kelas</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div>
+                    <label>Jenis Kelamin</label>
+                    <select id="siswaJK">
+                        <option value="L">Laki-laki</option>
+                        <option value="P">Perempuan</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Tanggal Lahir</label>
+                    <input type="date" id="siswaTglLahir">
+                </div>
+            </div>
+            
+            <button class="btn btn-primary" onclick="tambahSiswa()">
+                <i class="fas fa-plus"></i> Tambah Siswa
+            </button>
+        </div>
+        
+        <div class="card-premium">
+            <div class="card-title">Daftar Siswa</div>
+            <div id="siswaList" class="data-list"></div>
         </div>
     </div>
     
     <!-- GURU PAGE -->
     <div id="guruPage" class="page">
-        <div class="page-title">👨‍🏫 Data Guru</div>
-        <div class="card">
-            <div class="card-title">Daftar Guru</div>
-            <div class="card-content">
-                Fitur manajemen data guru akan ditampilkan di sini.
+        <div class="card-premium">
+            <div class="card-title">👨‍🏫 Data Guru</div>
+            
+            <div class="row">
+                <div>
+                    <label>Nama Lengkap</label>
+                    <input type="text" id="guruNama" placeholder="Nama guru">
+                </div>
             </div>
-            <button class="btn btn-primary mt-20" onclick="alert('Tambah guru baru')">➕ Tambah Guru</button>
+            
+            <div class="row">
+                <div>
+                    <label>NIP</label>
+                    <input type="text" id="guruNIP" placeholder="Nomor Induk Pegawai">
+                </div>
+                <div>
+                    <label>Mata Pelajaran</label>
+                    <input type="text" id="guruMapel" placeholder="Bidang studi">
+                </div>
+            </div>
+            
+            <div class="row">
+                <div>
+                    <label>No. Telp</label>
+                    <input type="tel" id="guruTelp" placeholder="08xx">
+                </div>
+            </div>
+            
+            <button class="btn btn-primary" onclick="tambahGuru()">
+                <i class="fas fa-plus"></i> Tambah Guru
+            </button>
+        </div>
+        
+        <div class="card-premium">
+            <div class="card-title">Daftar Guru</div>
+            <div id="guruList" class="data-list"></div>
         </div>
     </div>
     
     <!-- KELAS PAGE -->
     <div id="kelasPage" class="page">
-        <div class="page-title">🏛️ Data Kelas</div>
-        <div class="card">
-            <div class="card-title">Daftar Kelas</div>
-            <div class="card-content">
-                Fitur manajemen data kelas akan ditampilkan di sini.
+        <div class="card-premium">
+            <div class="card-title">🏛️ Data Kelas</div>
+            
+            <div class="row">
+                <div>
+                    <label>Nama Kelas</label>
+                    <input type="text" id="kelasNama" placeholder="Contoh: X IPA 1">
+                </div>
+                <div>
+                    <label>Tingkat</label>
+                    <select id="kelasTingkat">
+                        <option value="X">Kelas X</option>
+                        <option value="XI">Kelas XI</option>
+                        <option value="XII">Kelas XII</option>
+                    </select>
+                </div>
             </div>
-            <button class="btn btn-primary mt-20" onclick="alert('Tambah kelas baru')">➕ Tambah Kelas</button>
+            
+            <button class="btn btn-primary" onclick="tambahKelas()">
+                <i class="fas fa-plus"></i> Tambah Kelas
+            </button>
+        </div>
+        
+        <div class="card-premium">
+            <div class="card-title">Daftar Kelas</div>
+            <div id="kelasList" class="data-list"></div>
         </div>
     </div>
     
     <!-- MAPEL PAGE -->
     <div id="mapelPage" class="page">
-        <div class="page-title">📚 Mata Pelajaran</div>
-        <div class="card">
-            <div class="card-title">Daftar Mata Pelajaran</div>
-            <div class="card-content">
-                Fitur manajemen mata pelajaran akan ditampilkan di sini.
+        <div class="card-premium">
+            <div class="card-title">📚 Mata Pelajaran</div>
+            
+            <div class="row">
+                <div>
+                    <label>Nama Mata Pelajaran</label>
+                    <input type="text" id="mapelNama" placeholder="Contoh: Matematika">
+                </div>
             </div>
-            <button class="btn btn-primary mt-20" onclick="alert('Tambah mapel baru')">➕ Tambah Mapel</button>
+            
+            <div class="row">
+                <div>
+                    <label>Kode Mapel</label>
+                    <input type="text" id="mapelKode" placeholder="Contoh: MAT">
+                </div>
+                <div>
+                    <label>Jumlah SKS</label>
+                    <input type="number" id="mapelSKS" placeholder="2" value="2">
+                </div>
+            </div>
+            
+            <button class="btn btn-primary" onclick="tambahMapel()">
+                <i class="fas fa-plus"></i> Tambah Mapel
+            </button>
+        </div>
+        
+        <div class="card-premium">
+            <div class="card-title">Daftar Mata Pelajaran</div>
+            <div id="mapelList" class="data-list"></div>
         </div>
     </div>
     
     <!-- ABSENSI PAGE -->
     <div id="absensiPage" class="page">
-        <div class="page-title">✅ Absensi</div>
-        <div class="card">
-            <div class="card-title">Rekap Absensi</div>
-            <div class="card-content">
-                Fitur absensi siswa akan ditampilkan di sini.
+        <div class="card-premium">
+            <div class="card-title">✅ Absensi Siswa</div>
+            <p style="color: var(--gray); margin-bottom: 20px; font-size: 14px;">
+                Pilih kelas dan tanggal untuk input absensi
+            </p>
+            
+            <div class="row">
+                <div>
+                    <label>Pilih Kelas</label>
+                    <select id="absensiKelas">
+                        <option value="">Pilih Kelas</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Tanggal</label>
+                    <input type="date" id="absensiTanggal">
+                </div>
             </div>
-            <button class="btn btn-primary mt-20" onclick="alert('Input absensi')">➕ Input Absensi</button>
+            
+            <button class="btn btn-blue" onclick="loadAbsensiSiswa()">
+                <i class="fas fa-list"></i> Tampilkan Daftar Siswa
+            </button>
+        </div>
+        
+        <div class="card-premium" id="absensiContainer" style="display: none;">
+            <div class="card-title">Daftar Hadir</div>
+            <div id="absensiList" class="data-list"></div>
+            <button class="btn btn-primary" onclick="simpanAbsensi()" style="margin-top: 15px;">
+                <i class="fas fa-save"></i> Simpan Absensi
+            </button>
         </div>
     </div>
     
     <!-- NILAI PAGE -->
     <div id="nilaiPage" class="page">
-        <div class="page-title">📊 Nilai</div>
-        <div class="card">
-            <div class="card-title">Daftar Nilai</div>
-            <div class="card-content">
-                Fitur manajemen nilai siswa akan ditampilkan di sini.
+        <div class="card-premium">
+            <div class="card-title">📊 Input Nilai</div>
+            
+            <div class="row">
+                <div>
+                    <label>Pilih Siswa</label>
+                    <select id="nilaiSiswa">
+                        <option value="">Pilih Siswa</option>
+                    </select>
+                </div>
             </div>
-            <button class="btn btn-primary mt-20" onclick="alert('Input nilai')">➕ Input Nilai</button>
+            
+            <div class="row">
+                <div>
+                    <label>Mata Pelajaran</label>
+                    <select id="nilaiMapel">
+                        <option value="">Pilih Mapel</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Jenis Nilai</label>
+                    <select id="nilaiJenis">
+                        <option value="UH">Ulangan Harian</option>
+                        <option value="UTS">UTS</option>
+                        <option value="UAS">UAS</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div>
+                    <label>Nilai</label>
+                    <input type="number" id="nilaiAngka" placeholder="0-100" min="0" max="100">
+                </div>
+            </div>
+            
+            <button class="btn btn-primary" onclick="tambahNilai()">
+                <i class="fas fa-plus"></i> Tambah Nilai
+            </button>
+        </div>
+        
+        <div class="card-premium">
+            <div class="card-title">Daftar Nilai</div>
+            <div id="nilaiList" class="data-list"></div>
         </div>
     </div>
     
     <!-- JADWAL PAGE -->
     <div id="jadwalPage" class="page">
-        <div class="page-title">📅 Jadwal Pelajaran</div>
-        <div class="card">
-            <div class="card-title">Jadwal Mingguan</div>
-            <div class="card-content">
-                Fitur jadwal pelajaran akan ditampilkan di sini.
+        <div class="card-premium">
+            <div class="card-title">📅 Jadwal Pelajaran</div>
+            
+            <div class="row">
+                <div>
+                    <label>Kelas</label>
+                    <select id="jadwalKelas">
+                        <option value="">Pilih Kelas</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Hari</label>
+                    <select id="jadwalHari">
+                        <option value="Senin">Senin</option>
+                        <option value="Selasa">Selasa</option>
+                        <option value="Rabu">Rabu</option>
+                        <option value="Kamis">Kamis</option>
+                        <option value="Jumat">Jumat</option>
+                    </select>
+                </div>
             </div>
-            <button class="btn btn-primary mt-20" onclick="alert('Tambah jadwal')">➕ Tambah Jadwal</button>
+            
+            <div class="row">
+                <div>
+                    <label>Mata Pelajaran</label>
+                    <select id="jadwalMapel">
+                        <option value="">Pilih Mapel</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Guru</label>
+                    <select id="jadwalGuru">
+                        <option value="">Pilih Guru</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div>
+                    <label>Jam Mulai</label>
+                    <input type="time" id="jadwalJamMulai">
+                </div>
+                <div>
+                    <label>Jam Selesai</label>
+                    <input type="time" id="jadwalJamSelesai">
+                </div>
+            </div>
+            
+            <button class="btn btn-primary" onclick="tambahJadwal()">
+                <i class="fas fa-plus"></i> Tambah Jadwal
+            </button>
+        </div>
+        
+        <div class="card-premium">
+            <div class="card-title">Daftar Jadwal</div>
+            <div id="jadwalList" class="data-list"></div>
         </div>
     </div>
     
     <!-- PEMBAYARAN PAGE -->
     <div id="pembayaranPage" class="page">
-        <div class="page-title">💰 Pembayaran</div>
-        <div class="card">
-            <div class="card-title">Rekap Pembayaran</div>
-            <div class="card-content">
-                Fitur pembayaran SPP dan lainnya akan ditampilkan di sini.
+        <div class="card-premium">
+            <div class="card-title">💰 Pembayaran SPP</div>
+            
+            <div class="row">
+                <div>
+                    <label>Pilih Siswa</label>
+                    <select id="pembayaranSiswa">
+                        <option value="">Pilih Siswa</option>
+                    </select>
+                </div>
             </div>
-            <button class="btn btn-primary mt-20" onclick="alert('Input pembayaran')">➕ Input Pembayaran</button>
+            
+            <div class="row">
+                <div>
+                    <label>Bulan</label>
+                    <select id="pembayaranBulan">
+                        <option value="01">Januari</option>
+                        <option value="02">Februari</option>
+                        <option value="03">Maret</option>
+                        <option value="04">April</option>
+                        <option value="05">Mei</option>
+                        <option value="06">Juni</option>
+                        <option value="07">Juli</option>
+                        <option value="08">Agustus</option>
+                        <option value="09">September</option>
+                        <option value="10">Oktober</option>
+                        <option value="11">November</option>
+                        <option value="12">Desember</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Tahun</label>
+                    <input type="number" id="pembayaranTahun" value="2025">
+                </div>
+            </div>
+            
+            <div class="row">
+                <div>
+                    <label>Jumlah (Rp)</label>
+                    <input type="number" id="pembayaranJumlah" placeholder="500000">
+                </div>
+            </div>
+            
+            <button class="btn btn-primary" onclick="tambahPembayaran()">
+                <i class="fas fa-check"></i> Simpan Pembayaran
+            </button>
+        </div>
+        
+        <div class="card-premium">
+            <div class="card-title">Riwayat Pembayaran</div>
+            <div id="pembayaranList" class="data-list"></div>
         </div>
     </div>
     
     <!-- LAPORAN PAGE -->
     <div id="laporanPage" class="page">
-        <div class="page-title">📑 Laporan</div>
-        <div class="card">
-            <div class="card-title">Laporan Akademik</div>
-            <div class="card-content">
-                Fitur laporan dan rekap data akan ditampilkan di sini.
+        <div class="card-premium">
+            <div class="card-title">📑 Laporan & Rekap</div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px;">
+                <button class="btn btn-blue" onclick="showToast('Laporan Siswa')">
+                    <i class="fas fa-users"></i> Laporan Siswa
+                </button>
+                <button class="btn btn-orange" onclick="showToast('Laporan Absensi')">
+                    <i class="fas fa-calendar-check"></i> Laporan Absensi
+                </button>
+                <button class="btn btn-primary" onclick="showToast('Laporan Nilai')">
+                    <i class="fas fa-chart-bar"></i> Laporan Nilai
+                </button>
+                <button class="btn btn-danger" onclick="showToast('Laporan Pembayaran')">
+                    <i class="fas fa-money-bill"></i> Laporan Pembayaran
+                </button>
             </div>
-            <button class="btn btn-primary mt-20" onclick="alert('Generate laporan')">📄 Generate Laporan</button>
+        </div>
+        
+        <div class="card-premium">
+            <div class="card-title">Export Data</div>
+            <button class="btn btn-primary" onclick="exportAllData()">
+                <i class="fas fa-download"></i> Download Semua Data (JSON)
+            </button>
         </div>
     </div>
     
     <!-- PROFIL PAGE -->
     <div id="profilPage" class="page">
-        <div class="page-title">👤 Profil</div>
-        <div class="card">
-            <div class="card-title">Informasi Pengguna</div>
-            <div class="card-content">
-                <p><strong>Nama:</strong> <span id="profilNama">-</span></p>
-                <p><strong>Role:</strong> <span id="profilRole">-</span></p>
+        <div class="card-premium">
+            <div class="card-title">👤 Profil Pengguna</div>
+            
+            <div style="text-align: center; padding: 20px 0;">
+                <div style="font-size: 60px; margin-bottom: 15px;">👤</div>
+                <h3 style="font-size: 20px; font-weight: bold; margin-bottom: 5px;" id="profilNama">-</h3>
+                <p style="color: var(--gray); font-size: 14px;" id="profilRole">-</p>
             </div>
-            <button class="btn btn-logout" onclick="doLogout()">🚪 Logout</button>
+            
+            <div style="background: var(--gray-light); padding: 15px; border-radius: 12px; margin: 20px 0;">
+                <p style="font-size: 13px; color: var(--gray); margin-bottom: 8px;"><strong>Versi Aplikasi:</strong> 2.0 (Optimized)</p>
+                <p style="font-size: 13px; color: var(--gray);"><strong>Status:</strong> <span style="color: var(--green);">● Online</span></p>
+            </div>
+            
+            <button class="btn btn-danger" onclick="doLogout()">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+        
+        <div class="card-premium">
+            <div class="card-title">⚙️ Pengaturan</div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--gray-light);">
+                <span style="font-size: 14px; font-weight: 500;">Dark Mode</span>
+                <label style="position: relative; display: inline-block; width: 50px; height: 26px;">
+                    <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()" style="opacity: 0; width: 0; height: 0;">
+                    <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 26px;"></span>
+                    <span style="position: absolute; content: ''; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%;"></span>
+                </label>
+            </div>
+            
+            <button class="btn btn-orange" onclick="resetAllData()" style="margin-top: 20px;">
+                <i class="fas fa-trash"></i> Reset Semua Data
+            </button>
         </div>
     </div>
     
     <!-- BOTTOM NAVIGATION -->
-    <div class="bottom-nav">
-        <div class="nav-item active" onclick="showPage('homePage')">
-            <div class="nav-icon">🏠</div>
-            <div class="nav-label">Home</div>
+    <div class="bottom-nav-premium">
+        <div class="nav-item-premium active" onclick="showPagePremium('homePage')">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
         </div>
-        <div class="nav-item" onclick="showPage('siswaPage')">
-            <div class="nav-icon">👥</div>
-            <div class="nav-label">Siswa</div>
+        <div class="nav-item-premium" onclick="showPagePremium('siswaPage')">
+            <i class="fas fa-users"></i>
+            <span>Siswa</span>
         </div>
-        <div class="nav-item" onclick="showPage('laporanPage')">
-            <div class="nav-icon">📑</div>
-            <div class="nav-label">Laporan</div>
+        <div class="nav-item-premium" onclick="showPagePremium('laporanPage')">
+            <i class="fas fa-chart-line"></i>
+            <span>Laporan</span>
         </div>
-        <div class="nav-item" onclick="showPage('profilPage')">
-            <div class="nav-icon">👤</div>
-            <div class="nav-label">Profil</div>
+        <div class="nav-item-premium" onclick="showPagePremium('profilPage')">
+            <i class="fas fa-user"></i>
+            <span>Profil</span>
         </div>
     </div>
 </div>
 
 <script>
-// ==================== FIXED VERSION - ANTI STUCK ====================
-console.log('🚀 SekolahKu App Starting...');
+// ==================== OPTIMIZED VERSION 2.0 ====================
+// Anti-Stuck Protection & Performance Optimizations
+console.log('%c🚀 SekolahKu v2.0 Starting...', 'color: #0D5C4A; font-size: 16px; font-weight: bold;');
 
-// Global variables
+// Global Variables
 let currentUser = null;
-let loadTimeout = null;
+let loadProgress = 0;
+let initTimeout = null;
 
-// ==================== ERROR HANDLING ====================
-function showError(message) {
-    const errorDiv = document.getElementById('errorMessage');
-    errorDiv.textContent = '⚠️ ' + message;
-    errorDiv.classList.add('show');
-    setTimeout(() => {
-        errorDiv.classList.remove('show');
-    }, 5000);
-}
-
-window.onerror = function(msg, url, lineNo, columnNo, error) {
-    console.error('Error: ' + msg + '\nLine: ' + lineNo);
-    showError('Terjadi kesalahan. Silakan refresh halaman.');
-    return false;
-};
+// Data Arrays
+let siswaList = [];
+let guruList = [];
+let kelasList = [];
+let mapelList = [];
+let absensiList = [];
+let nilaiList = [];
+let jadwalList = [];
+let pembayaranList = [];
 
 // ==================== LOADING MANAGER ====================
-function updateLoadingText(text) {
-    const loadingText = document.getElementById('loadingText');
-    if (loadingText) {
-        loadingText.textContent = text;
+function updateLoadingProgress(percent, text) {
+    const bar = document.getElementById('loadingBar');
+    const textEl = document.getElementById('loadingText');
+    
+    if (bar) {
+        bar.style.width = percent + '%';
     }
+    
+    if (textEl && text) {
+        textEl.textContent = text;
+    }
+    
+    loadProgress = percent;
 }
 
 function hideSplashScreen() {
     const splash = document.getElementById('splashScreen');
     if (splash) {
-        splash.classList.add('hide');
+        updateLoadingProgress(100, 'Siap digunakan!');
         setTimeout(() => {
-            splash.style.display = 'none';
-        }, 500);
+            splash.classList.add('hide');
+            setTimeout(() => {
+                splash.style.display = 'none';
+            }, 400);
+        }, 300);
     }
 }
 
 function showLoginPage() {
-    updateLoadingText('Membuka halaman login...');
-    setTimeout(() => {
-        hideSplashScreen();
-        document.getElementById('login-page').style.display = 'flex';
-        console.log('✅ Login page ready');
-    }, 300);
+    hideSplashScreen();
+    const loginPage = document.getElementById('login-page');
+    if (loginPage) {
+        loginPage.style.display = 'flex';
+    }
+    console.log('✅ Login page ready');
 }
 
-// ==================== LIBRARY LOADING CHECK ====================
-function checkLibraries() {
-    updateLoadingText('Memeriksa library...');
-    
-    // Check if critical libraries loaded
-    let allLoaded = true;
-    
-    // If libraries fail, continue anyway (graceful degradation)
-    setTimeout(() => {
-        if (typeof L === 'undefined') {
-            console.warn('⚠️ Leaflet not loaded (maps disabled)');
-        }
-        console.log('✅ Library check complete');
-        showLoginPage();
-    }, 500);
+// ==================== ERROR HANDLING ====================
+function showError(message) {
+    const errorBanner = document.getElementById('errorBanner');
+    if (errorBanner) {
+        errorBanner.textContent = '⚠️ ' + message;
+        errorBanner.classList.add('show');
+        setTimeout(() => {
+            errorBanner.classList.remove('show');
+        }, 5000);
+    }
 }
 
-// ==================== INIT WITH TIMEOUT ====================
+window.onerror = function(msg, url, lineNo, columnNo, error) {
+    console.error('Error:', msg, 'Line:', lineNo);
+    showError('Terjadi kesalahan. Silakan refresh halaman.');
+    return false;
+};
+
+// ==================== DATA LOADING ====================
+function loadAllData() {
+    updateLoadingProgress(30, 'Memuat data siswa...');
+    
+    try {
+        siswaList = JSON.parse(localStorage.getItem('data_siswa') || '[]');
+        updateLoadingProgress(40, 'Memuat data guru...');
+        
+        guruList = JSON.parse(localStorage.getItem('data_guru') || '[]');
+        updateLoadingProgress(50, 'Memuat data kelas...');
+        
+        kelasList = JSON.parse(localStorage.getItem('data_kelas') || '[]');
+        updateLoadingProgress(60, 'Memuat data mapel...');
+        
+        mapelList = JSON.parse(localStorage.getItem('data_mapel') || '[]');
+        updateLoadingProgress(70, 'Memuat data absensi...');
+        
+        absensiList = JSON.parse(localStorage.getItem('data_absensi') || '[]');
+        updateLoadingProgress(80, 'Memuat data nilai...');
+        
+        nilaiList = JSON.parse(localStorage.getItem('data_nilai') || '[]');
+        updateLoadingProgress(85, 'Memuat jadwal...');
+        
+        jadwalList = JSON.parse(localStorage.getItem('data_jadwal') || '[]');
+        updateLoadingProgress(90, 'Memuat pembayaran...');
+        
+        pembayaranList = JSON.parse(localStorage.getItem('data_pembayaran') || '[]');
+        
+        console.log('✅ Data loaded successfully');
+        return true;
+    } catch (e) {
+        console.error('❌ Error loading data:', e);
+        showError('Gagal memuat data. Menggunakan data kosong.');
+        return false;
+    }
+}
+
+// ==================== INIT SEQUENCE ====================
 function initApp() {
     console.log('🔄 Initializing app...');
-    updateLoadingText('Memuat komponen...');
+    updateLoadingProgress(10, 'Memulai aplikasi...');
     
-    // Set timeout to prevent stuck
-    loadTimeout = setTimeout(() => {
+    // Set timeout to prevent infinite loading
+    initTimeout = setTimeout(() => {
         console.warn('⏱️ Init timeout - forcing login page');
         showLoginPage();
-    }, 3000);
+    }, 5000); // 5 second max
     
-    // Load localStorage data with error handling
-    try {
-        updateLoadingText('Memuat data lokal...');
-        // Simulate data loading
+    // Simulate initialization steps
+    setTimeout(() => {
+        updateLoadingProgress(20, 'Memeriksa sistem...');
+        
         setTimeout(() => {
-            clearTimeout(loadTimeout);
-            checkLibraries();
-        }, 800);
-    } catch (e) {
-        console.error('❌ LocalStorage error:', e);
-        clearTimeout(loadTimeout);
-        showError('Gagal memuat data. Menggunakan data default.');
-        checkLibraries();
-    }
+            const dataLoaded = loadAllData();
+            
+            if (dataLoaded) {
+                updateLoadingProgress(95, 'Hampir selesai...');
+            }
+            
+            setTimeout(() => {
+                clearTimeout(initTimeout);
+                showLoginPage();
+            }, 500);
+        }, 400);
+    }, 600);
 }
 
 // ==================== LOGIN ====================
@@ -835,17 +1535,20 @@ function doLogin() {
         return;
     }
     
-    // Simple authentication
-    if ((username === 'admin' && password === '1234') || 
-        (username === 'guru' && password === '1234') || 
-        (username === 'siswa' && password === '1234')) {
-        
+    // Validate credentials
+    const validCredentials = [
+        { user: 'admin', pass: '1234', role: 'admin', nama: 'Administrator' },
+        { user: 'guru', pass: '1234', role: 'guru', nama: 'Guru' },
+        { user: 'siswa', pass: '1234', role: 'siswa', nama: 'Siswa' }
+    ];
+    
+    const credential = validCredentials.find(c => c.user === username && c.pass === password);
+    
+    if (credential) {
         currentUser = {
-            role: username,
-            nama: username === 'admin' ? 'Administrator' : 
-                  username === 'guru' ? 'Guru' : 'Siswa'
+            role: credential.role,
+            nama: credential.nama
         };
-        
         showMainApp();
     } else {
         showError('Username atau password salah!');
@@ -861,15 +1564,22 @@ function showMainApp() {
     document.getElementById('profilNama').textContent = currentUser.nama;
     document.getElementById('profilRole').textContent = currentUser.role.toUpperCase();
     
-    // Update date
-    const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    document.getElementById('homeDate').textContent = new Date().toLocaleDateString('id-ID', dateOptions);
+    // Update dashboard stats
+    updateDashboardStats();
     
-    // Load dashboard stats
-    loadDashboardStats();
+    // Render all data
+    renderAllData();
     
-    console.log('✅ Main app loaded');
-    showError = null; // Clear error handler
+    // Check dark mode
+    const darkMode = localStorage.getItem('dark_mode') === 'true';
+    if (darkMode) {
+        document.body.classList.add('dark-mode');
+        const toggle = document.getElementById('darkModeToggle');
+        if (toggle) toggle.checked = true;
+    }
+    
+    showToast('Selamat datang, ' + currentUser.nama + '!');
+    console.log('✅ Main app loaded for:', currentUser.nama);
 }
 
 function doLogout() {
@@ -881,11 +1591,16 @@ function doLogout() {
         // Reset form
         document.getElementById('login-username').value = '';
         document.getElementById('login-password').value = '';
+        
+        // Reset to home page
+        showPagePremium('homePage');
+        
+        showToast('Berhasil logout');
     }
 }
 
 // ==================== PAGE NAVIGATION ====================
-function showPage(pageId) {
+function showPagePremium(pageId) {
     // Hide all pages
     document.querySelectorAll('.page').forEach(page => {
         page.classList.remove('active');
@@ -898,11 +1613,11 @@ function showPage(pageId) {
     }
     
     // Update nav active state
-    document.querySelectorAll('.nav-item').forEach(item => {
+    document.querySelectorAll('.nav-item-premium').forEach(item => {
         item.classList.remove('active');
     });
     
-    // Highlight active nav based on page
+    // Map page to nav index
     const navMap = {
         'homePage': 0,
         'siswaPage': 1,
@@ -919,58 +1634,812 @@ function showPage(pageId) {
     
     const navIndex = navMap[pageId];
     if (navIndex !== undefined) {
-        const navItems = document.querySelectorAll('.nav-item');
+        const navItems = document.querySelectorAll('.nav-item-premium');
         if (navItems[navIndex]) {
             navItems[navIndex].classList.add('active');
         }
     }
 }
 
-// ==================== DASHBOARD STATS ====================
-function loadDashboardStats() {
-    // Demo data - replace with actual localStorage data
-    try {
-        const dataSiswa = JSON.parse(localStorage.getItem('data_siswa') || '[]');
-        const dataGuru = JSON.parse(localStorage.getItem('data_guru') || '[]');
-        const dataKelas = JSON.parse(localStorage.getItem('data_kelas') || '[]');
-        const dataMapel = JSON.parse(localStorage.getItem('data_mapel') || '[]');
+// ==================== DASHBOARD ====================
+function updateDashboardStats() {
+    document.getElementById('statSiswa').textContent = siswaList.length;
+    document.getElementById('statGuru').textContent = guruList.length;
+    document.getElementById('statKelas').textContent = kelasList.length;
+    document.getElementById('statMapel').textContent = mapelList.length;
+}
+
+// ==================== DARK MODE ====================
+function toggleDarkMode() {
+    document.body.classList.toggle('dark-mode');
+    const isDark = document.body.classList.contains('dark-mode');
+    localStorage.setItem('dark_mode', isDark);
+    
+    const icon = document.getElementById('darkModeIcon');
+    if (icon) {
+        icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+    }
+}
+
+// ==================== TOAST NOTIFICATION ====================
+function showToast(message) {
+    const toast = document.getElementById('toastPremium');
+    if (toast) {
+        toast.textContent = message;
+        toast.classList.add('show');
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 3000);
+    }
+}
+
+// ==================== SISWA CRUD ====================
+function tambahSiswa() {
+    const nama = document.getElementById('siswaNama').value.trim();
+    const nis = document.getElementById('siswaNIS').value.trim();
+    const kelasId = document.getElementById('siswaKelas').value;
+    const jk = document.getElementById('siswaJK').value;
+    const tglLahir = document.getElementById('siswaTglLahir').value;
+    
+    if (!nama || !nis) {
+        showError('Nama dan NIS harus diisi!');
+        return;
+    }
+    
+    const newSiswa = {
+        id: Date.now(),
+        nama: nama,
+        nis: nis,
+        kelasId: parseInt(kelasId) || null,
+        jk: jk,
+        tglLahir: tglLahir
+    };
+    
+    siswaList.push(newSiswa);
+    localStorage.setItem('data_siswa', JSON.stringify(siswaList));
+    
+    // Clear form
+    document.getElementById('siswaNama').value = '';
+    document.getElementById('siswaNIS').value = '';
+    document.getElementById('siswaKelas').value = '';
+    document.getElementById('siswaTglLahir').value = '';
+    
+    renderSiswaList();
+    updateDashboardStats();
+    showToast('✅ Siswa berhasil ditambahkan');
+}
+
+function renderSiswaList() {
+    const container = document.getElementById('siswaList');
+    if (!container) return;
+    
+    if (siswaList.length === 0) {
+        container.innerHTML = '<div class="empty-data">Belum ada data siswa</div>';
+        return;
+    }
+    
+    let html = '';
+    siswaList.forEach(siswa => {
+        const kelas = kelasList.find(k => k.id == siswa.kelasId);
+        html += `
+            <div class="data-item">
+                <div class="data-item-info">
+                    <h4>${siswa.nama}</h4>
+                    <p>NIS: ${siswa.nis} | Kelas: ${kelas?.nama || '-'} | ${siswa.jk === 'L' ? 'Laki-laki' : 'Perempuan'}</p>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn-delete" onclick="hapusSiswa(${siswa.id})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+    
+    // Update dropdown di form nilai dan pembayaran
+    updateSiswaDropdowns();
+}
+
+function hapusSiswa(id) {
+    if (confirm('Yakin ingin menghapus siswa ini?')) {
+        siswaList = siswaList.filter(s => s.id != id);
+        localStorage.setItem('data_siswa', JSON.stringify(siswaList));
+        renderSiswaList();
+        updateDashboardStats();
+        showToast('Siswa dihapus');
+    }
+}
+
+function updateSiswaDropdowns() {
+    // Update dropdown di absensi
+    const absensiSelect = document.getElementById('absensiKelas');
+    const nilaiSelect = document.getElementById('nilaiSiswa');
+    const pembayaranSelect = document.getElementById('pembayaranSiswa');
+    
+    if (nilaiSelect) {
+        nilaiSelect.innerHTML = '<option value="">Pilih Siswa</option>';
+        siswaList.forEach(siswa => {
+            nilaiSelect.innerHTML += `<option value="${siswa.id}">${siswa.nama} (${siswa.nis})</option>`;
+        });
+    }
+    
+    if (pembayaranSelect) {
+        pembayaranSelect.innerHTML = '<option value="">Pilih Siswa</option>';
+        siswaList.forEach(siswa => {
+            pembayaranSelect.innerHTML += `<option value="${siswa.id}">${siswa.nama} (${siswa.nis})</option>`;
+        });
+    }
+}
+
+// ==================== GURU CRUD ====================
+function tambahGuru() {
+    const nama = document.getElementById('guruNama').value.trim();
+    const nip = document.getElementById('guruNIP').value.trim();
+    const mapel = document.getElementById('guruMapel').value.trim();
+    const telp = document.getElementById('guruTelp').value.trim();
+    
+    if (!nama || !nip) {
+        showError('Nama dan NIP harus diisi!');
+        return;
+    }
+    
+    const newGuru = {
+        id: Date.now(),
+        nama: nama,
+        nip: nip,
+        mapel: mapel,
+        telp: telp
+    };
+    
+    guruList.push(newGuru);
+    localStorage.setItem('data_guru', JSON.stringify(guruList));
+    
+    // Clear form
+    document.getElementById('guruNama').value = '';
+    document.getElementById('guruNIP').value = '';
+    document.getElementById('guruMapel').value = '';
+    document.getElementById('guruTelp').value = '';
+    
+    renderGuruList();
+    updateDashboardStats();
+    showToast('✅ Guru berhasil ditambahkan');
+}
+
+function renderGuruList() {
+    const container = document.getElementById('guruList');
+    if (!container) return;
+    
+    if (guruList.length === 0) {
+        container.innerHTML = '<div class="empty-data">Belum ada data guru</div>';
+        return;
+    }
+    
+    let html = '';
+    guruList.forEach(guru => {
+        html += `
+            <div class="data-item">
+                <div class="data-item-info">
+                    <h4>${guru.nama}</h4>
+                    <p>NIP: ${guru.nip} | Mapel: ${guru.mapel || '-'} | Telp: ${guru.telp || '-'}</p>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn-delete" onclick="hapusGuru(${guru.id})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+    updateGuruDropdowns();
+}
+
+function hapusGuru(id) {
+    if (confirm('Yakin ingin menghapus guru ini?')) {
+        guruList = guruList.filter(g => g.id != id);
+        localStorage.setItem('data_guru', JSON.stringify(guruList));
+        renderGuruList();
+        updateDashboardStats();
+        showToast('Guru dihapus');
+    }
+}
+
+function updateGuruDropdowns() {
+    const jadwalSelect = document.getElementById('jadwalGuru');
+    if (jadwalSelect) {
+        jadwalSelect.innerHTML = '<option value="">Pilih Guru</option>';
+        guruList.forEach(guru => {
+            jadwalSelect.innerHTML += `<option value="${guru.id}">${guru.nama}</option>`;
+        });
+    }
+}
+
+// ==================== KELAS CRUD ====================
+function tambahKelas() {
+    const nama = document.getElementById('kelasNama').value.trim();
+    const tingkat = document.getElementById('kelasTingkat').value;
+    
+    if (!nama) {
+        showError('Nama kelas harus diisi!');
+        return;
+    }
+    
+    const newKelas = {
+        id: Date.now(),
+        nama: nama,
+        tingkat: tingkat
+    };
+    
+    kelasList.push(newKelas);
+    localStorage.setItem('data_kelas', JSON.stringify(kelasList));
+    
+    // Clear form
+    document.getElementById('kelasNama').value = '';
+    
+    renderKelasList();
+    updateDashboardStats();
+    showToast('✅ Kelas berhasil ditambahkan');
+}
+
+function renderKelasList() {
+    const container = document.getElementById('kelasList');
+    if (!container) return;
+    
+    if (kelasList.length === 0) {
+        container.innerHTML = '<div class="empty-data">Belum ada data kelas</div>';
+        return;
+    }
+    
+    let html = '';
+    kelasList.forEach(kelas => {
+        const jumlahSiswa = siswaList.filter(s => s.kelasId == kelas.id).length;
+        html += `
+            <div class="data-item">
+                <div class="data-item-info">
+                    <h4>${kelas.nama}</h4>
+                    <p>Tingkat: ${kelas.tingkat} | Jumlah Siswa: ${jumlahSiswa}</p>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn-delete" onclick="hapusKelas(${kelas.id})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+    updateKelasDropdowns();
+}
+
+function hapusKelas(id) {
+    if (confirm('Yakin ingin menghapus kelas ini?')) {
+        kelasList = kelasList.filter(k => k.id != id);
+        localStorage.setItem('data_kelas', JSON.stringify(kelasList));
+        renderKelasList();
+        updateDashboardStats();
+        showToast('Kelas dihapus');
+    }
+}
+
+function updateKelasDropdowns() {
+    const siswaSelect = document.getElementById('siswaKelas');
+    const absensiSelect = document.getElementById('absensiKelas');
+    const jadwalSelect = document.getElementById('jadwalKelas');
+    
+    [siswaSelect, absensiSelect, jadwalSelect].forEach(select => {
+        if (select) {
+            const currentValue = select.value;
+            select.innerHTML = '<option value="">Pilih Kelas</option>';
+            kelasList.forEach(kelas => {
+                select.innerHTML += `<option value="${kelas.id}">${kelas.nama}</option>`;
+            });
+            select.value = currentValue;
+        }
+    });
+}
+
+// ==================== MAPEL CRUD ====================
+function tambahMapel() {
+    const nama = document.getElementById('mapelNama').value.trim();
+    const kode = document.getElementById('mapelKode').value.trim();
+    const sks = document.getElementById('mapelSKS').value;
+    
+    if (!nama || !kode) {
+        showError('Nama dan kode mapel harus diisi!');
+        return;
+    }
+    
+    const newMapel = {
+        id: Date.now(),
+        nama: nama,
+        kode: kode,
+        sks: parseInt(sks) || 2
+    };
+    
+    mapelList.push(newMapel);
+    localStorage.setItem('data_mapel', JSON.stringify(mapelList));
+    
+    // Clear form
+    document.getElementById('mapelNama').value = '';
+    document.getElementById('mapelKode').value = '';
+    document.getElementById('mapelSKS').value = '2';
+    
+    renderMapelList();
+    updateDashboardStats();
+    showToast('✅ Mata pelajaran berhasil ditambahkan');
+}
+
+function renderMapelList() {
+    const container = document.getElementById('mapelList');
+    if (!container) return;
+    
+    if (mapelList.length === 0) {
+        container.innerHTML = '<div class="empty-data">Belum ada data mata pelajaran</div>';
+        return;
+    }
+    
+    let html = '';
+    mapelList.forEach(mapel => {
+        html += `
+            <div class="data-item">
+                <div class="data-item-info">
+                    <h4>${mapel.nama}</h4>
+                    <p>Kode: ${mapel.kode} | SKS: ${mapel.sks}</p>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn-delete" onclick="hapusMapel(${mapel.id})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+    updateMapelDropdowns();
+}
+
+function hapusMapel(id) {
+    if (confirm('Yakin ingin menghapus mata pelajaran ini?')) {
+        mapelList = mapelList.filter(m => m.id != id);
+        localStorage.setItem('data_mapel', JSON.stringify(mapelList));
+        renderMapelList();
+        updateDashboardStats();
+        showToast('Mata pelajaran dihapus');
+    }
+}
+
+function updateMapelDropdowns() {
+    const nilaiSelect = document.getElementById('nilaiMapel');
+    const jadwalSelect = document.getElementById('jadwalMapel');
+    
+    [nilaiSelect, jadwalSelect].forEach(select => {
+        if (select) {
+            select.innerHTML = '<option value="">Pilih Mapel</option>';
+            mapelList.forEach(mapel => {
+                select.innerHTML += `<option value="${mapel.id}">${mapel.nama}</option>`;
+            });
+        }
+    });
+}
+
+// ==================== ABSENSI ====================
+let currentAbsensiData = [];
+
+function loadAbsensiSiswa() {
+    const kelasId = document.getElementById('absensiKelas').value;
+    const tanggal = document.getElementById('absensiTanggal').value;
+    
+    if (!kelasId || !tanggal) {
+        showError('Pilih kelas dan tanggal terlebih dahulu!');
+        return;
+    }
+    
+    const siswaKelas = siswaList.filter(s => s.kelasId == kelasId);
+    
+    if (siswaKelas.length === 0) {
+        showError('Tidak ada siswa di kelas ini!');
+        return;
+    }
+    
+    currentAbsensiData = siswaKelas.map(siswa => {
+        const existing = absensiList.find(a => 
+            a.siswaId == siswa.id && a.tanggal === tanggal
+        );
         
-        document.getElementById('statSiswa').textContent = dataSiswa.length || '0';
-        document.getElementById('statGuru').textContent = dataGuru.length || '0';
-        document.getElementById('statKelas').textContent = dataKelas.length || '0';
-        document.getElementById('statMapel').textContent = dataMapel.length || '0';
-    } catch (e) {
-        console.warn('Could not load stats:', e);
-        // Use default values
-        document.getElementById('statSiswa').textContent = '0';
-        document.getElementById('statGuru').textContent = '0';
-        document.getElementById('statKelas').textContent = '0';
-        document.getElementById('statMapel').textContent = '0';
+        return {
+            siswaId: siswa.id,
+            nama: siswa.nama,
+            status: existing ? existing.status : 'Hadir'
+        };
+    });
+    
+    renderAbsensiForm();
+    document.getElementById('absensiContainer').style.display = 'block';
+}
+
+function renderAbsensiForm() {
+    const container = document.getElementById('absensiList');
+    if (!container) return;
+    
+    let html = '';
+    currentAbsensiData.forEach((data, index) => {
+        html += `
+            <div class="data-item" style="flex-direction: column; align-items: flex-start;">
+                <div style="width: 100%; margin-bottom: 8px;">
+                    <h4>${data.nama}</h4>
+                </div>
+                <div style="width: 100%; display: flex; gap: 8px;">
+                    <button class="btn btn-small ${data.status === 'Hadir' ? 'btn-primary' : ''}" 
+                            onclick="setAbsensiStatus(${index}, 'Hadir')" style="flex: 1;">
+                        ✓ Hadir
+                    </button>
+                    <button class="btn btn-small ${data.status === 'Izin' ? 'btn-orange' : ''}" 
+                            onclick="setAbsensiStatus(${index}, 'Izin')" style="flex: 1;">
+                        📝 Izin
+                    </button>
+                    <button class="btn btn-small ${data.status === 'Sakit' ? 'btn-blue' : ''}" 
+                            onclick="setAbsensiStatus(${index}, 'Sakit')" style="flex: 1;">
+                        🏥 Sakit
+                    </button>
+                    <button class="btn btn-small ${data.status === 'Alpa' ? 'btn-danger' : ''}" 
+                            onclick="setAbsensiStatus(${index}, 'Alpa')" style="flex: 1;">
+                        ✗ Alpa
+                    </button>
+                </div>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+}
+
+function setAbsensiStatus(index, status) {
+    currentAbsensiData[index].status = status;
+    renderAbsensiForm();
+}
+
+function simpanAbsensi() {
+    const tanggal = document.getElementById('absensiTanggal').value;
+    const kelasId = document.getElementById('absensiKelas').value;
+    
+    if (!tanggal || !kelasId) {
+        showError('Data tidak lengkap!');
+        return;
+    }
+    
+    // Hapus absensi lama untuk tanggal dan kelas yang sama
+    absensiList = absensiList.filter(a => {
+        const siswa = siswaList.find(s => s.id == a.siswaId);
+        return !(a.tanggal === tanggal && siswa && siswa.kelasId == kelasId);
+    });
+    
+    // Tambah absensi baru
+    currentAbsensiData.forEach(data => {
+        absensiList.push({
+            id: Date.now() + Math.random(),
+            siswaId: data.siswaId,
+            tanggal: tanggal,
+            status: data.status
+        });
+    });
+    
+    localStorage.setItem('data_absensi', JSON.stringify(absensiList));
+    
+    showToast('✅ Absensi berhasil disimpan');
+    document.getElementById('absensiContainer').style.display = 'none';
+    currentAbsensiData = [];
+}
+
+// ==================== NILAI ====================
+function tambahNilai() {
+    const siswaId = document.getElementById('nilaiSiswa').value;
+    const mapelId = document.getElementById('nilaiMapel').value;
+    const jenis = document.getElementById('nilaiJenis').value;
+    const angka = document.getElementById('nilaiAngka').value;
+    
+    if (!siswaId || !mapelId || !angka) {
+        showError('Semua field harus diisi!');
+        return;
+    }
+    
+    const nilai = parseInt(angka);
+    if (nilai < 0 || nilai > 100) {
+        showError('Nilai harus antara 0-100!');
+        return;
+    }
+    
+    const newNilai = {
+        id: Date.now(),
+        siswaId: parseInt(siswaId),
+        mapelId: parseInt(mapelId),
+        jenis: jenis,
+        nilai: nilai,
+        tanggal: new Date().toISOString().split('T')[0]
+    };
+    
+    nilaiList.push(newNilai);
+    localStorage.setItem('data_nilai', JSON.stringify(nilaiList));
+    
+    // Clear form
+    document.getElementById('nilaiSiswa').value = '';
+    document.getElementById('nilaiMapel').value = '';
+    document.getElementById('nilaiAngka').value = '';
+    
+    renderNilaiList();
+    showToast('✅ Nilai berhasil ditambahkan');
+}
+
+function renderNilaiList() {
+    const container = document.getElementById('nilaiList');
+    if (!container) return;
+    
+    if (nilaiList.length === 0) {
+        container.innerHTML = '<div class="empty-data">Belum ada data nilai</div>';
+        return;
+    }
+    
+    let html = '';
+    nilaiList.forEach(nilai => {
+        const siswa = siswaList.find(s => s.id == nilai.siswaId);
+        const mapel = mapelList.find(m => m.id == nilai.mapelId);
+        html += `
+            <div class="data-item">
+                <div class="data-item-info">
+                    <h4>${siswa?.nama || '-'} - ${mapel?.nama || '-'}</h4>
+                    <p>${nilai.jenis}: ${nilai.nilai} | ${nilai.tanggal}</p>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn-delete" onclick="hapusNilai(${nilai.id})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+}
+
+function hapusNilai(id) {
+    if (confirm('Yakin ingin menghapus nilai ini?')) {
+        nilaiList = nilaiList.filter(n => n.id != id);
+        localStorage.setItem('data_nilai', JSON.stringify(nilaiList));
+        renderNilaiList();
+        showToast('Nilai dihapus');
+    }
+}
+
+// ==================== JADWAL ====================
+function tambahJadwal() {
+    const kelasId = document.getElementById('jadwalKelas').value;
+    const hari = document.getElementById('jadwalHari').value;
+    const mapelId = document.getElementById('jadwalMapel').value;
+    const guruId = document.getElementById('jadwalGuru').value;
+    const jamMulai = document.getElementById('jadwalJamMulai').value;
+    const jamSelesai = document.getElementById('jadwalJamSelesai').value;
+    
+    if (!kelasId || !mapelId || !guruId || !jamMulai || !jamSelesai) {
+        showError('Semua field harus diisi!');
+        return;
+    }
+    
+    const newJadwal = {
+        id: Date.now(),
+        kelasId: parseInt(kelasId),
+        hari: hari,
+        mapelId: parseInt(mapelId),
+        guruId: parseInt(guruId),
+        jamMulai: jamMulai,
+        jamSelesai: jamSelesai
+    };
+    
+    jadwalList.push(newJadwal);
+    localStorage.setItem('data_jadwal', JSON.stringify(jadwalList));
+    
+    // Clear form
+    document.getElementById('jadwalKelas').value = '';
+    document.getElementById('jadwalMapel').value = '';
+    document.getElementById('jadwalGuru').value = '';
+    document.getElementById('jadwalJamMulai').value = '';
+    document.getElementById('jadwalJamSelesai').value = '';
+    
+    renderJadwalList();
+    showToast('✅ Jadwal berhasil ditambahkan');
+}
+
+function renderJadwalList() {
+    const container = document.getElementById('jadwalList');
+    if (!container) return;
+    
+    if (jadwalList.length === 0) {
+        container.innerHTML = '<div class="empty-data">Belum ada jadwal</div>';
+        return;
+    }
+    
+    let html = '';
+    jadwalList.forEach(jadwal => {
+        const kelas = kelasList.find(k => k.id == jadwal.kelasId);
+        const mapel = mapelList.find(m => m.id == jadwal.mapelId);
+        const guru = guruList.find(g => g.id == jadwal.guruId);
+        html += `
+            <div class="data-item">
+                <div class="data-item-info">
+                    <h4>${jadwal.hari} | ${jadwal.jamMulai} - ${jadwal.jamSelesai}</h4>
+                    <p>${kelas?.nama || '-'} | ${mapel?.nama || '-'} | ${guru?.nama || '-'}</p>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn-delete" onclick="hapusJadwal(${jadwal.id})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+}
+
+function hapusJadwal(id) {
+    if (confirm('Yakin ingin menghapus jadwal ini?')) {
+        jadwalList = jadwalList.filter(j => j.id != id);
+        localStorage.setItem('data_jadwal', JSON.stringify(jadwalList));
+        renderJadwalList();
+        showToast('Jadwal dihapus');
+    }
+}
+
+// ==================== PEMBAYARAN ====================
+function tambahPembayaran() {
+    const siswaId = document.getElementById('pembayaranSiswa').value;
+    const bulan = document.getElementById('pembayaranBulan').value;
+    const tahun = document.getElementById('pembayaranTahun').value;
+    const jumlah = document.getElementById('pembayaranJumlah').value;
+    
+    if (!siswaId || !jumlah) {
+        showError('Semua field harus diisi!');
+        return;
+    }
+    
+    const newPembayaran = {
+        id: Date.now(),
+        siswaId: parseInt(siswaId),
+        bulan: bulan,
+        tahun: parseInt(tahun),
+        jumlah: parseInt(jumlah),
+        tanggal: new Date().toISOString().split('T')[0]
+    };
+    
+    pembayaranList.push(newPembayaran);
+    localStorage.setItem('data_pembayaran', JSON.stringify(pembayaranList));
+    
+    // Clear form
+    document.getElementById('pembayaranSiswa').value = '';
+    document.getElementById('pembayaranJumlah').value = '';
+    
+    renderPembayaranList();
+    showToast('✅ Pembayaran berhasil disimpan');
+}
+
+function renderPembayaranList() {
+    const container = document.getElementById('pembayaranList');
+    if (!container) return;
+    
+    if (pembayaranList.length === 0) {
+        container.innerHTML = '<div class="empty-data">Belum ada riwayat pembayaran</div>';
+        return;
+    }
+    
+    const bulanNama = ['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 
+                       'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+    
+    let html = '';
+    pembayaranList.forEach(bayar => {
+        const siswa = siswaList.find(s => s.id == bayar.siswaId);
+        html += `
+            <div class="data-item">
+                <div class="data-item-info">
+                    <h4>${siswa?.nama || '-'}</h4>
+                    <p>${bulanNama[parseInt(bayar.bulan)]} ${bayar.tahun} | Rp ${bayar.jumlah.toLocaleString('id-ID')}</p>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn-delete" onclick="hapusPembayaran(${bayar.id})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+}
+
+function hapusPembayaran(id) {
+    if (confirm('Yakin ingin menghapus pembayaran ini?')) {
+        pembayaranList = pembayaranList.filter(p => p.id != id);
+        localStorage.setItem('data_pembayaran', JSON.stringify(pembayaranList));
+        renderPembayaranList();
+        showToast('Pembayaran dihapus');
+    }
+}
+
+// ==================== EXPORT DATA ====================
+function exportAllData() {
+    const data = {
+        siswa: siswaList,
+        guru: guruList,
+        kelas: kelasList,
+        mapel: mapelList,
+        absensi: absensiList,
+        nilai: nilaiList,
+        jadwal: jadwalList,
+        pembayaran: pembayaranList,
+        exported_at: new Date().toISOString()
+    };
+    
+    const dataStr = JSON.stringify(data, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `sekolahku_data_${Date.now()}.json`;
+    link.click();
+    
+    URL.revokeObjectURL(url);
+    showToast('✅ Data berhasil diexport');
+}
+
+// ==================== RESET DATA ====================
+function resetAllData() {
+    if (confirm('⚠️ PERINGATAN!\n\nMenghapus SEMUA data tidak dapat dibatalkan!\n\nYakin ingin melanjutkan?')) {
+        if (confirm('Konfirmasi sekali lagi: Hapus semua data?')) {
+            localStorage.clear();
+            location.reload();
+        }
+    }
+}
+
+// ==================== RENDER ALL ====================
+function renderAllData() {
+    renderSiswaList();
+    renderGuruList();
+    renderKelasList();
+    renderMapelList();
+    renderNilaiList();
+    renderJadwalList();
+    renderPembayaranList();
+    
+    // Set tanggal hari ini untuk absensi
+    const today = new Date().toISOString().split('T')[0];
+    const absensiTanggal = document.getElementById('absensiTanggal');
+    if (absensiTanggal) {
+        absensiTanggal.value = today;
     }
 }
 
 // ==================== START APP ====================
-// Use DOMContentLoaded to ensure DOM is ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initApp);
 } else {
     initApp();
 }
 
-console.log('✅ Script loaded successfully');
-</script>
-
-<!-- Load external libraries with error handling -->
-<script>
+// ==================== LOAD EXTERNAL LIBRARIES ====================
 (function() {
-    // Leaflet with timeout
     const leafletScript = document.createElement('script');
     leafletScript.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-    leafletScript.onerror = () => console.warn('Leaflet failed to load');
     leafletScript.async = true;
+    leafletScript.onerror = () => console.warn('⚠️ Leaflet gagal dimuat (maps tidak tersedia)');
     document.head.appendChild(leafletScript);
 })();
+
+console.log('%c✅ SekolahKu v2.0 Initialized', 'color: #10B981; font-size: 14px; font-weight: bold;');
 </script>
 
 </body>
-                </html>
+    </html>
