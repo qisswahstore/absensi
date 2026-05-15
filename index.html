@@ -757,6 +757,49 @@
             }
         }
         
+        /* Print Styles */
+        @media print {
+            body {
+                background: white;
+            }
+            
+            .header-premium,
+            .bottom-nav-premium,
+            .menu-grid-premium,
+            #laporanFilter,
+            .btn,
+            button {
+                display: none !important;
+            }
+            
+            #laporanContainer {
+                display: block !important;
+            }
+            
+            .card-premium {
+                box-shadow: none;
+                border: 1px solid #ddd;
+                page-break-inside: avoid;
+            }
+            
+            table {
+                page-break-inside: auto;
+            }
+            
+            tr {
+                page-break-inside: avoid;
+                page-break-after: auto;
+            }
+            
+            thead {
+                display: table-header-group;
+            }
+            
+            tfoot {
+                display: table-footer-group;
+            }
+        }
+        
         /* Loading Overlay for Actions */
         .loading-overlay {
             position: fixed;
@@ -1324,18 +1367,36 @@
             <div class="card-title">📑 Laporan & Rekap</div>
             
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px;">
-                <button class="btn btn-blue" onclick="showToast('Laporan Siswa')">
+                <button class="btn btn-blue" onclick="tampilkanLaporanSiswa()">
                     <i class="fas fa-users"></i> Laporan Siswa
                 </button>
-                <button class="btn btn-orange" onclick="showToast('Laporan Absensi')">
+                <button class="btn btn-orange" onclick="tampilkanLaporanAbsensi()">
                     <i class="fas fa-calendar-check"></i> Laporan Absensi
                 </button>
-                <button class="btn btn-primary" onclick="showToast('Laporan Nilai')">
+                <button class="btn btn-primary" onclick="tampilkanLaporanNilai()">
                     <i class="fas fa-chart-bar"></i> Laporan Nilai
                 </button>
-                <button class="btn btn-danger" onclick="showToast('Laporan Pembayaran')">
+                <button class="btn btn-danger" onclick="tampilkanLaporanPembayaran()">
                     <i class="fas fa-money-bill"></i> Laporan Pembayaran
                 </button>
+            </div>
+        </div>
+        
+        <!-- Container untuk menampilkan laporan -->
+        <div id="laporanContainer" style="display: none;">
+            <div class="card-premium">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <div class="card-title" id="laporanTitle" style="margin-bottom: 0;">Laporan</div>
+                    <button class="btn btn-small btn-primary" onclick="printLaporan()">
+                        <i class="fas fa-print"></i> Print
+                    </button>
+                </div>
+                
+                <!-- Filter Section -->
+                <div id="laporanFilter" style="margin-bottom: 20px; padding: 15px; background: var(--gray-light); border-radius: 12px;"></div>
+                
+                <!-- Laporan Content -->
+                <div id="laporanContent"></div>
             </div>
         </div>
         
@@ -2596,6 +2657,516 @@ function handleImportFile(event) {
     reader.readAsText(file);
 }
 
+// ==================== LAPORAN FUNCTIONS ====================
+
+// 1. LAPORAN SISWA
+function tampilkanLaporanSiswa() {
+    const container = document.getElementById('laporanContainer');
+    const titleEl = document.getElementById('laporanTitle');
+    const filterEl = document.getElementById('laporanFilter');
+    const contentEl = document.getElementById('laporanContent');
+    
+    if (!container) return;
+    
+    titleEl.textContent = '👥 Laporan Data Siswa';
+    
+    // Filter
+    filterEl.innerHTML = `
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <select id="filterKelasLaporan" style="flex: 1; min-width: 150px;" onchange="tampilkanLaporanSiswa()">
+                <option value="">Semua Kelas</option>
+                ${kelasList.map(k => `<option value="${k.id}">${k.nama}</option>`).join('')}
+            </select>
+            <select id="filterJKLaporan" style="flex: 1; min-width: 150px;" onchange="tampilkanLaporanSiswa()">
+                <option value="">Semua Jenis Kelamin</option>
+                <option value="L">Laki-laki</option>
+                <option value="P">Perempuan</option>
+            </select>
+        </div>
+    `;
+    
+    // Get filter values
+    const filterKelas = document.getElementById('filterKelasLaporan')?.value || '';
+    const filterJK = document.getElementById('filterJKLaporan')?.value || '';
+    
+    // Filter data
+    let filteredSiswa = siswaList;
+    if (filterKelas) {
+        filteredSiswa = filteredSiswa.filter(s => s.kelasId == filterKelas);
+    }
+    if (filterJK) {
+        filteredSiswa = filteredSiswa.filter(s => s.jk === filterJK);
+    }
+    
+    // Generate content
+    let html = `
+        <div style="margin-bottom: 15px; padding: 10px; background: var(--blue); color: white; border-radius: 8px; text-align: center;">
+            <strong>Total: ${filteredSiswa.length} Siswa</strong>
+        </div>
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: var(--gray-light);">
+                    <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">No</th>
+                    <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">NIS</th>
+                    <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Nama</th>
+                    <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Kelas</th>
+                    <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">JK</th>
+                    <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Tgl Lahir</th>
+                    <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">No. WA</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+    
+    filteredSiswa.forEach((siswa, index) => {
+        const kelas = kelasList.find(k => k.id == siswa.kelasId);
+        html += `
+            <tr>
+                <td style="padding: 10px; border: 1px solid #ddd;">${index + 1}</td>
+                <td style="padding: 10px; border: 1px solid #ddd;">${siswa.nis}</td>
+                <td style="padding: 10px; border: 1px solid #ddd;"><strong>${siswa.nama}</strong></td>
+                <td style="padding: 10px; border: 1px solid #ddd;">${kelas?.nama || '-'}</td>
+                <td style="padding: 10px; border: 1px solid #ddd;">${siswa.jk === 'L' ? 'L' : 'P'}</td>
+                <td style="padding: 10px; border: 1px solid #ddd;">${siswa.tglLahir || '-'}</td>
+                <td style="padding: 10px; border: 1px solid #ddd;">${siswa.wa || '-'}</td>
+            </tr>
+        `;
+    });
+    
+    html += '</tbody></table>';
+    
+    if (filteredSiswa.length === 0) {
+        html = '<div class="empty-data">Tidak ada data siswa</div>';
+    }
+    
+    contentEl.innerHTML = html;
+    container.style.display = 'block';
+    
+    // Scroll to laporan
+    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// 2. LAPORAN ABSENSI
+function tampilkanLaporanAbsensi() {
+    const container = document.getElementById('laporanContainer');
+    const titleEl = document.getElementById('laporanTitle');
+    const filterEl = document.getElementById('laporanFilter');
+    const contentEl = document.getElementById('laporanContent');
+    
+    if (!container) return;
+    
+    titleEl.textContent = '✅ Laporan Absensi';
+    
+    // Filter
+    const today = new Date();
+    const currentMonth = String(today.getMonth() + 1).padStart(2, '0');
+    const currentYear = today.getFullYear();
+    
+    filterEl.innerHTML = `
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <select id="filterKelasAbsensi" style="flex: 1; min-width: 150px;">
+                <option value="">Pilih Kelas</option>
+                ${kelasList.map(k => `<option value="${k.id}">${k.nama}</option>`).join('')}
+            </select>
+            <select id="filterBulanAbsensi" style="flex: 1; min-width: 120px;">
+                <option value="01">Januari</option>
+                <option value="02">Februari</option>
+                <option value="03">Maret</option>
+                <option value="04">April</option>
+                <option value="05">Mei</option>
+                <option value="06">Juni</option>
+                <option value="07">Juli</option>
+                <option value="08">Agustus</option>
+                <option value="09">September</option>
+                <option value="10">Oktober</option>
+                <option value="11">November</option>
+                <option value="12">Desember</option>
+            </select>
+            <input type="number" id="filterTahunAbsensi" value="${currentYear}" style="flex: 0 0 100px;" min="2020" max="2030">
+            <button class="btn btn-small btn-primary" onclick="generateLaporanAbsensi()">
+                <i class="fas fa-search"></i> Tampilkan
+            </button>
+        </div>
+    `;
+    
+    // Set default bulan
+    const bulanSelect = document.getElementById('filterBulanAbsensi');
+    if (bulanSelect) bulanSelect.value = currentMonth;
+    
+    contentEl.innerHTML = '<div class="empty-data">Pilih kelas dan klik "Tampilkan" untuk melihat laporan</div>';
+    container.style.display = 'block';
+    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function generateLaporanAbsensi() {
+    const kelasId = document.getElementById('filterKelasAbsensi')?.value;
+    const bulan = document.getElementById('filterBulanAbsensi')?.value;
+    const tahun = document.getElementById('filterTahunAbsensi')?.value;
+    const contentEl = document.getElementById('laporanContent');
+    
+    if (!kelasId) {
+        showError('Pilih kelas terlebih dahulu!');
+        return;
+    }
+    
+    const kelas = kelasList.find(k => k.id == kelasId);
+    const siswaKelas = siswaList.filter(s => s.kelasId == kelasId);
+    
+    if (siswaKelas.length === 0) {
+        contentEl.innerHTML = '<div class="empty-data">Tidak ada siswa di kelas ini</div>';
+        return;
+    }
+    
+    const bulanNama = ['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 
+                       'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+    
+    let html = `
+        <div style="text-align: center; margin-bottom: 20px;">
+            <h3 style="margin-bottom: 5px;">Rekap Absensi ${kelas?.nama || '-'}</h3>
+            <p style="color: var(--gray);">Periode: ${bulanNama[parseInt(bulan)]} ${tahun}</p>
+        </div>
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+            <thead>
+                <tr style="background: var(--gray-light);">
+                    <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">No</th>
+                    <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">NIS</th>
+                    <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Nama</th>
+                    <th style="padding: 10px; text-align: center; border: 1px solid #ddd;">Hadir</th>
+                    <th style="padding: 10px; text-align: center; border: 1px solid #ddd;">Izin</th>
+                    <th style="padding: 10px; text-align: center; border: 1px solid #ddd;">Sakit</th>
+                    <th style="padding: 10px; text-align: center; border: 1px solid #ddd;">Alpa</th>
+                    <th style="padding: 10px; text-align: center; border: 1px solid #ddd;">%</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+    
+    siswaKelas.forEach((siswa, index) => {
+        // Hitung absensi siswa untuk bulan ini
+        const absensiSiswa = absensiList.filter(a => {
+            return a.siswaId == siswa.id && 
+                   a.tanggal && 
+                   a.tanggal.startsWith(`${tahun}-${bulan}`);
+        });
+        
+        const hadir = absensiSiswa.filter(a => a.status === 'Hadir').length;
+        const izin = absensiSiswa.filter(a => a.status === 'Izin').length;
+        const sakit = absensiSiswa.filter(a => a.status === 'Sakit').length;
+        const alpa = absensiSiswa.filter(a => a.status === 'Alpa').length;
+        const total = absensiSiswa.length;
+        const persentase = total > 0 ? Math.round((hadir / total) * 100) : 0;
+        
+        html += `
+            <tr>
+                <td style="padding: 8px; border: 1px solid #ddd;">${index + 1}</td>
+                <td style="padding: 8px; border: 1px solid #ddd;">${siswa.nis}</td>
+                <td style="padding: 8px; border: 1px solid #ddd;"><strong>${siswa.nama}</strong></td>
+                <td style="padding: 8px; text-align: center; border: 1px solid #ddd; background: rgba(16, 185, 129, 0.1);">${hadir}</td>
+                <td style="padding: 8px; text-align: center; border: 1px solid #ddd; background: rgba(245, 158, 11, 0.1);">${izin}</td>
+                <td style="padding: 8px; text-align: center; border: 1px solid #ddd; background: rgba(59, 130, 246, 0.1);">${sakit}</td>
+                <td style="padding: 8px; text-align: center; border: 1px solid #ddd; background: rgba(239, 68, 68, 0.1);">${alpa}</td>
+                <td style="padding: 8px; text-align: center; border: 1px solid #ddd; font-weight: bold;">${persentase}%</td>
+            </tr>
+        `;
+    });
+    
+    html += '</tbody></table>';
+    contentEl.innerHTML = html;
+}
+
+// 3. LAPORAN NILAI
+function tampilkanLaporanNilai() {
+    const container = document.getElementById('laporanContainer');
+    const titleEl = document.getElementById('laporanTitle');
+    const filterEl = document.getElementById('laporanFilter');
+    const contentEl = document.getElementById('laporanContent');
+    
+    if (!container) return;
+    
+    titleEl.textContent = '📊 Laporan Nilai';
+    
+    filterEl.innerHTML = `
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <select id="filterKelasNilai" style="flex: 1; min-width: 150px;">
+                <option value="">Pilih Kelas</option>
+                ${kelasList.map(k => `<option value="${k.id}">${k.nama}</option>`).join('')}
+            </select>
+            <select id="filterMapelNilai" style="flex: 1; min-width: 150px;">
+                <option value="">Semua Mapel</option>
+                ${mapelList.map(m => `<option value="${m.id}">${m.nama}</option>`).join('')}
+            </select>
+            <button class="btn btn-small btn-primary" onclick="generateLaporanNilai()">
+                <i class="fas fa-search"></i> Tampilkan
+            </button>
+        </div>
+    `;
+    
+    contentEl.innerHTML = '<div class="empty-data">Pilih kelas dan klik "Tampilkan" untuk melihat laporan</div>';
+    container.style.display = 'block';
+    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function generateLaporanNilai() {
+    const kelasId = document.getElementById('filterKelasNilai')?.value;
+    const mapelId = document.getElementById('filterMapelNilai')?.value;
+    const contentEl = document.getElementById('laporanContent');
+    
+    if (!kelasId) {
+        showError('Pilih kelas terlebih dahulu!');
+        return;
+    }
+    
+    const kelas = kelasList.find(k => k.id == kelasId);
+    const mapel = mapelId ? mapelList.find(m => m.id == mapelId) : null;
+    const siswaKelas = siswaList.filter(s => s.kelasId == kelasId);
+    
+    if (siswaKelas.length === 0) {
+        contentEl.innerHTML = '<div class="empty-data">Tidak ada siswa di kelas ini</div>';
+        return;
+    }
+    
+    let html = `
+        <div style="text-align: center; margin-bottom: 20px;">
+            <h3 style="margin-bottom: 5px;">Rekap Nilai ${kelas?.nama || '-'}</h3>
+            <p style="color: var(--gray);">${mapel ? 'Mata Pelajaran: ' + mapel.nama : 'Semua Mata Pelajaran'}</p>
+        </div>
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+            <thead>
+                <tr style="background: var(--gray-light);">
+                    <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">No</th>
+                    <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">NIS</th>
+                    <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Nama</th>
+                    ${!mapelId ? '<th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Mapel</th>' : ''}
+                    <th style="padding: 10px; text-align: center; border: 1px solid #ddd;">UH</th>
+                    <th style="padding: 10px; text-align: center; border: 1px solid #ddd;">UTS</th>
+                    <th style="padding: 10px; text-align: center; border: 1px solid #ddd;">UAS</th>
+                    <th style="padding: 10px; text-align: center; border: 1px solid #ddd;">Rata-rata</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+    
+    let totalRataRata = 0;
+    let countSiswa = 0;
+    
+    siswaKelas.forEach((siswa, index) => {
+        let nilaiSiswa = nilaiList.filter(n => n.siswaId == siswa.id);
+        if (mapelId) {
+            nilaiSiswa = nilaiSiswa.filter(n => n.mapelId == mapelId);
+        }
+        
+        if (mapelId) {
+            // Jika filter mapel, tampilkan per siswa
+            const uh = nilaiSiswa.filter(n => n.jenis === 'UH');
+            const uts = nilaiSiswa.find(n => n.jenis === 'UTS');
+            const uas = nilaiSiswa.find(n => n.jenis === 'UAS');
+            
+            const avgUH = uh.length > 0 ? Math.round(uh.reduce((sum, n) => sum + n.nilai, 0) / uh.length) : 0;
+            const nilaiUTS = uts ? uts.nilai : 0;
+            const nilaiUAS = uas ? uas.nilai : 0;
+            
+            const rataRata = Math.round((avgUH + nilaiUTS + nilaiUAS) / 3);
+            totalRataRata += rataRata;
+            countSiswa++;
+            
+            html += `
+                <tr>
+                    <td style="padding: 8px; border: 1px solid #ddd;">${index + 1}</td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">${siswa.nis}</td>
+                    <td style="padding: 8px; border: 1px solid #ddd;"><strong>${siswa.nama}</strong></td>
+                    <td style="padding: 8px; text-align: center; border: 1px solid #ddd;">${avgUH || '-'}</td>
+                    <td style="padding: 8px; text-align: center; border: 1px solid #ddd;">${nilaiUTS || '-'}</td>
+                    <td style="padding: 8px; text-align: center; border: 1px solid #ddd;">${nilaiUAS || '-'}</td>
+                    <td style="padding: 8px; text-align: center; border: 1px solid #ddd; font-weight: bold; background: rgba(59, 130, 246, 0.1);">${rataRata || '-'}</td>
+                </tr>
+            `;
+        } else {
+            // Jika semua mapel, group by mapel
+            const mapelSiswa = new Set(nilaiSiswa.map(n => n.mapelId));
+            mapelSiswa.forEach(mId => {
+                const mapelNama = mapelList.find(m => m.id == mId)?.nama || '-';
+                const nilaiMapel = nilaiSiswa.filter(n => n.mapelId == mId);
+                
+                const uh = nilaiMapel.filter(n => n.jenis === 'UH');
+                const uts = nilaiMapel.find(n => n.jenis === 'UTS');
+                const uas = nilaiMapel.find(n => n.jenis === 'UAS');
+                
+                const avgUH = uh.length > 0 ? Math.round(uh.reduce((sum, n) => sum + n.nilai, 0) / uh.length) : 0;
+                const nilaiUTS = uts ? uts.nilai : 0;
+                const nilaiUAS = uas ? uas.nilai : 0;
+                
+                const rataRata = Math.round((avgUH + nilaiUTS + nilaiUAS) / 3);
+                
+                html += `
+                    <tr>
+                        <td style="padding: 8px; border: 1px solid #ddd;">${index + 1}</td>
+                        <td style="padding: 8px; border: 1px solid #ddd;">${siswa.nis}</td>
+                        <td style="padding: 8px; border: 1px solid #ddd;"><strong>${siswa.nama}</strong></td>
+                        <td style="padding: 8px; border: 1px solid #ddd;">${mapelNama}</td>
+                        <td style="padding: 8px; text-align: center; border: 1px solid #ddd;">${avgUH || '-'}</td>
+                        <td style="padding: 8px; text-align: center; border: 1px solid #ddd;">${nilaiUTS || '-'}</td>
+                        <td style="padding: 8px; text-align: center; border: 1px solid #ddd;">${nilaiUAS || '-'}</td>
+                        <td style="padding: 8px; text-align: center; border: 1px solid #ddd; font-weight: bold;">${rataRata || '-'}</td>
+                    </tr>
+                `;
+            });
+        }
+    });
+    
+    html += '</tbody>';
+    
+    if (mapelId && countSiswa > 0) {
+        const avgKelas = Math.round(totalRataRata / countSiswa);
+        html += `
+            <tfoot>
+                <tr style="background: var(--primary); color: white; font-weight: bold;">
+                    <td colspan="${!mapelId ? '6' : '6'}" style="padding: 10px; text-align: right; border: 1px solid #ddd;">Rata-rata Kelas:</td>
+                    <td style="padding: 10px; text-align: center; border: 1px solid #ddd;">${avgKelas}</td>
+                </tr>
+            </tfoot>
+        `;
+    }
+    
+    html += '</table>';
+    
+    if (siswaKelas.length === 0 || nilaiList.length === 0) {
+        html = '<div class="empty-data">Belum ada data nilai</div>';
+    }
+    
+    contentEl.innerHTML = html;
+}
+
+// 4. LAPORAN PEMBAYARAN
+function tampilkanLaporanPembayaran() {
+    const container = document.getElementById('laporanContainer');
+    const titleEl = document.getElementById('laporanTitle');
+    const filterEl = document.getElementById('laporanFilter');
+    const contentEl = document.getElementById('laporanContent');
+    
+    if (!container) return;
+    
+    titleEl.textContent = '💰 Laporan Pembayaran SPP';
+    
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    
+    filterEl.innerHTML = `
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <select id="filterKelasPembayaran" style="flex: 1; min-width: 150px;">
+                <option value="">Pilih Kelas</option>
+                ${kelasList.map(k => `<option value="${k.id}">${k.nama}</option>`).join('')}
+            </select>
+            <input type="number" id="filterTahunPembayaran" value="${currentYear}" style="flex: 0 0 100px;" min="2020" max="2030">
+            <button class="btn btn-small btn-primary" onclick="generateLaporanPembayaran()">
+                <i class="fas fa-search"></i> Tampilkan
+            </button>
+        </div>
+    `;
+    
+    contentEl.innerHTML = '<div class="empty-data">Pilih kelas dan klik "Tampilkan" untuk melihat laporan</div>';
+    container.style.display = 'block';
+    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function generateLaporanPembayaran() {
+    const kelasId = document.getElementById('filterKelasPembayaran')?.value;
+    const tahun = document.getElementById('filterTahunPembayaran')?.value;
+    const contentEl = document.getElementById('laporanContent');
+    
+    if (!kelasId) {
+        showError('Pilih kelas terlebih dahulu!');
+        return;
+    }
+    
+    const kelas = kelasList.find(k => k.id == kelasId);
+    const siswaKelas = siswaList.filter(s => s.kelasId == kelasId);
+    
+    if (siswaKelas.length === 0) {
+        contentEl.innerHTML = '<div class="empty-data">Tidak ada siswa di kelas ini</div>';
+        return;
+    }
+    
+    const bulanNama = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
+    
+    let html = `
+        <div style="text-align: center; margin-bottom: 20px;">
+            <h3 style="margin-bottom: 5px;">Rekap Pembayaran SPP ${kelas?.nama || '-'}</h3>
+            <p style="color: var(--gray);">Tahun: ${tahun}</p>
+        </div>
+        <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+            <thead>
+                <tr style="background: var(--gray-light);">
+                    <th style="padding: 8px; border: 1px solid #ddd; position: sticky; left: 0; background: var(--gray-light);">No</th>
+                    <th style="padding: 8px; border: 1px solid #ddd; position: sticky; left: 30px; background: var(--gray-light);">Nama</th>
+                    ${bulanNama.map(b => `<th style="padding: 8px; text-align: center; border: 1px solid #ddd;">${b}</th>`).join('')}
+                    <th style="padding: 8px; text-align: center; border: 1px solid #ddd; background: var(--primary); color: white;">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+    
+    let totalPembayaran = 0;
+    
+    siswaKelas.forEach((siswa, index) => {
+        let totalSiswa = 0;
+        html += `
+            <tr>
+                <td style="padding: 8px; border: 1px solid #ddd; position: sticky; left: 0; background: white;">${index + 1}</td>
+                <td style="padding: 8px; border: 1px solid #ddd; position: sticky; left: 30px; background: white;"><strong>${siswa.nama}</strong></td>
+        `;
+        
+        for (let m = 1; m <= 12; m++) {
+            const bulan = String(m).padStart(2, '0');
+            const bayar = pembayaranList.find(p => 
+                p.siswaId == siswa.id && 
+                p.bulan === bulan && 
+                p.tahun == tahun
+            );
+            
+            if (bayar) {
+                html += `<td style="padding: 8px; text-align: center; border: 1px solid #ddd; background: rgba(16, 185, 129, 0.2);">✓</td>`;
+                totalSiswa += bayar.jumlah;
+            } else {
+                html += `<td style="padding: 8px; text-align: center; border: 1px solid #ddd; background: rgba(239, 68, 68, 0.1);">✗</td>`;
+            }
+        }
+        
+        totalPembayaran += totalSiswa;
+        
+        html += `
+                <td style="padding: 8px; text-align: center; border: 1px solid #ddd; font-weight: bold; background: rgba(59, 130, 246, 0.1);">
+                    Rp ${totalSiswa.toLocaleString('id-ID')}
+                </td>
+            </tr>
+        `;
+    });
+    
+    html += `
+            </tbody>
+            <tfoot>
+                <tr style="background: var(--primary); color: white; font-weight: bold;">
+                    <td colspan="14" style="padding: 10px; text-align: right; border: 1px solid #ddd;">Total Pembayaran:</td>
+                    <td style="padding: 10px; text-align: center; border: 1px solid #ddd;">Rp ${totalPembayaran.toLocaleString('id-ID')}</td>
+                </tr>
+            </tfoot>
+        </table>
+        </div>
+        <div style="margin-top: 15px; padding: 12px; background: var(--gray-light); border-radius: 8px; font-size: 13px;">
+            <strong>Keterangan:</strong><br>
+            <span style="color: var(--green);">✓</span> = Lunas | 
+            <span style="color: var(--red);">✗</span> = Belum Bayar
+        </div>
+    `;
+    
+    contentEl.innerHTML = html;
+}
+
+// PRINT LAPORAN
+function printLaporan() {
+    window.print();
+}
+
 // ==================== RESET DATA ====================
 function resetAllData() {
     if (confirm('⚠️ PERINGATAN!\n\nMenghapus SEMUA data tidak dapat dibatalkan!\n\nYakin ingin melanjutkan?')) {
@@ -2645,4 +3216,3 @@ console.log('%c✅ SekolahKu v2.0 Initialized', 'color: #10B981; font-size: 14px
 
 </body>
 </html>
- 
