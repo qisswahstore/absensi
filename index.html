@@ -1340,10 +1340,24 @@
         </div>
         
         <div class="card-premium">
-            <div class="card-title">Export Data</div>
-            <button class="btn btn-primary" onclick="exportAllData()">
+            <div class="card-title">💾 Export & Import Data</div>
+            
+            <button class="btn btn-primary" onclick="exportAllData()" style="margin-bottom: 15px;">
                 <i class="fas fa-download"></i> Download Semua Data (JSON)
             </button>
+            
+            <div style="border-top: 2px solid var(--gray-light); padding-top: 15px; margin-top: 15px;">
+                <label style="display: block; margin-bottom: 10px; font-weight: 600; font-size: 14px;">
+                    <i class="fas fa-upload"></i> Import Data dari File JSON:
+                </label>
+                <input type="file" id="importFileInput" accept=".json" style="display: none;" onchange="handleImportFile(event)">
+                <button class="btn btn-blue" onclick="document.getElementById('importFileInput').click()">
+                    <i class="fas fa-upload"></i> Pilih File JSON untuk Import
+                </button>
+                <p style="font-size: 12px; color: var(--gray); margin-top: 10px;">
+                    ⚠️ Import akan <strong>mengganti semua data</strong> yang ada dengan data dari file
+                </p>
+            </div>
         </div>
     </div>
     
@@ -2484,6 +2498,104 @@ function exportAllData() {
     showToast('✅ Data berhasil diexport');
 }
 
+// ==================== IMPORT DATA ====================
+function handleImportFile(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    if (!file.name.endsWith('.json')) {
+        showError('File harus berformat JSON!');
+        return;
+    }
+    
+    const reader = new FileReader();
+    
+    reader.onload = function(e) {
+        try {
+            const importedData = JSON.parse(e.target.result);
+            
+            // Validasi struktur data
+            if (!importedData.siswa || !importedData.guru || !importedData.kelas) {
+                showError('Format file JSON tidak valid!');
+                return;
+            }
+            
+            // Konfirmasi import
+            if (!confirm('⚠️ PERINGATAN!\n\nImport akan mengganti SEMUA data yang ada.\nData lama akan hilang!\n\nLanjutkan import?')) {
+                // Reset file input
+                event.target.value = '';
+                return;
+            }
+            
+            // Show loading
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            if (loadingOverlay) loadingOverlay.classList.add('show');
+            
+            // Import data dengan delay untuk loading indicator
+            setTimeout(() => {
+                try {
+                    // Import semua data
+                    siswaList = importedData.siswa || [];
+                    guruList = importedData.guru || [];
+                    kelasList = importedData.kelas || [];
+                    mapelList = importedData.mapel || [];
+                    absensiList = importedData.absensi || [];
+                    nilaiList = importedData.nilai || [];
+                    jadwalList = importedData.jadwal || [];
+                    pembayaranList = importedData.pembayaran || [];
+                    
+                    // Simpan ke localStorage
+                    localStorage.setItem('data_siswa', JSON.stringify(siswaList));
+                    localStorage.setItem('data_guru', JSON.stringify(guruList));
+                    localStorage.setItem('data_kelas', JSON.stringify(kelasList));
+                    localStorage.setItem('data_mapel', JSON.stringify(mapelList));
+                    localStorage.setItem('data_absensi', JSON.stringify(absensiList));
+                    localStorage.setItem('data_nilai', JSON.stringify(nilaiList));
+                    localStorage.setItem('data_jadwal', JSON.stringify(jadwalList));
+                    localStorage.setItem('data_pembayaran', JSON.stringify(pembayaranList));
+                    
+                    // Update dashboard dan render semua
+                    updateDashboardStats();
+                    renderAllData();
+                    
+                    // Hide loading
+                    if (loadingOverlay) loadingOverlay.classList.remove('show');
+                    
+                    // Reset file input
+                    event.target.value = '';
+                    
+                    // Show success message
+                    showToast('✅ Data berhasil diimport! Total: ' + siswaList.length + ' siswa, ' + guruList.length + ' guru');
+                    
+                    console.log('✅ Import successful:', {
+                        siswa: siswaList.length,
+                        guru: guruList.length,
+                        kelas: kelasList.length,
+                        mapel: mapelList.length
+                    });
+                    
+                } catch (error) {
+                    console.error('Error saving imported data:', error);
+                    if (loadingOverlay) loadingOverlay.classList.remove('show');
+                    showError('Gagal menyimpan data import!');
+                }
+            }, 500);
+            
+        } catch (error) {
+            console.error('Error parsing JSON:', error);
+            showError('File JSON rusak atau tidak valid!');
+            event.target.value = '';
+        }
+    };
+    
+    reader.onerror = function() {
+        showError('Gagal membaca file!');
+        event.target.value = '';
+    };
+    
+    reader.readAsText(file);
+}
+
 // ==================== RESET DATA ====================
 function resetAllData() {
     if (confirm('⚠️ PERINGATAN!\n\nMenghapus SEMUA data tidak dapat dibatalkan!\n\nYakin ingin melanjutkan?')) {
@@ -2533,3 +2645,4 @@ console.log('%c✅ SekolahKu v2.0 Initialized', 'color: #10B981; font-size: 14px
 
 </body>
 </html>
+ 
