@@ -574,6 +574,32 @@
             border-radius: 10px;
         }
         
+        /* Button Template Kelas - Universal */
+        .btn-template {
+            padding: 10px 12px;
+            border: 2px solid #E2E8F0;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--dark);
+            font-family: inherit;
+        }
+        
+        .btn-template:hover {
+            border-color: var(--primary);
+            background: rgba(13, 92, 74, 0.05);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .btn-template:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
         /* Data List */
         .data-list {
             margin-top: 20px;
@@ -1107,26 +1133,115 @@
     <!-- KELAS PAGE -->
     <div id="kelasPage" class="page">
         <div class="card-premium">
-            <div class="card-title">🏛️ Data Kelas</div>
+            <div class="card-title">🏛️ Data Kelas (Universal)</div>
+            <p style="color: var(--gray); margin-bottom: 15px; font-size: 13px;">
+                ✨ Sistem untuk SD, SMP, SMA, Pesantren, Madin, dan semua jenis pendidikan
+            </p>
             
-            <div class="row">
-                <div>
-                    <label>Nama Kelas</label>
-                    <input type="text" id="kelasNama" placeholder="Contoh: X IPA 1">
-                </div>
-                <div>
-                    <label>Tingkat</label>
-                    <select id="kelasTingkat">
-                        <option value="X">Kelas X</option>
-                        <option value="XI">Kelas XI</option>
-                        <option value="XII">Kelas XII</option>
-                    </select>
+            <!-- TEMPLATE SD -->
+            <div style="border-bottom: 2px solid var(--gray-light); padding-bottom: 15px; margin-bottom: 15px;">
+                <label style="margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 18px;">🎒</span>
+                    <strong>SD (Sekolah Dasar)</strong>
+                </label>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('1A')">1A</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('1B')">1B</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('2A')">2A</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('2B')">2B</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('3A')">3A</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('3B')">3B</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('4A')">4A</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('5A')">5A</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('6A')">6A</button>
                 </div>
             </div>
             
-            <button class="btn btn-primary" onclick="tambahKelas()">
-                <i class="fas fa-plus"></i> Tambah Kelas
-            </button>
+            <!-- TEMPLATE SMP/MTs -->
+            <div style="border-bottom: 2px solid var(--gray-light); padding-bottom: 15px; margin-bottom: 15px;">
+                <label style="margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 18px;">📚</span>
+                    <strong>SMP/MTs</strong>
+                </label>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('7A')">7A</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('7 IPA')">7 IPA</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('7 IPS')">7 IPS</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('8A')">8A</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('8 IPA')">8 IPA</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('8 IPS')">8 IPS</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('9A')">9A</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('9 IPA')">9 IPA</button>
+                </div>
+            </div>
+            
+            <!-- TEMPLATE SMA/MA -->
+            <div style="border-bottom: 2px solid var(--gray-light); padding-bottom: 15px; margin-bottom: 15px;">
+                <label style="margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 18px;">🎓</span>
+                    <strong>SMA/MA</strong>
+                </label>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('X IPA 1')">X IPA 1</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('X IPA 2')">X IPA 2</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('X IPS 1')">X IPS 1</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('XI IPA 1')">XI IPA 1</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('XI IPA 2')">XI IPA 2</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('XI IPS 1')">XI IPS 1</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('XII IPA 1')">XII IPA 1</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('XII IPS 1')">XII IPS 1</button>
+                </div>
+            </div>
+            
+            <!-- TEMPLATE PESANTREN -->
+            <div style="border-bottom: 2px solid var(--gray-light); padding-bottom: 15px; margin-bottom: 15px;">
+                <label style="margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 18px;">🕌</span>
+                    <strong>Pesantren</strong>
+                </label>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('Ula 1')">Ula 1</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('Ula 2')">Ula 2</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('Ula 3')">Ula 3</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('Wustho 1')">Wustho 1</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('Wustho 2')">Wustho 2</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('Wustho 3')">Wustho 3</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('Ulya 1')">Ulya 1</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('Ulya 2')">Ulya 2</button>
+                </div>
+            </div>
+            
+            <!-- TEMPLATE MADIN -->
+            <div style="border-bottom: 2px solid var(--gray-light); padding-bottom: 15px; margin-bottom: 15px;">
+                <label style="margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 18px;">📖</span>
+                    <strong>Madin (Madrasah Diniyah)</strong>
+                </label>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('Awaliyah 1')">Awaliyah 1</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('Awaliyah 2')">Awaliyah 2</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('Awaliyah 3')">Awaliyah 3</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('Wustho Madin')">Wustho Madin</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('Ulya Madin')">Ulya Madin</button>
+                </div>
+            </div>
+            
+            <!-- INPUT MANUAL -->
+            <div style="background: var(--gray-light); padding: 15px; border-radius: 12px;">
+                <label style="margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 18px;">✍️</span>
+                    <strong>Input Manual (Kelas Khusus)</strong>
+                </label>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="kelasNamaManual" placeholder="Contoh: Tahfidz Intensif, Kelas Olimpiade, Grade 7, dll" style="flex: 1;">
+                    <button class="btn btn-primary" onclick="tambahKelasManual()" style="padding: 12px 20px;">
+                        <i class="fas fa-plus"></i> Tambah
+                    </button>
+                </div>
+                <p style="font-size: 12px; color: var(--gray); margin-top: 8px;">
+                    💡 Gunakan untuk kelas yang tidak ada di template (Tahfidz, Bilingual, Akselerasi, dll)
+                </p>
+            </div>
         </div>
         
         <div class="card-premium">
@@ -2031,31 +2146,57 @@ function updateGuruDropdowns() {
     }
 }
 
-// ==================== KELAS CRUD ====================
-function tambahKelas() {
-    const nama = document.getElementById('kelasNama').value.trim();
-    const tingkat = document.getElementById('kelasTingkat').value;
+// ==================== KELAS CRUD (UNIVERSAL - TANPA TINGKAT) ====================
+function tambahKelasQuick(namaKelas) {
+    // Cek apakah kelas sudah ada
+    const existing = kelasList.find(k => k.nama.toLowerCase() === namaKelas.toLowerCase());
+    if (existing) {
+        showError(`Kelas "${namaKelas}" sudah ada!`);
+        return;
+    }
+    
+    const newKelas = {
+        id: Date.now(),
+        nama: namaKelas
+    };
+    
+    kelasList.push(newKelas);
+    localStorage.setItem('data_kelas', JSON.stringify(kelasList));
+    
+    renderKelasList();
+    updateDashboardStats();
+    showToast(`✅ Kelas "${namaKelas}" ditambahkan`);
+}
+
+function tambahKelasManual() {
+    const nama = document.getElementById('kelasNamaManual').value.trim();
     
     if (!nama) {
         showError('Nama kelas harus diisi!');
         return;
     }
     
+    // Cek apakah kelas sudah ada
+    const existing = kelasList.find(k => k.nama.toLowerCase() === nama.toLowerCase());
+    if (existing) {
+        showError(`Kelas "${nama}" sudah ada!`);
+        return;
+    }
+    
     const newKelas = {
         id: Date.now(),
-        nama: nama,
-        tingkat: tingkat
+        nama: nama
     };
     
     kelasList.push(newKelas);
     localStorage.setItem('data_kelas', JSON.stringify(kelasList));
     
     // Clear form
-    document.getElementById('kelasNama').value = '';
+    document.getElementById('kelasNamaManual').value = '';
     
     renderKelasList();
     updateDashboardStats();
-    showToast('✅ Kelas berhasil ditambahkan');
+    showToast(`✅ Kelas "${nama}" ditambahkan`);
 }
 
 function renderKelasList() {
@@ -2074,7 +2215,7 @@ function renderKelasList() {
             <div class="data-item">
                 <div class="data-item-info">
                     <h4>${kelas.nama}</h4>
-                    <p>Tingkat: ${kelas.tingkat} | Jumlah Siswa: ${jumlahSiswa}</p>
+                    <p>Jumlah Siswa: ${jumlahSiswa} orang</p>
                 </div>
                 <div class="action-buttons">
                     <button class="btn-delete" onclick="hapusKelas(${kelas.id})">
