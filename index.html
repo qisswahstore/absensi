@@ -840,11 +840,15 @@
         </form>
         
         <div class="login-help">
-            <strong>🔑 Akun Demo untuk Testing:</strong>
-            <div style="margin-top: 8px;">
-                <div><code style="background: white; padding: 2px 8px; border-radius: 4px; font-size: 12px;">admin / 1234</code> - Administrator</div>
-                <div style="margin-top: 4px;"><code style="background: white; padding: 2px 8px; border-radius: 4px; font-size: 12px;">guru / 1234</code> - Guru/Pengajar</div>
-                <div style="margin-top: 4px;"><code style="background: white; padding: 2px 8px; border-radius: 4px; font-size: 12px;">siswa / 1234</code> - Siswa</div>
+            <strong>🔑 Akun Demo Administrator:</strong>
+            <div style="margin-top: 8px; margin-bottom: 15px;">
+                <div><code style="background: white; padding: 2px 8px; border-radius: 4px; font-size: 12px;">admin / 1234</code> - Administrator (Akses Penuh)</div>
+            </div>
+            
+            <strong>👥 Akun Guru & Siswa:</strong>
+            <div style="margin-top: 8px; font-size: 13px;">
+                • <strong>Guru:</strong> Dibuat otomatis saat input data guru<br>
+                • <strong>Siswa:</strong> Username = NIS, Password = 1234
             </div>
         </div>
     </div>
@@ -940,6 +944,9 @@
     <div id="siswaPage" class="page">
         <div class="card-premium">
             <div class="card-title">📋 Data Siswa</div>
+            <p style="color: var(--gray); margin-bottom: 15px; font-size: 13px;">
+                ℹ️ Username = NIS, Password otomatis = 1234
+            </p>
             
             <div class="row">
                 <div>
@@ -950,8 +957,8 @@
             
             <div class="row">
                 <div>
-                    <label>NIS</label>
-                    <input type="text" id="siswaNIS" placeholder="Nomor Induk">
+                    <label>NIS (jadi Username)</label>
+                    <input type="text" id="siswaNIS" placeholder="Nomor Induk Siswa">
                 </div>
                 <div>
                     <label>Kelas</label>
@@ -972,6 +979,13 @@
                 <div>
                     <label>Tanggal Lahir</label>
                     <input type="date" id="siswaTglLahir">
+                </div>
+            </div>
+            
+            <div class="row">
+                <div>
+                    <label>No. WhatsApp</label>
+                    <input type="tel" id="siswaWA" placeholder="08xxxx">
                 </div>
             </div>
             
@@ -1011,8 +1025,19 @@
             
             <div class="row">
                 <div>
-                    <label>No. Telp</label>
-                    <input type="tel" id="guruTelp" placeholder="08xx">
+                    <label>No. WhatsApp</label>
+                    <input type="tel" id="guruWA" placeholder="08xxxx">
+                </div>
+            </div>
+            
+            <div class="row">
+                <div>
+                    <label>Username Login</label>
+                    <input type="text" id="guruUsername" placeholder="Username untuk login">
+                </div>
+                <div>
+                    <label>Password Login</label>
+                    <input type="password" id="guruPassword" placeholder="Password">
                 </div>
             </div>
             
@@ -1535,24 +1560,51 @@ function doLogin() {
         return;
     }
     
-    // Validate credentials
+    // Cek akun demo default
     const validCredentials = [
-        { user: 'admin', pass: '1234', role: 'admin', nama: 'Administrator' },
-        { user: 'guru', pass: '1234', role: 'guru', nama: 'Guru' },
-        { user: 'siswa', pass: '1234', role: 'siswa', nama: 'Siswa' }
+        { user: 'admin', pass: '1234', role: 'admin', nama: 'Administrator' }
     ];
     
-    const credential = validCredentials.find(c => c.user === username && c.pass === password);
+    const demoCredential = validCredentials.find(c => c.user === username && c.pass === password);
     
-    if (credential) {
+    if (demoCredential) {
         currentUser = {
-            role: credential.role,
-            nama: credential.nama
+            role: demoCredential.role,
+            nama: demoCredential.nama,
+            id: null
         };
         showMainApp();
-    } else {
-        showError('Username atau password salah!');
+        return;
     }
+    
+    // Cek akun guru yang sudah dibuat
+    const guru = guruList.find(g => g.username === username && g.password === password);
+    if (guru) {
+        currentUser = {
+            role: 'guru',
+            nama: guru.nama,
+            id: guru.id,
+            data: guru
+        };
+        showMainApp();
+        return;
+    }
+    
+    // Cek akun siswa yang sudah dibuat
+    const siswa = siswaList.find(s => s.username === username && s.password === password);
+    if (siswa) {
+        currentUser = {
+            role: 'siswa',
+            nama: siswa.nama,
+            id: siswa.id,
+            data: siswa
+        };
+        showMainApp();
+        return;
+    }
+    
+    // Jika tidak ada yang cocok
+    showError('Username atau password salah!');
 }
 
 function showMainApp() {
@@ -1680,9 +1732,18 @@ function tambahSiswa() {
     const kelasId = document.getElementById('siswaKelas').value;
     const jk = document.getElementById('siswaJK').value;
     const tglLahir = document.getElementById('siswaTglLahir').value;
+    const wa = document.getElementById('siswaWA').value.trim();
     
     if (!nama || !nis) {
         showError('Nama dan NIS harus diisi!');
+        return;
+    }
+    
+    // Cek NIS/username sudah dipakai belum
+    const existingSiswa = siswaList.find(s => s.username === nis);
+    const existingGuru = guruList.find(g => g.username === nis);
+    if (existingSiswa || existingGuru) {
+        showError('NIS/Username sudah digunakan! Gunakan NIS yang berbeda.');
         return;
     }
     
@@ -1690,9 +1751,12 @@ function tambahSiswa() {
         id: Date.now(),
         nama: nama,
         nis: nis,
+        username: nis, // Username otomatis = NIS
+        password: '1234', // Password default
         kelasId: parseInt(kelasId) || null,
         jk: jk,
-        tglLahir: tglLahir
+        tglLahir: tglLahir,
+        wa: wa
     };
     
     siswaList.push(newSiswa);
@@ -1703,10 +1767,11 @@ function tambahSiswa() {
     document.getElementById('siswaNIS').value = '';
     document.getElementById('siswaKelas').value = '';
     document.getElementById('siswaTglLahir').value = '';
+    document.getElementById('siswaWA').value = '';
     
     renderSiswaList();
     updateDashboardStats();
-    showToast('✅ Siswa berhasil ditambahkan');
+    showToast('✅ Siswa berhasil ditambahkan (Username: ' + nis + ', Password: 1234)');
 }
 
 function renderSiswaList() {
@@ -1725,7 +1790,10 @@ function renderSiswaList() {
             <div class="data-item">
                 <div class="data-item-info">
                     <h4>${siswa.nama}</h4>
-                    <p>NIS: ${siswa.nis} | Kelas: ${kelas?.nama || '-'} | ${siswa.jk === 'L' ? 'Laki-laki' : 'Perempuan'}</p>
+                    <p>NIS: ${siswa.nis} | Kelas: ${kelas?.nama || '-'} | ${siswa.jk === 'L' ? 'Laki-laki' : 'Perempuan'} | WA: ${siswa.wa || '-'}</p>
+                    <p style="font-size: 12px; color: var(--gray); margin-top: 4px;">
+                        🔐 Login: ${siswa.username} / ${siswa.password}
+                    </p>
                 </div>
                 <div class="action-buttons">
                     <button class="btn-delete" onclick="hapusSiswa(${siswa.id})">
@@ -1778,10 +1846,25 @@ function tambahGuru() {
     const nama = document.getElementById('guruNama').value.trim();
     const nip = document.getElementById('guruNIP').value.trim();
     const mapel = document.getElementById('guruMapel').value.trim();
-    const telp = document.getElementById('guruTelp').value.trim();
+    const wa = document.getElementById('guruWA').value.trim();
+    const username = document.getElementById('guruUsername').value.trim();
+    const password = document.getElementById('guruPassword').value.trim();
     
     if (!nama || !nip) {
         showError('Nama dan NIP harus diisi!');
+        return;
+    }
+    
+    if (!username || !password) {
+        showError('Username dan password harus diisi!');
+        return;
+    }
+    
+    // Cek username sudah dipakai belum
+    const existingGuru = guruList.find(g => g.username === username);
+    const existingSiswa = siswaList.find(s => s.username === username);
+    if (existingGuru || existingSiswa) {
+        showError('Username sudah digunakan! Gunakan username lain.');
         return;
     }
     
@@ -1790,7 +1873,9 @@ function tambahGuru() {
         nama: nama,
         nip: nip,
         mapel: mapel,
-        telp: telp
+        wa: wa,
+        username: username,
+        password: password
     };
     
     guruList.push(newGuru);
@@ -1800,11 +1885,13 @@ function tambahGuru() {
     document.getElementById('guruNama').value = '';
     document.getElementById('guruNIP').value = '';
     document.getElementById('guruMapel').value = '';
-    document.getElementById('guruTelp').value = '';
+    document.getElementById('guruWA').value = '';
+    document.getElementById('guruUsername').value = '';
+    document.getElementById('guruPassword').value = '';
     
     renderGuruList();
     updateDashboardStats();
-    showToast('✅ Guru berhasil ditambahkan');
+    showToast('✅ Guru berhasil ditambahkan dengan akun login');
 }
 
 function renderGuruList() {
@@ -1822,7 +1909,10 @@ function renderGuruList() {
             <div class="data-item">
                 <div class="data-item-info">
                     <h4>${guru.nama}</h4>
-                    <p>NIP: ${guru.nip} | Mapel: ${guru.mapel || '-'} | Telp: ${guru.telp || '-'}</p>
+                    <p>NIP: ${guru.nip} | Mapel: ${guru.mapel || '-'} | WA: ${guru.wa || '-'}</p>
+                    <p style="font-size: 12px; color: var(--gray); margin-top: 4px;">
+                        🔐 Login: ${guru.username} / ${guru.password}
+                    </p>
                 </div>
                 <div class="action-buttons">
                     <button class="btn-delete" onclick="hapusGuru(${guru.id})">
@@ -2442,4 +2532,4 @@ console.log('%c✅ SekolahKu v2.0 Initialized', 'color: #10B981; font-size: 14px
 </script>
 
 </body>
-    </html>
+</html>
