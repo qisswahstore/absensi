@@ -313,9 +313,9 @@
         /* Header Premium */
         .header-premium {
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            padding: 16px 20px 20px 20px;
+            padding: 14px 20px 16px 20px;
             border-radius: 0 0 20px 20px;
-            margin-bottom: -10px;
+            margin-bottom: -8px;
             position: relative;
             overflow: hidden;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
@@ -433,7 +433,8 @@
             grid-template-columns: repeat(3, 1fr);
             gap: 12px;
             padding: 0 20px;
-            margin-bottom: 20px;
+            margin-bottom: 12px;
+            margin-top: -5px;
         }
         
         .menu-card-premium {
@@ -489,7 +490,7 @@
             background: white;
             border-radius: 20px;
             padding: 20px;
-            margin: 24px 16px 16px 16px;
+            margin: 12px 16px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.06);
         }
         
@@ -2835,29 +2836,77 @@ function renderDashboardWaliKelas() {
 }
 
 function showAbsensiKelas(kelasId) {
+    // Pindah ke laporan page
     showPagePremium('laporanPage');
+    
+    // Tunggu sebentar agar page sudah render
     setTimeout(() => {
-        document.getElementById('laporanType').value = 'absensi';
-        document.getElementById('filterKelasAbsensi').value = kelasId;
-        document.getElementById('laporanType').dispatchEvent(new Event('change'));
+        // Tampilkan form laporan absensi
+        tampilkanLaporanAbsensi();
+        
+        // Tunggu form sudah muncul
+        setTimeout(() => {
+            // Set filter kelas
+            const filterKelas = document.getElementById('filterKelasAbsensi');
+            if (filterKelas) {
+                filterKelas.value = kelasId;
+            }
+            
+            // Auto-generate laporan
+            setTimeout(() => {
+                generateLaporanAbsensi();
+            }, 100);
+        }, 200);
     }, 100);
 }
 
 function showNilaiKelas(kelasId) {
+    // Pindah ke laporan page
     showPagePremium('laporanPage');
+    
+    // Tunggu sebentar agar page sudah render
     setTimeout(() => {
-        document.getElementById('laporanType').value = 'nilai';
-        document.getElementById('filterKelasNilai').value = kelasId;
-        document.getElementById('laporanType').dispatchEvent(new Event('change'));
+        // Tampilkan form laporan nilai
+        tampilkanLaporanNilai();
+        
+        // Tunggu form sudah muncul
+        setTimeout(() => {
+            // Set filter kelas
+            const filterKelas = document.getElementById('filterKelasNilai');
+            if (filterKelas) {
+                filterKelas.value = kelasId;
+            }
+            
+            // Auto-generate laporan
+            setTimeout(() => {
+                generateLaporanNilai();
+            }, 100);
+        }, 200);
     }, 100);
 }
 
 function showPembayaranKelas(kelasId) {
+    // Pindah ke laporan page
     showPagePremium('laporanPage');
+    
+    // Tunggu sebentar agar page sudah render
     setTimeout(() => {
-        document.getElementById('laporanType').value = 'pembayaran';
-        document.getElementById('filterKelasPembayaran').value = kelasId;
-        document.getElementById('laporanType').dispatchEvent(new Event('change'));
+        // Tampilkan form laporan pembayaran
+        tampilkanLaporanPembayaran();
+        
+        // Tunggu form sudah muncul
+        setTimeout(() => {
+            // Set filter kelas
+            const filterKelas = document.getElementById('filterKelasPembayaran');
+            if (filterKelas) {
+                filterKelas.value = kelasId;
+            }
+            
+            // Auto-generate laporan
+            setTimeout(() => {
+                generateLaporanPembayaran();
+            }, 100);
+        }, 200);
     }, 100);
 }
 
