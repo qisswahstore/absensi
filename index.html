@@ -1026,7 +1026,33 @@
                 ℹ️ Username = NIS, Password otomatis = 1234
             </p>
             
-            <div class="row">
+            <!-- Import Excel Section -->
+            <div style="background: #EFF6FF; border: 2px solid #3B82F6; padding: 15px; border-radius: 12px; margin-bottom: 20px;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                    <i class="fas fa-file-excel" style="font-size: 24px; color: #10B981;"></i>
+                    <strong style="color: var(--dark);">Import Massal dari Excel</strong>
+                </div>
+                
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn btn-primary" onclick="downloadTemplateSiswa()" style="flex: 1; min-width: 150px;">
+                        <i class="fas fa-download"></i> Download Template
+                    </button>
+                    <input type="file" id="importExcelSiswa" accept=".xlsx,.xls,.csv" style="display: none;" onchange="handleImportExcelSiswa(event)">
+                    <button class="btn btn-blue" onclick="document.getElementById('importExcelSiswa').click()" style="flex: 1; min-width: 150px;">
+                        <i class="fas fa-upload"></i> Upload Excel
+                    </button>
+                </div>
+                
+                <p style="font-size: 12px; color: var(--gray); margin-top: 10px;">
+                    💡 <strong>Cara:</strong> Download template → Isi data di Excel → Upload kembali
+                </p>
+            </div>
+            
+            <div style="border-top: 2px solid var(--gray-light); padding-top: 15px; margin-top: 15px;">
+                <strong>Atau Input Manual:</strong>
+            </div>
+            
+            <div class="row" style="margin-top: 15px;">
                 <div>
                     <label>Nama Lengkap</label>
                     <input type="text" id="siswaNama" placeholder="Nama siswa">
@@ -2019,6 +2045,166 @@ function hapusSiswa(id) {
     }
 }
 
+// ==================== IMPORT EXCEL SISWA ====================
+function downloadTemplateSiswa() {
+    // Buat CSV template
+    const headers = ['Nama', 'NIS', 'Kelas', 'JK', 'TglLahir', 'NoWA'];
+    const contoh = [
+        'Ahmad Rizki', '2024001', '7 IPA', 'L', '2010-05-15', '081234567890',
+        'Siti Nurhaliza', '2024002', '7 IPA', 'P', '2010-08-20', '081234567891',
+        'Budi Santoso', '2024003', 'Ula 1', 'L', '2009-12-10', '081234567892'
+    ];
+    
+    let csv = headers.join(',') + '\n';
+    csv += contoh.join(',') + '\n';
+    csv += '\n';
+    csv += '# Format:\n';
+    csv += '# Nama: Nama lengkap siswa\n';
+    csv += '# NIS: Nomor Induk Siswa (otomatis jadi username)\n';
+    csv += '# Kelas: Nama kelas (harus sudah ada di sistem)\n';
+    csv += '# JK: L (Laki-laki) atau P (Perempuan)\n';
+    csv += '# TglLahir: Format YYYY-MM-DD (contoh: 2010-05-15)\n';
+    csv += '# NoWA: Nomor WhatsApp (08xxx)\n';
+    
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.href = url;
+    link.download = 'template_siswa.csv';
+    link.click();
+    
+    URL.revokeObjectURL(url);
+    showToast('✅ Template berhasil didownload');
+}
+
+function handleImportExcelSiswa(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    
+    reader.onload = function(e) {
+        try {
+            const text = e.target.result;
+            const lines = text.split('\n').filter(line => line.trim() && !line.startsWith('#'));
+            
+            if (lines.length < 2) {
+                showError('File kosong atau format salah!');
+                return;
+            }
+            
+            const headers = lines[0].split(',').map(h => h.trim());
+            
+            // Validasi headers
+            const requiredHeaders = ['Nama', 'NIS', 'Kelas'];
+            const hasRequiredHeaders = requiredHeaders.every(h => headers.includes(h));
+            
+            if (!hasRequiredHeaders) {
+                showError('Header file harus ada: Nama, NIS, Kelas');
+                return;
+            }
+            
+            const namaIdx = headers.indexOf('Nama');
+            const nisIdx = headers.indexOf('NIS');
+            const kelasIdx = headers.indexOf('Kelas');
+            const jkIdx = headers.indexOf('JK');
+            const tglLahirIdx = headers.indexOf('TglLahir');
+            const waIdx = headers.indexOf('NoWA');
+            
+            let imported = 0;
+            let skipped = 0;
+            const errors = [];
+            
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue;
+                
+                const values = line.split(',').map(v => v.trim());
+                
+                const nama = values[namaIdx];
+                const nis = values[nisIdx];
+                const namaKelas = values[kelasIdx];
+                const jk = jkIdx >= 0 ? values[jkIdx] : 'L';
+                const tglLahir = tglLahirIdx >= 0 ? values[tglLahirIdx] : '';
+                const wa = waIdx >= 0 ? values[waIdx] : '';
+                
+                // Validasi
+                if (!nama || !nis) {
+                    errors.push(`Baris ${i + 1}: Nama atau NIS kosong`);
+                    skipped++;
+                    continue;
+                }
+                
+                // Cek duplikat NIS
+                const existing = siswaList.find(s => s.nis === nis);
+                if (existing) {
+                    errors.push(`Baris ${i + 1}: NIS ${nis} sudah ada`);
+                    skipped++;
+                    continue;
+                }
+                
+                // Cari kelas
+                const kelas = kelasList.find(k => k.nama.toLowerCase() === namaKelas.toLowerCase());
+                if (!kelas && namaKelas) {
+                    errors.push(`Baris ${i + 1}: Kelas "${namaKelas}" tidak ditemukan`);
+                    skipped++;
+                    continue;
+                }
+                
+                // Tambah siswa
+                const newSiswa = {
+                    id: Date.now() + imported,
+                    nama: nama,
+                    nis: nis,
+                    username: nis,
+                    password: '1234',
+                    kelasId: kelas ? kelas.id : null,
+                    jk: jk.toUpperCase() === 'P' ? 'P' : 'L',
+                    tglLahir: tglLahir,
+                    wa: wa
+                };
+                
+                siswaList.push(newSiswa);
+                imported++;
+            }
+            
+            // Simpan
+            localStorage.setItem('data_siswa', JSON.stringify(siswaList));
+            renderSiswaList();
+            updateDashboardStats();
+            
+            // Reset input
+            event.target.value = '';
+            
+            // Show result
+            let message = `✅ Berhasil import ${imported} siswa`;
+            if (skipped > 0) {
+                message += `\n⚠️ ${skipped} data dilewati`;
+            }
+            
+            if (errors.length > 0 && errors.length <= 5) {
+                message += '\n\nError:\n' + errors.slice(0, 5).join('\n');
+            }
+            
+            alert(message);
+            showToast(`✅ Import selesai: ${imported} siswa ditambahkan`);
+            
+        } catch (error) {
+            console.error('Error parsing file:', error);
+            showError('Gagal membaca file! Pastikan format CSV benar.');
+            event.target.value = '';
+        }
+    };
+    
+    reader.onerror = function() {
+        showError('Gagal membaca file!');
+        event.target.value = '';
+    };
+    
+    reader.readAsText(file);
+}
+
 function updateSiswaDropdowns() {
     // Update dropdown di absensi
     const absensiSelect = document.getElementById('absensiKelas');
@@ -2218,6 +2404,9 @@ function renderKelasList() {
                     <p>Jumlah Siswa: ${jumlahSiswa} orang</p>
                 </div>
                 <div class="action-buttons">
+                    <button class="btn-edit" onclick="editKelas(${kelas.id}, '${kelas.nama.replace(/'/g, "\\'")}')">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
                     <button class="btn-delete" onclick="hapusKelas(${kelas.id})">
                         <i class="fas fa-trash"></i>
                     </button>
@@ -2228,6 +2417,36 @@ function renderKelasList() {
     
     container.innerHTML = html;
     updateKelasDropdowns();
+}
+
+function editKelas(id, namaLama) {
+    const namaBaru = prompt(`Edit Nama Kelas:\n\nNama lama: "${namaLama}"`, namaLama);
+    
+    if (namaBaru === null) return; // User cancel
+    
+    const trimmedNama = namaBaru.trim();
+    
+    if (!trimmedNama) {
+        showError('Nama kelas tidak boleh kosong!');
+        return;
+    }
+    
+    // Cek duplikat (kecuali kelas yang sedang diedit)
+    const existing = kelasList.find(k => k.id != id && k.nama.toLowerCase() === trimmedNama.toLowerCase());
+    if (existing) {
+        showError(`Kelas "${trimmedNama}" sudah ada!`);
+        return;
+    }
+    
+    // Update kelas
+    const kelas = kelasList.find(k => k.id == id);
+    if (kelas) {
+        kelas.nama = trimmedNama;
+        localStorage.setItem('data_kelas', JSON.stringify(kelasList));
+        renderKelasList();
+        updateKelasDropdowns();
+        showToast(`✅ Kelas "${namaLama}" diubah menjadi "${trimmedNama}"`);
+    }
 }
 
 function hapusKelas(id) {
@@ -3365,4 +3584,4 @@ console.log('%c✅ SekolahKu v2.0 Initialized', 'color: #10B981; font-size: 14px
 </script>
 
 </body>
-</html>
+    </html>
