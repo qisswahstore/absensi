@@ -494,6 +494,38 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.06);
         }
         
+        /* Compact layout untuk Dashboard Wali */
+        #dashboardWaliPage .card-premium {
+            margin: 8px 16px;
+            padding: 16px;
+        }
+        
+        #dashboardWaliPage .card-premium:first-child {
+            margin-top: 8px;
+        }
+        
+        /* Compact spacing untuk konten dashboard wali */
+        #waliKelasContent > div {
+            margin-bottom: 12px !important;
+        }
+        
+        #waliKelasContent h3 {
+            margin-bottom: 4px !important;
+        }
+        
+        #waliKelasContent h4 {
+            margin-bottom: 8px !important;
+        }
+        
+        /* Hide home page saat page lain active */
+        #homePage:not(.active) {
+            display: none !important;
+        }
+        
+        .page:not(.active) {
+            display: none !important;
+        }
+        
         .card-title {
             font-size: 18px;
             font-weight: bold;
@@ -2113,24 +2145,29 @@ function hapusSiswa(id) {
 
 // ==================== IMPORT EXCEL SISWA ====================
 function downloadTemplateSiswa() {
-    // Buat CSV template
+    // Buat CSV template dengan BOM untuk Excel compatibility
     const headers = ['Nama', 'NIS', 'Kelas', 'JK', 'TglLahir', 'NoWA'];
     const contoh = [
-        'Ahmad Rizki', '2024001', '7 IPA', 'L', '2010-05-15', '081234567890',
-        'Siti Nurhaliza', '2024002', '7 IPA', 'P', '2010-08-20', '081234567891',
-        'Budi Santoso', '2024003', 'Ula 1', 'L', '2009-12-10', '081234567892'
+        ['Ahmad Rizki', '2024001', '7 IPA', 'L', '2010-05-15', '081234567890'],
+        ['Siti Nurhaliza', '2024002', '7 IPA', 'P', '2010-08-20', '081234567891'],
+        ['Budi Santoso', '2024003', 'Ula 1', 'L', '2009-12-10', '081234567892']
     ];
     
-    let csv = headers.join(',') + '\n';
-    csv += contoh.join(',') + '\n';
+    let csv = '\uFEFF'; // BOM for Excel UTF-8
+    csv += headers.join(',') + '\n';
+    
+    contoh.forEach(row => {
+        csv += row.join(',') + '\n';
+    });
+    
     csv += '\n';
-    csv += '# Format:\n';
-    csv += '# Nama: Nama lengkap siswa\n';
-    csv += '# NIS: Nomor Induk Siswa (otomatis jadi username)\n';
-    csv += '# Kelas: Nama kelas (harus sudah ada di sistem)\n';
-    csv += '# JK: L (Laki-laki) atau P (Perempuan)\n';
-    csv += '# TglLahir: Format YYYY-MM-DD (contoh: 2010-05-15)\n';
-    csv += '# NoWA: Nomor WhatsApp (08xxx)\n';
+    csv += '# PETUNJUK PENGISIAN:\n';
+    csv += '# 1. Jangan ubah nama kolom (Nama, NIS, Kelas, dst)\n';
+    csv += '# 2. Isi data mulai baris ke-5 (setelah contoh)\n';
+    csv += '# 3. Nama kelas harus sudah ada di sistem\n';
+    csv += '# 4. JK: L (Laki-laki) atau P (Perempuan)\n';
+    csv += '# 5. TglLahir: Format YYYY-MM-DD (contoh: 2010-05-15)\n';
+    csv += '# 6. Simpan sebagai CSV (Comma delimited)\n';
     
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
@@ -2152,31 +2189,44 @@ function handleImportExcelSiswa(event) {
     
     reader.onload = function(e) {
         try {
-            const text = e.target.result;
-            const lines = text.split('\n').filter(line => line.trim() && !line.startsWith('#'));
+            let text = e.target.result;
+            
+            // Remove BOM if exists
+            if (text.charCodeAt(0) === 0xFEFF) {
+                text = text.substring(1);
+            }
+            
+            const lines = text.split('\n')
+                .map(line => line.trim())
+                .filter(line => line && !line.startsWith('#'));
             
             if (lines.length < 2) {
-                showError('File kosong atau format salah!');
+                showError('File kosong atau format salah! Pastikan ada header dan minimal 1 data.');
+                event.target.value = '';
                 return;
             }
             
-            const headers = lines[0].split(',').map(h => h.trim());
+            // Parse header dengan toleransi case insensitive dan trim
+            const rawHeaders = lines[0].split(',').map(h => h.trim());
+            const headers = rawHeaders.map(h => h.toLowerCase());
             
-            // Validasi headers
-            const requiredHeaders = ['Nama', 'NIS', 'Kelas'];
-            const hasRequiredHeaders = requiredHeaders.every(h => headers.includes(h));
+            // Validasi headers dengan case insensitive
+            const requiredHeaders = ['nama', 'nis', 'kelas'];
+            const missingHeaders = requiredHeaders.filter(h => !headers.includes(h));
             
-            if (!hasRequiredHeaders) {
-                showError('Header file harus ada: Nama, NIS, Kelas');
+            if (missingHeaders.length > 0) {
+                showError(`Header tidak lengkap!\n\nYang diperlukan: Nama, NIS, Kelas\nYang ditemukan: ${rawHeaders.join(', ')}\n\nPastikan header persis seperti di template!`);
+                event.target.value = '';
                 return;
             }
             
-            const namaIdx = headers.indexOf('Nama');
-            const nisIdx = headers.indexOf('NIS');
-            const kelasIdx = headers.indexOf('Kelas');
-            const jkIdx = headers.indexOf('JK');
-            const tglLahirIdx = headers.indexOf('TglLahir');
-            const waIdx = headers.indexOf('NoWA');
+            // Map header index
+            const namaIdx = headers.indexOf('nama');
+            const nisIdx = headers.indexOf('nis');
+            const kelasIdx = headers.indexOf('kelas');
+            const jkIdx = headers.indexOf('jk');
+            const tglLahirIdx = headers.indexOf('tgllahir');
+            const waIdx = headers.indexOf('nowa');
             
             let imported = 0;
             let skipped = 0;
@@ -2184,7 +2234,7 @@ function handleImportExcelSiswa(event) {
             
             for (let i = 1; i < lines.length; i++) {
                 const line = lines[i].trim();
-                if (!line) continue;
+                if (!line || line.startsWith('#')) continue;
                 
                 const values = line.split(',').map(v => v.trim());
                 
@@ -2251,6 +2301,9 @@ function handleImportExcelSiswa(event) {
             
             if (errors.length > 0 && errors.length <= 5) {
                 message += '\n\nError:\n' + errors.slice(0, 5).join('\n');
+                if (errors.length > 5) {
+                    message += `\n... dan ${errors.length - 5} error lainnya`;
+                }
             }
             
             alert(message);
@@ -2258,7 +2311,7 @@ function handleImportExcelSiswa(event) {
             
         } catch (error) {
             console.error('Error parsing file:', error);
-            showError('Gagal membaca file! Pastikan format CSV benar.');
+            showError('Gagal membaca file!\n\nPastikan:\n1. File CSV (bukan Excel .xlsx)\n2. Format sesuai template\n3. Tidak ada karakter khusus\n\nError: ' + error.message);
             event.target.value = '';
         }
     };
