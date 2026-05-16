@@ -1272,12 +1272,23 @@
                     <span style="font-size: 18px;">✍️</span>
                     <strong>Input Manual (Kelas Khusus)</strong>
                 </label>
-                <div style="display: flex; gap: 10px;">
-                    <input type="text" id="kelasNamaManual" placeholder="Contoh: Tahfidz Intensif, Kelas Olimpiade, Grade 7, dll" style="flex: 1;">
-                    <button class="btn btn-primary" onclick="tambahKelasManual()" style="padding: 12px 20px;">
-                        <i class="fas fa-plus"></i> Tambah
-                    </button>
+                
+                <div style="margin-bottom: 12px;">
+                    <label style="font-size: 13px; margin-bottom: 6px; display: block;">Nama Kelas</label>
+                    <input type="text" id="kelasNamaManual" placeholder="Contoh: Tahfidz Intensif, Kelas Olimpiade, Grade 7, dll" style="width: 100%;">
                 </div>
+                
+                <div style="margin-bottom: 12px;">
+                    <label style="font-size: 13px; margin-bottom: 6px; display: block;">👨‍🏫 Wali Kelas (Opsional)</label>
+                    <select id="kelasWaliKelas" style="width: 100%; padding: 12px; border: 2px solid #E2E8F0; border-radius: 10px; font-family: inherit;">
+                        <option value="">-- Pilih Wali Kelas --</option>
+                    </select>
+                </div>
+                
+                <button class="btn btn-primary" onclick="tambahKelasManual()" style="width: 100%;">
+                    <i class="fas fa-plus"></i> Tambah Kelas
+                </button>
+                
                 <p style="font-size: 12px; color: var(--gray); margin-top: 8px;">
                     💡 Gunakan untuk kelas yang tidak ada di template (Tahfidz, Bilingual, Akselerasi, dll)
                 </p>
@@ -1749,6 +1760,11 @@ function loadAllData() {
         updateLoadingProgress(90, 'Memuat pembayaran...');
         
         pembayaranList = JSON.parse(localStorage.getItem('data_pembayaran') || '[]');
+        
+        // Update wali kelas dropdown after all data loaded
+        setTimeout(() => {
+            updateWaliKelasDropdown();
+        }, 100);
         
         console.log('✅ Data loaded successfully');
         return true;
@@ -2324,6 +2340,7 @@ function renderGuruList() {
     
     container.innerHTML = html;
     updateGuruDropdowns();
+    updateWaliKelasDropdown();
 }
 
 function hapusGuru(id) {
@@ -2357,7 +2374,8 @@ function tambahKelasQuick(namaKelas) {
     
     const newKelas = {
         id: Date.now(),
-        nama: namaKelas
+        nama: namaKelas,
+        waliKelasId: null // Bisa diset later via edit
     };
     
     kelasList.push(newKelas);
@@ -2370,6 +2388,7 @@ function tambahKelasQuick(namaKelas) {
 
 function tambahKelasManual() {
     const nama = document.getElementById('kelasNamaManual').value.trim();
+    const waliKelasId = document.getElementById('kelasWaliKelas').value;
     
     if (!nama) {
         showError('Nama kelas harus diisi!');
@@ -2385,7 +2404,8 @@ function tambahKelasManual() {
     
     const newKelas = {
         id: Date.now(),
-        nama: nama
+        nama: nama,
+        waliKelasId: waliKelasId || null
     };
     
     kelasList.push(newKelas);
@@ -2393,10 +2413,26 @@ function tambahKelasManual() {
     
     // Clear form
     document.getElementById('kelasNamaManual').value = '';
+    document.getElementById('kelasWaliKelas').value = '';
     
     renderKelasList();
     updateDashboardStats();
+    updateWaliKelasDropdown();
     showToast(`✅ Kelas "${nama}" ditambahkan`);
+}
+
+function updateWaliKelasDropdown() {
+    const dropdown = document.getElementById('kelasWaliKelas');
+    if (!dropdown) return;
+    
+    dropdown.innerHTML = '<option value="">-- Pilih Wali Kelas --</option>';
+    
+    guruList.forEach(guru => {
+        const option = document.createElement('option');
+        option.value = guru.id;
+        option.textContent = guru.nama;
+        dropdown.appendChild(option);
+    });
 }
 
 function renderKelasList() {
@@ -2411,11 +2447,21 @@ function renderKelasList() {
     let html = '';
     kelasList.forEach(kelas => {
         const jumlahSiswa = siswaList.filter(s => s.kelasId == kelas.id).length;
+        
+        // Cari wali kelas
+        let waliKelasInfo = '<span style="color: var(--gray); font-size: 13px;">Belum ada wali kelas</span>';
+        if (kelas.waliKelasId) {
+            const waliKelas = guruList.find(g => g.id == kelas.waliKelasId);
+            if (waliKelas) {
+                waliKelasInfo = `<span style="color: var(--primary); font-weight: 600; font-size: 13px;">👨‍🏫 ${waliKelas.nama}</span>`;
+            }
+        }
+        
         html += `
             <div class="data-item">
                 <div class="data-item-info">
                     <h4>${kelas.nama}</h4>
-                    <p>Jumlah Siswa: ${jumlahSiswa} orang</p>
+                    <p>Jumlah Siswa: ${jumlahSiswa} orang | Wali Kelas: ${waliKelasInfo}</p>
                 </div>
                 <div class="action-buttons">
                     <button class="btn-edit" onclick="editKelas(${kelas.id}, '${kelas.nama.replace(/'/g, "\\'")}')">
@@ -2434,32 +2480,77 @@ function renderKelasList() {
 }
 
 function editKelas(id, namaLama) {
-    const namaBaru = prompt(`Edit Nama Kelas:\n\nNama lama: "${namaLama}"`, namaLama);
+    const kelas = kelasList.find(k => k.id == id);
+    if (!kelas) return;
     
-    if (namaBaru === null) return; // User cancel
+    // Create custom dialog for editing
+    const dialogHTML = `
+        <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 10000; display: flex; align-items: center; justify-content: center;" id="editKelasDialog" onclick="if(event.target.id==='editKelasDialog') this.remove()">
+            <div style="background: white; padding: 20px; border-radius: 12px; max-width: 400px; width: 90%;" onclick="event.stopPropagation()">
+                <h3 style="margin: 0 0 15px 0;">✏️ Edit Kelas</h3>
+                
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: 600;">Nama Kelas</label>
+                    <input type="text" id="editKelasNama" value="${namaLama}" style="width: 100%; padding: 10px; border: 2px solid #E2E8F0; border-radius: 8px; font-family: inherit;">
+                </div>
+                
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: 600;">👨‍🏫 Wali Kelas</label>
+                    <select id="editKelasWali" style="width: 100%; padding: 10px; border: 2px solid #E2E8F0; border-radius: 8px; font-family: inherit;">
+                        <option value="">-- Pilih Wali Kelas --</option>
+                        ${guruList.map(g => `<option value="${g.id}" ${kelas.waliKelasId == g.id ? 'selected' : ''}>${g.nama}</option>`).join('')}
+                    </select>
+                </div>
+                
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="saveEditKelas(${id})" style="flex: 1; padding: 10px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                        💾 Simpan
+                    </button>
+                    <button onclick="document.getElementById('editKelasDialog').remove()" style="flex: 1; padding: 10px; background: var(--gray-light); color: var(--dark); border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                        ✖️ Batal
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
     
-    const trimmedNama = namaBaru.trim();
+    document.body.insertAdjacentHTML('beforeend', dialogHTML);
+}
+
+function saveEditKelas(id) {
+    const namaBaru = document.getElementById('editKelasNama').value.trim();
+    const waliKelasIdBaru = document.getElementById('editKelasWali').value;
     
-    if (!trimmedNama) {
+    if (!namaBaru) {
         showError('Nama kelas tidak boleh kosong!');
         return;
     }
     
     // Cek duplikat (kecuali kelas yang sedang diedit)
-    const existing = kelasList.find(k => k.id != id && k.nama.toLowerCase() === trimmedNama.toLowerCase());
+    const existing = kelasList.find(k => k.id != id && k.nama.toLowerCase() === namaBaru.toLowerCase());
     if (existing) {
-        showError(`Kelas "${trimmedNama}" sudah ada!`);
+        showError(`Kelas "${namaBaru}" sudah ada!`);
         return;
     }
     
     // Update kelas
     const kelas = kelasList.find(k => k.id == id);
     if (kelas) {
-        kelas.nama = trimmedNama;
+        const namaLama = kelas.nama;
+        kelas.nama = namaBaru;
+        kelas.waliKelasId = waliKelasIdBaru || null;
+        
         localStorage.setItem('data_kelas', JSON.stringify(kelasList));
         renderKelasList();
         updateKelasDropdowns();
-        showToast(`✅ Kelas "${namaLama}" diubah menjadi "${trimmedNama}"`);
+        
+        const waliKelas = waliKelasIdBaru ? guruList.find(g => g.id == waliKelasIdBaru) : null;
+        const waliInfo = waliKelas ? ` dengan wali kelas ${waliKelas.nama}` : '';
+        
+        showToast(`✅ Kelas "${namaLama}" berhasil diupdate${waliInfo}`);
+        
+        // Close dialog
+        document.getElementById('editKelasDialog').remove();
     }
 }
 
@@ -3775,4 +3866,4 @@ console.log('%c✅ SekolahKu v2.0 Initialized', 'color: #10B981; font-size: 14px
 </script>
 
 </body>
-    </html>
+</html>
