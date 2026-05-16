@@ -2604,181 +2604,234 @@ function renderDashboardWaliKelas() {
     const container = document.getElementById('waliKelasContent');
     if (!container) return;
     
-    // Get current user (guru)
-    const currentGuru = currentUserData;
-    if (!currentGuru) {
-        container.innerHTML = '<div class="empty-data">Error: Data guru tidak ditemukan</div>';
-        return;
-    }
-    
-    // Find kelas yang dipegang oleh wali kelas ini
-    const kelasWali = kelasList.filter(k => k.waliKelasId == currentGuru.id);
-    
-    if (kelasWali.length === 0) {
-        container.innerHTML = `
-            <div class="empty-data">
-                <p style="font-size: 48px; margin-bottom: 10px;">👨‍🏫</p>
-                <p>Anda belum ditugaskan sebagai wali kelas</p>
-                <p style="font-size: 13px; color: var(--gray); margin-top: 8px;">
-                    Hubungi admin untuk penugasan wali kelas
-                </p>
-            </div>
-        `;
-        return;
-    }
-    
-    let html = '';
-    
-    kelasWali.forEach((kelas, index) => {
-        const siswaKelas = siswaList.filter(s => s.kelasId == kelas.id);
-        const jumlahSiswa = siswaKelas.length;
+    try {
+        // Get current user
+        if (!currentUser) {
+            container.innerHTML = '<div class="empty-data">Error: Silakan login ulang</div>';
+            return;
+        }
         
-        // Get today's date
-        const today = new Date().toISOString().split('T')[0];
+        // Find guru data based on current user
+        let currentGuru = null;
         
-        // Absensi hari ini
-        const absensiHariIni = absensiList.filter(a => {
-            const siswa = siswaList.find(s => s.id == a.siswaId);
-            return siswa && siswa.kelasId == kelas.id && a.tanggal === today;
-        });
-        
-        const hadir = absensiHariIni.filter(a => a.status === 'Hadir').length;
-        const izin = absensiHariIni.filter(a => a.status === 'Izin').length;
-        const sakit = absensiHariIni.filter(a => a.status === 'Sakit').length;
-        const alpa = absensiHariIni.filter(a => a.status === 'Alpa').length;
-        
-        // SPP Status (bulan ini)
-        const currentMonth = new Date().getMonth() + 1;
-        const currentYear = new Date().getFullYear();
-        
-        let sppLunas = 0;
-        let sppBelum = 0;
-        
-        siswaKelas.forEach(siswa => {
-            const pembayaran = pembayaranList.find(p => 
-                p.siswaId == siswa.id && 
-                p.bulan == currentMonth && 
-                p.tahun == currentYear
-            );
+        if (currentUser.role === 'guru') {
+            // Find guru by username
+            currentGuru = guruList.find(g => g.username === currentUser.username);
             
-            if (pembayaran && pembayaran.status === 'Lunas') {
-                sppLunas++;
-            } else {
-                sppBelum++;
+            if (!currentGuru) {
+                container.innerHTML = `
+                    <div class="empty-data">
+                        <p style="font-size: 48px; margin-bottom: 10px;">⚠️</p>
+                        <p>Data guru tidak ditemukan</p>
+                        <p style="font-size: 13px; color: var(--gray); margin-top: 8px;">
+                            Username: ${currentUser.username}
+                        </p>
+                        <button class="btn btn-primary" onclick="doLogout()" style="margin-top: 15px;">
+                            Logout & Login Ulang
+                        </button>
+                    </div>
+                `;
+                return;
             }
-        });
+        } else if (currentUser.role === 'admin') {
+            // Admin can see all - use first guru as example or show all
+            currentGuru = { id: 'admin', nama: 'Administrator' };
+        } else {
+            container.innerHTML = '<div class="empty-data">Hanya guru dan admin yang dapat mengakses</div>';
+            return;
+        }
         
-        // Rata-rata nilai kelas per mapel
-        let nilaiPerMapel = {};
-        mapelList.forEach(mapel => {
-            const nilaiMapel = nilaiList.filter(n => {
-                const siswa = siswaList.find(s => s.id == n.siswaId);
-                return siswa && siswa.kelasId == kelas.id && n.mapelId == mapel.id;
+        // Find kelas yang dipegang oleh wali kelas ini
+        let kelasWali = [];
+        
+        if (currentUser.role === 'admin') {
+            // Admin see all kelas with wali
+            kelasWali = kelasList.filter(k => k.waliKelasId);
+        } else {
+            kelasWali = kelasList.filter(k => k.waliKelasId == currentGuru.id);
+        }
+        
+        if (kelasWali.length === 0) {
+            container.innerHTML = `
+                <div class="empty-data">
+                    <p style="font-size: 48px; margin-bottom: 10px;">👨‍🏫</p>
+                    <p>Anda belum ditugaskan sebagai wali kelas</p>
+                    <p style="font-size: 13px; color: var(--gray); margin-top: 8px;">
+                        Hubungi admin untuk penugasan wali kelas
+                    </p>
+                </div>
+            `;
+            return;
+        }
+        
+        let html = '';
+        
+        kelasWali.forEach((kelas, index) => {
+            const siswaKelas = siswaList.filter(s => s.kelasId == kelas.id);
+            const jumlahSiswa = siswaKelas.length;
+            
+            // Get today's date
+            const today = new Date().toISOString().split('T')[0];
+            
+            // Absensi hari ini
+            const absensiHariIni = absensiList.filter(a => {
+                const siswa = siswaList.find(s => s.id == a.siswaId);
+                return siswa && siswa.kelasId == kelas.id && a.tanggal === today;
             });
             
-            if (nilaiMapel.length > 0) {
-                const totalNilai = nilaiMapel.reduce((sum, n) => {
-                    const rata = ((n.uh || 0) + (n.uts || 0) + (n.uas || 0)) / 3;
-                    return sum + rata;
-                }, 0);
-                nilaiPerMapel[mapel.nama] = Math.round(totalNilai / nilaiMapel.length);
-            }
-        });
-        
-        if (index > 0) html += '<div style="border-top: 2px solid var(--gray-light); margin: 20px 0;"></div>';
-        
-        html += `
-            <div style="background: linear-gradient(135deg, var(--primary), #0A3D31); padding: 20px; border-radius: 12px; color: white; margin-bottom: 20px;">
-                <h3 style="margin: 0 0 8px 0; font-size: 24px;">📚 ${kelas.nama}</h3>
-                <p style="margin: 0; opacity: 0.9; font-size: 14px;">Jumlah Siswa: ${jumlahSiswa} orang</p>
-            </div>
+            const hadir = absensiHariIni.filter(a => a.status === 'Hadir').length;
+            const izin = absensiHariIni.filter(a => a.status === 'Izin').length;
+            const sakit = absensiHariIni.filter(a => a.status === 'Sakit').length;
+            const alpa = absensiHariIni.filter(a => a.status === 'Alpa').length;
             
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px;">
-                <div style="background: #EFF6FF; padding: 15px; border-radius: 10px; border-left: 4px solid #3B82F6;">
-                    <div style="font-size: 24px; font-weight: bold; color: #1E40AF;">${hadir}</div>
-                    <div style="font-size: 13px; color: var(--gray); margin-top: 4px;">✅ Hadir</div>
-                </div>
-                <div style="background: #FEF3C7; padding: 15px; border-radius: 10px; border-left: 4px solid #F59E0B;">
-                    <div style="font-size: 24px; font-weight: bold; color: #D97706;">${izin}</div>
-                    <div style="font-size: 13px; color: var(--gray); margin-top: 4px;">📝 Izin</div>
-                </div>
-                <div style="background: #FEE2E2; padding: 15px; border-radius: 10px; border-left: 4px solid #EF4444;">
-                    <div style="font-size: 24px; font-weight: bold; color: #DC2626;">${sakit}</div>
-                    <div style="font-size: 13px; color: var(--gray); margin-top: 4px;">🏥 Sakit</div>
-                </div>
-                <div style="background: #F3F4F6; padding: 15px; border-radius: 10px; border-left: 4px solid #6B7280;">
-                    <div style="font-size: 24px; font-weight: bold; color: #374151;">${alpa}</div>
-                    <div style="font-size: 13px; color: var(--gray); margin-top: 4px;">❌ Alpa</div>
-                </div>
-            </div>
+            // SPP Status (bulan ini)
+            const currentMonth = new Date().getMonth() + 1;
+            const currentYear = new Date().getFullYear();
             
-            <div style="background: var(--gray-light); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
-                <h4 style="margin: 0 0 12px 0; font-size: 15px;">💰 Status SPP Bulan Ini</h4>
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
-                    <div>
-                        <div style="font-size: 20px; font-weight: bold; color: #10B981;">${sppLunas}</div>
-                        <div style="font-size: 12px; color: var(--gray);">✅ Lunas</div>
+            let sppLunas = 0;
+            let sppBelum = 0;
+            
+            siswaKelas.forEach(siswa => {
+                const pembayaran = pembayaranList.find(p => 
+                    p.siswaId == siswa.id && 
+                    p.bulan == currentMonth && 
+                    p.tahun == currentYear
+                );
+                
+                if (pembayaran && pembayaran.status === 'Lunas') {
+                    sppLunas++;
+                } else {
+                    sppBelum++;
+                }
+            });
+            
+            // Rata-rata nilai kelas per mapel
+            let nilaiPerMapel = {};
+            mapelList.forEach(mapel => {
+                const nilaiMapel = nilaiList.filter(n => {
+                    const siswa = siswaList.find(s => s.id == n.siswaId);
+                    return siswa && siswa.kelasId == kelas.id && n.mapelId == mapel.id;
+                });
+                
+                if (nilaiMapel.length > 0) {
+                    const totalNilai = nilaiMapel.reduce((sum, n) => {
+                        const rata = ((n.uh || 0) + (n.uts || 0) + (n.uas || 0)) / 3;
+                        return sum + rata;
+                    }, 0);
+                    nilaiPerMapel[mapel.nama] = Math.round(totalNilai / nilaiMapel.length);
+                }
+            });
+            
+            if (index > 0) html += '<div style="border-top: 2px solid var(--gray-light); margin: 20px 0;"></div>';
+            
+            html += `
+                <div style="background: linear-gradient(135deg, var(--primary), #0A3D31); padding: 20px; border-radius: 12px; color: white; margin-bottom: 20px;">
+                    <h3 style="margin: 0 0 8px 0; font-size: 24px;">📚 ${kelas.nama}</h3>
+                    <p style="margin: 0; opacity: 0.9; font-size: 14px;">Jumlah Siswa: ${jumlahSiswa} orang</p>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px;">
+                    <div style="background: #EFF6FF; padding: 15px; border-radius: 10px; border-left: 4px solid #3B82F6;">
+                        <div style="font-size: 24px; font-weight: bold; color: #1E40AF;">${hadir}</div>
+                        <div style="font-size: 13px; color: var(--gray); margin-top: 4px;">✅ Hadir</div>
                     </div>
-                    <div>
-                        <div style="font-size: 20px; font-weight: bold; color: #EF4444;">${sppBelum}</div>
-                        <div style="font-size: 12px; color: var(--gray);">⚠️ Belum Bayar</div>
+                    <div style="background: #FEF3C7; padding: 15px; border-radius: 10px; border-left: 4px solid #F59E0B;">
+                        <div style="font-size: 24px; font-weight: bold; color: #D97706;">${izin}</div>
+                        <div style="font-size: 13px; color: var(--gray); margin-top: 4px;">📝 Izin</div>
+                    </div>
+                    <div style="background: #FEE2E2; padding: 15px; border-radius: 10px; border-left: 4px solid #EF4444;">
+                        <div style="font-size: 24px; font-weight: bold; color: #DC2626;">${sakit}</div>
+                        <div style="font-size: 13px; color: var(--gray); margin-top: 4px;">🏥 Sakit</div>
+                    </div>
+                    <div style="background: #F3F4F6; padding: 15px; border-radius: 10px; border-left: 4px solid #6B7280;">
+                        <div style="font-size: 24px; font-weight: bold; color: #374151;">${alpa}</div>
+                        <div style="font-size: 13px; color: var(--gray); margin-top: 4px;">❌ Alpa</div>
                     </div>
                 </div>
-            </div>
-            
-            ${Object.keys(nilaiPerMapel).length > 0 ? `
-            <div style="background: var(--gray-light); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
-                <h4 style="margin: 0 0 12px 0; font-size: 15px;">📈 Rata-rata Nilai Kelas</h4>
-                <div style="display: grid; gap: 8px;">
-                    ${Object.entries(nilaiPerMapel).slice(0, 5).map(([mapel, nilai]) => `
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-size: 13px;">${mapel}</span>
-                            <span style="font-weight: bold; color: var(--primary);">${nilai}</span>
+                
+                <div style="background: var(--gray-light); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                    <h4 style="margin: 0 0 12px 0; font-size: 15px;">💰 Status SPP Bulan Ini</h4>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+                        <div>
+                            <div style="font-size: 20px; font-weight: bold; color: #10B981;">${sppLunas}</div>
+                            <div style="font-size: 12px; color: var(--gray);">✅ Lunas</div>
                         </div>
-                    `).join('')}
+                        <div>
+                            <div style="font-size: 20px; font-weight: bold; color: #EF4444;">${sppBelum}</div>
+                            <div style="font-size: 12px; color: var(--gray);">⚠️ Belum Bayar</div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            ` : ''}
-            
-            <div style="margin-bottom: 20px;">
-                <h4 style="margin: 0 0 12px 0; font-size: 15px;">📋 Daftar Siswa (${jumlahSiswa} orang)</h4>
-                <div style="max-height: 300px; overflow-y: auto; border: 2px solid var(--gray-light); border-radius: 10px;">
-                    ${siswaKelas.length === 0 ? '<div class="empty-data">Belum ada siswa</div>' : 
-                        siswaKelas.map((siswa, i) => `
-                            <div style="padding: 12px; border-bottom: 1px solid var(--gray-light); display: flex; justify-content: space-between; align-items: center;">
-                                <div>
-                                    <div style="font-weight: 600;">${i + 1}. ${siswa.nama}</div>
-                                    <div style="font-size: 12px; color: var(--gray); margin-top: 2px;">
-                                        NIS: ${siswa.nis} | ${siswa.jk === 'L' ? '👦' : '👧'} ${siswa.jk === 'L' ? 'Laki-laki' : 'Perempuan'}
+                
+                ${Object.keys(nilaiPerMapel).length > 0 ? `
+                <div style="background: var(--gray-light); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                    <h4 style="margin: 0 0 12px 0; font-size: 15px;">📈 Rata-rata Nilai Kelas</h4>
+                    <div style="display: grid; gap: 8px;">
+                        ${Object.entries(nilaiPerMapel).slice(0, 5).map(([mapel, nilai]) => `
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-size: 13px;">${mapel}</span>
+                                <span style="font-weight: bold; color: var(--primary);">${nilai}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                ` : ''}
+                
+                <div style="margin-bottom: 20px;">
+                    <h4 style="margin: 0 0 12px 0; font-size: 15px;">📋 Daftar Siswa (${jumlahSiswa} orang)</h4>
+                    <div style="max-height: 300px; overflow-y: auto; border: 2px solid var(--gray-light); border-radius: 10px;">
+                        ${siswaKelas.length === 0 ? '<div class="empty-data">Belum ada siswa</div>' : 
+                            siswaKelas.map((siswa, i) => `
+                                <div style="padding: 12px; border-bottom: 1px solid var(--gray-light); display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <div style="font-weight: 600;">${i + 1}. ${siswa.nama}</div>
+                                        <div style="font-size: 12px; color: var(--gray); margin-top: 2px;">
+                                            NIS: ${siswa.nis} | ${siswa.jk === 'L' ? '👦' : '👧'} ${siswa.jk === 'L' ? 'Laki-laki' : 'Perempuan'}
+                                        </div>
+                                    </div>
+                                    <div style="font-size: 11px; color: var(--gray);">
+                                        ${siswa.wa ? '📱 ' + siswa.wa : ''}
                                     </div>
                                 </div>
-                                <div style="font-size: 11px; color: var(--gray);">
-                                    ${siswa.wa ? '📱 ' + siswa.wa : ''}
-                                </div>
-                            </div>
-                        `).join('')
-                    }
+                            `).join('')
+                        }
+                    </div>
                 </div>
-            </div>
-            
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
-                <button class="btn btn-primary" onclick="showAbsensiKelas(${kelas.id})">
-                    <i class="fas fa-check"></i> Rekap Absensi
-                </button>
-                <button class="btn btn-primary" onclick="showNilaiKelas(${kelas.id})">
-                    <i class="fas fa-chart-bar"></i> Rekap Nilai
-                </button>
-                <button class="btn btn-primary" onclick="showPembayaranKelas(${kelas.id})">
-                    <i class="fas fa-money-bill"></i> Rekap SPP
-                </button>
-                <button class="btn btn-blue" onclick="exportKelasData(${kelas.id}, '${kelas.nama}')">
-                    <i class="fas fa-download"></i> Export Data
+                
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                    <button class="btn btn-primary" onclick="showAbsensiKelas(${kelas.id})">
+                        <i class="fas fa-check"></i> Rekap Absensi
+                    </button>
+                    <button class="btn btn-primary" onclick="showNilaiKelas(${kelas.id})">
+                        <i class="fas fa-chart-bar"></i> Rekap Nilai
+                    </button>
+                    <button class="btn btn-primary" onclick="showPembayaranKelas(${kelas.id})">
+                        <i class="fas fa-money-bill"></i> Rekap SPP
+                    </button>
+                    <button class="btn btn-blue" onclick="exportKelasData(${kelas.id}, '${kelas.nama}')">
+                        <i class="fas fa-download"></i> Export Data
+                    </button>
+                </div>
+            `;
+        });
+        
+        container.innerHTML = html;
+        
+    } catch (error) {
+        console.error('Error rendering dashboard wali:', error);
+        container.innerHTML = `
+            <div class="empty-data">
+                <p style="font-size: 48px; margin-bottom: 10px;">❌</p>
+                <p>Terjadi kesalahan saat memuat dashboard</p>
+                <p style="font-size: 13px; color: var(--gray); margin-top: 8px;">
+                    Error: ${error.message}
+                </p>
+                <button class="btn btn-primary" onclick="renderDashboardWaliKelas()" style="margin-top: 15px;">
+                    <i class="fas fa-sync"></i> Coba Lagi
                 </button>
             </div>
         `;
-    });
-    
-    container.innerHTML = html;
+    }
 }
 
 function showAbsensiKelas(kelasId) {
