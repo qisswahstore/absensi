@@ -4,7 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#0D5C4A">
-    <title>SekolahKu - Sistem Manajemen Sekolah (Optimized)</title>
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SekolahKu">
+    <meta name="description" content="Sistem Manajemen Sekolah, Pesantren, dan Madrasah - Lengkap dengan Absensi GPS">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" id="manifest-placeholder">
+    
+    <!-- Icons -->
+    <link rel="icon" type="image/png" sizes="192x192" href="https://img.icons8.com/color/192/school.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="https://img.icons8.com/color/512/school.png">
+    <link rel="apple-touch-icon" href="https://img.icons8.com/color/192/school.png">
+    
+    <title>SekolahKu - Sistem Manajemen Sekolah (Full PWA)</title>
     
     <!-- OPTIMIZED: Async loading of external resources -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" media="print" onload="this.media='all'" onerror="console.warn('Leaflet CSS gagal dimuat')"/>
@@ -475,7 +489,7 @@
             background: white;
             border-radius: 20px;
             padding: 20px;
-            margin: 16px;
+            margin: 24px 16px 16px 16px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.06);
         }
         
@@ -572,6 +586,32 @@
             padding: 10px;
             font-size: 12px;
             border-radius: 10px;
+        }
+        
+        /* Button Template Kelas - Universal */
+        .btn-template {
+            padding: 10px 12px;
+            border: 2px solid #E2E8F0;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--dark);
+            font-family: inherit;
+        }
+        
+        .btn-template:hover {
+            border-color: var(--primary);
+            background: rgba(13, 92, 74, 0.05);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .btn-template:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         
         /* Data List */
@@ -989,6 +1029,11 @@
                 <div class="menu-icon">📑</div>
                 <div class="menu-label">Laporan</div>
             </div>
+            <!-- Dashboard Wali Kelas - Show only for Wali Kelas -->
+            <div class="menu-card-premium" id="menuWaliKelas" onclick="showPagePremium('dashboardWaliPage')" style="display: none;">
+                <div class="menu-icon">👨‍🏫</div>
+                <div class="menu-label">Dashboard Wali</div>
+            </div>
         </div>
     </div>
     
@@ -1000,7 +1045,33 @@
                 ℹ️ Username = NIS, Password otomatis = 1234
             </p>
             
-            <div class="row">
+            <!-- Import Excel Section -->
+            <div style="background: #EFF6FF; border: 2px solid #3B82F6; padding: 15px; border-radius: 12px; margin-bottom: 20px;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                    <i class="fas fa-file-excel" style="font-size: 24px; color: #10B981;"></i>
+                    <strong style="color: var(--dark);">Import Massal dari Excel</strong>
+                </div>
+                
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn btn-primary" onclick="downloadTemplateSiswa()" style="flex: 1; min-width: 150px;">
+                        <i class="fas fa-download"></i> Download Template
+                    </button>
+                    <input type="file" id="importExcelSiswa" accept=".xlsx,.xls,.csv" style="display: none;" onchange="handleImportExcelSiswa(event)">
+                    <button class="btn btn-blue" onclick="document.getElementById('importExcelSiswa').click()" style="flex: 1; min-width: 150px;">
+                        <i class="fas fa-upload"></i> Upload Excel
+                    </button>
+                </div>
+                
+                <p style="font-size: 12px; color: var(--gray); margin-top: 10px;">
+                    💡 <strong>Cara:</strong> Download template → Isi data di Excel → Upload kembali
+                </p>
+            </div>
+            
+            <div style="border-top: 2px solid var(--gray-light); padding-top: 15px; margin-top: 15px;">
+                <strong>Atau Input Manual:</strong>
+            </div>
+            
+            <div class="row" style="margin-top: 15px;">
                 <div>
                     <label>Nama Lengkap</label>
                     <input type="text" id="siswaNama" placeholder="Nama siswa">
@@ -1107,26 +1178,126 @@
     <!-- KELAS PAGE -->
     <div id="kelasPage" class="page">
         <div class="card-premium">
-            <div class="card-title">🏛️ Data Kelas</div>
+            <div class="card-title">🏛️ Data Kelas (Universal)</div>
+            <p style="color: var(--gray); margin-bottom: 15px; font-size: 13px;">
+                ✨ Sistem untuk SD, SMP, SMA, Pesantren, Madin, dan semua jenis pendidikan
+            </p>
             
-            <div class="row">
-                <div>
-                    <label>Nama Kelas</label>
-                    <input type="text" id="kelasNama" placeholder="Contoh: X IPA 1">
-                </div>
-                <div>
-                    <label>Tingkat</label>
-                    <select id="kelasTingkat">
-                        <option value="X">Kelas X</option>
-                        <option value="XI">Kelas XI</option>
-                        <option value="XII">Kelas XII</option>
-                    </select>
+            <!-- TEMPLATE SD -->
+            <div style="border-bottom: 2px solid var(--gray-light); padding-bottom: 15px; margin-bottom: 15px;">
+                <label style="margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 18px;">🎒</span>
+                    <strong>SD (Sekolah Dasar)</strong>
+                </label>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('1A')">1A</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('1B')">1B</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('2A')">2A</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('2B')">2B</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('3A')">3A</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('3B')">3B</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('4A')">4A</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('5A')">5A</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('6A')">6A</button>
                 </div>
             </div>
             
-            <button class="btn btn-primary" onclick="tambahKelas()">
-                <i class="fas fa-plus"></i> Tambah Kelas
-            </button>
+            <!-- TEMPLATE SMP/MTs -->
+            <div style="border-bottom: 2px solid var(--gray-light); padding-bottom: 15px; margin-bottom: 15px;">
+                <label style="margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 18px;">📚</span>
+                    <strong>SMP/MTs</strong>
+                </label>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('7A')">7A</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('7 IPA')">7 IPA</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('7 IPS')">7 IPS</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('8A')">8A</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('8 IPA')">8 IPA</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('8 IPS')">8 IPS</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('9A')">9A</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('9 IPA')">9 IPA</button>
+                </div>
+            </div>
+            
+            <!-- TEMPLATE SMA/MA -->
+            <div style="border-bottom: 2px solid var(--gray-light); padding-bottom: 15px; margin-bottom: 15px;">
+                <label style="margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 18px;">🎓</span>
+                    <strong>SMA/MA</strong>
+                </label>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('X IPA 1')">X IPA 1</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('X IPA 2')">X IPA 2</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('X IPS 1')">X IPS 1</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('XI IPA 1')">XI IPA 1</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('XI IPA 2')">XI IPA 2</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('XI IPS 1')">XI IPS 1</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('XII IPA 1')">XII IPA 1</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('XII IPS 1')">XII IPS 1</button>
+                </div>
+            </div>
+            
+            <!-- TEMPLATE PESANTREN -->
+            <div style="border-bottom: 2px solid var(--gray-light); padding-bottom: 15px; margin-bottom: 15px;">
+                <label style="margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 18px;">🕌</span>
+                    <strong>Pesantren</strong>
+                </label>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('Ula 1')">Ula 1</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('Ula 2')">Ula 2</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('Ula 3')">Ula 3</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('Wustho 1')">Wustho 1</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('Wustho 2')">Wustho 2</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('Wustho 3')">Wustho 3</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('Ulya 1')">Ulya 1</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('Ulya 2')">Ulya 2</button>
+                </div>
+            </div>
+            
+            <!-- TEMPLATE MADIN -->
+            <div style="border-bottom: 2px solid var(--gray-light); padding-bottom: 15px; margin-bottom: 15px;">
+                <label style="margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 18px;">📖</span>
+                    <strong>Madin (Madrasah Diniyah)</strong>
+                </label>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('Awaliyah 1')">Awaliyah 1</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('Awaliyah 2')">Awaliyah 2</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('Awaliyah 3')">Awaliyah 3</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('Wustho Madin')">Wustho Madin</button>
+                    <button type="button" class="btn-template" onclick="tambahKelasQuick('Ulya Madin')">Ulya Madin</button>
+                </div>
+            </div>
+            
+            <!-- INPUT MANUAL -->
+            <div style="background: var(--gray-light); padding: 15px; border-radius: 12px;">
+                <label style="margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 18px;">✍️</span>
+                    <strong>Input Manual (Kelas Khusus)</strong>
+                </label>
+                
+                <div style="margin-bottom: 12px;">
+                    <label style="font-size: 13px; margin-bottom: 6px; display: block;">Nama Kelas</label>
+                    <input type="text" id="kelasNamaManual" placeholder="Contoh: Tahfidz Intensif, Kelas Olimpiade, Grade 7, dll" style="width: 100%;">
+                </div>
+                
+                <div style="margin-bottom: 12px;">
+                    <label style="font-size: 13px; margin-bottom: 6px; display: block;">👨‍🏫 Wali Kelas (Opsional)</label>
+                    <select id="kelasWaliKelas" style="width: 100%; padding: 12px; border: 2px solid #E2E8F0; border-radius: 10px; font-family: inherit;">
+                        <option value="">-- Pilih Wali Kelas --</option>
+                    </select>
+                </div>
+                
+                <button class="btn btn-primary" onclick="tambahKelasManual()" style="width: 100%;">
+                    <i class="fas fa-plus"></i> Tambah Kelas
+                </button>
+                
+                <p style="font-size: 12px; color: var(--gray); margin-top: 8px;">
+                    💡 Gunakan untuk kelas yang tidak ada di template (Tahfidz, Bilingual, Akselerasi, dll)
+                </p>
+            </div>
         </div>
         
         <div class="card-premium">
@@ -1273,6 +1444,7 @@
                         <option value="Rabu">Rabu</option>
                         <option value="Kamis">Kamis</option>
                         <option value="Jumat">Jumat</option>
+                        <option value="Sabtu">Sabtu</option>
                     </select>
                 </div>
             </div>
@@ -1491,6 +1663,14 @@
     </div>
 </div>
 
+<!-- DASHBOARD WALI KELAS PAGE -->
+<div id="dashboardWaliPage" class="page">
+    <div class="card-premium">
+        <div class="card-title">👨‍🏫 Dashboard Wali Kelas</div>
+        <div id="waliKelasContent"></div>
+    </div>
+</div>
+
 <script>
 // ==================== OPTIMIZED VERSION 2.0 ====================
 // Anti-Stuck Protection & Performance Optimizations
@@ -1594,6 +1774,11 @@ function loadAllData() {
         updateLoadingProgress(90, 'Memuat pembayaran...');
         
         pembayaranList = JSON.parse(localStorage.getItem('data_pembayaran') || '[]');
+        
+        // Update wali kelas dropdown after all data loaded
+        setTimeout(() => {
+            updateWaliKelasDropdown();
+        }, 100);
         
         console.log('✅ Data loaded successfully');
         return true;
@@ -1700,6 +1885,21 @@ function showMainApp() {
     document.getElementById('profilNama').textContent = currentUser.nama;
     document.getElementById('profilRole').textContent = currentUser.role.toUpperCase();
     
+    // Show/hide Dashboard Wali Kelas menu based on role
+    const menuWaliKelas = document.getElementById('menuWaliKelas');
+    if (menuWaliKelas) {
+        if (currentUser.role === 'guru') {
+            // Check if this guru is a wali kelas
+            const isWaliKelas = kelasList.some(k => k.waliKelasId == currentUserData?.id);
+            menuWaliKelas.style.display = isWaliKelas ? 'block' : 'none';
+        } else if (currentUser.role === 'admin') {
+            // Admin can see all wali kelas dashboards
+            menuWaliKelas.style.display = 'block';
+        } else {
+            menuWaliKelas.style.display = 'none';
+        }
+    }
+    
     // Update dashboard stats
     updateDashboardStats();
     
@@ -1748,6 +1948,11 @@ function showPagePremium(pageId) {
         targetPage.classList.add('active');
     }
     
+    // Render dashboard wali kelas if needed
+    if (pageId === 'dashboardWaliPage') {
+        renderDashboardWaliKelas();
+    }
+    
     // Update nav active state
     document.querySelectorAll('.nav-item-premium').forEach(item => {
         item.classList.remove('active');
@@ -1765,6 +1970,7 @@ function showPagePremium(pageId) {
         'jadwalPage': 1,
         'pembayaranPage': 1,
         'laporanPage': 2,
+        'dashboardWaliPage': 1,
         'profilPage': 3
     };
     
@@ -1904,6 +2110,166 @@ function hapusSiswa(id) {
     }
 }
 
+// ==================== IMPORT EXCEL SISWA ====================
+function downloadTemplateSiswa() {
+    // Buat CSV template
+    const headers = ['Nama', 'NIS', 'Kelas', 'JK', 'TglLahir', 'NoWA'];
+    const contoh = [
+        'Ahmad Rizki', '2024001', '7 IPA', 'L', '2010-05-15', '081234567890',
+        'Siti Nurhaliza', '2024002', '7 IPA', 'P', '2010-08-20', '081234567891',
+        'Budi Santoso', '2024003', 'Ula 1', 'L', '2009-12-10', '081234567892'
+    ];
+    
+    let csv = headers.join(',') + '\n';
+    csv += contoh.join(',') + '\n';
+    csv += '\n';
+    csv += '# Format:\n';
+    csv += '# Nama: Nama lengkap siswa\n';
+    csv += '# NIS: Nomor Induk Siswa (otomatis jadi username)\n';
+    csv += '# Kelas: Nama kelas (harus sudah ada di sistem)\n';
+    csv += '# JK: L (Laki-laki) atau P (Perempuan)\n';
+    csv += '# TglLahir: Format YYYY-MM-DD (contoh: 2010-05-15)\n';
+    csv += '# NoWA: Nomor WhatsApp (08xxx)\n';
+    
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.href = url;
+    link.download = 'template_siswa.csv';
+    link.click();
+    
+    URL.revokeObjectURL(url);
+    showToast('✅ Template berhasil didownload');
+}
+
+function handleImportExcelSiswa(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    
+    reader.onload = function(e) {
+        try {
+            const text = e.target.result;
+            const lines = text.split('\n').filter(line => line.trim() && !line.startsWith('#'));
+            
+            if (lines.length < 2) {
+                showError('File kosong atau format salah!');
+                return;
+            }
+            
+            const headers = lines[0].split(',').map(h => h.trim());
+            
+            // Validasi headers
+            const requiredHeaders = ['Nama', 'NIS', 'Kelas'];
+            const hasRequiredHeaders = requiredHeaders.every(h => headers.includes(h));
+            
+            if (!hasRequiredHeaders) {
+                showError('Header file harus ada: Nama, NIS, Kelas');
+                return;
+            }
+            
+            const namaIdx = headers.indexOf('Nama');
+            const nisIdx = headers.indexOf('NIS');
+            const kelasIdx = headers.indexOf('Kelas');
+            const jkIdx = headers.indexOf('JK');
+            const tglLahirIdx = headers.indexOf('TglLahir');
+            const waIdx = headers.indexOf('NoWA');
+            
+            let imported = 0;
+            let skipped = 0;
+            const errors = [];
+            
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue;
+                
+                const values = line.split(',').map(v => v.trim());
+                
+                const nama = values[namaIdx];
+                const nis = values[nisIdx];
+                const namaKelas = values[kelasIdx];
+                const jk = jkIdx >= 0 ? values[jkIdx] : 'L';
+                const tglLahir = tglLahirIdx >= 0 ? values[tglLahirIdx] : '';
+                const wa = waIdx >= 0 ? values[waIdx] : '';
+                
+                // Validasi
+                if (!nama || !nis) {
+                    errors.push(`Baris ${i + 1}: Nama atau NIS kosong`);
+                    skipped++;
+                    continue;
+                }
+                
+                // Cek duplikat NIS
+                const existing = siswaList.find(s => s.nis === nis);
+                if (existing) {
+                    errors.push(`Baris ${i + 1}: NIS ${nis} sudah ada`);
+                    skipped++;
+                    continue;
+                }
+                
+                // Cari kelas
+                const kelas = kelasList.find(k => k.nama.toLowerCase() === namaKelas.toLowerCase());
+                if (!kelas && namaKelas) {
+                    errors.push(`Baris ${i + 1}: Kelas "${namaKelas}" tidak ditemukan`);
+                    skipped++;
+                    continue;
+                }
+                
+                // Tambah siswa
+                const newSiswa = {
+                    id: Date.now() + imported,
+                    nama: nama,
+                    nis: nis,
+                    username: nis,
+                    password: '1234',
+                    kelasId: kelas ? kelas.id : null,
+                    jk: jk.toUpperCase() === 'P' ? 'P' : 'L',
+                    tglLahir: tglLahir,
+                    wa: wa
+                };
+                
+                siswaList.push(newSiswa);
+                imported++;
+            }
+            
+            // Simpan
+            localStorage.setItem('data_siswa', JSON.stringify(siswaList));
+            renderSiswaList();
+            updateDashboardStats();
+            
+            // Reset input
+            event.target.value = '';
+            
+            // Show result
+            let message = `✅ Berhasil import ${imported} siswa`;
+            if (skipped > 0) {
+                message += `\n⚠️ ${skipped} data dilewati`;
+            }
+            
+            if (errors.length > 0 && errors.length <= 5) {
+                message += '\n\nError:\n' + errors.slice(0, 5).join('\n');
+            }
+            
+            alert(message);
+            showToast(`✅ Import selesai: ${imported} siswa ditambahkan`);
+            
+        } catch (error) {
+            console.error('Error parsing file:', error);
+            showError('Gagal membaca file! Pastikan format CSV benar.');
+            event.target.value = '';
+        }
+    };
+    
+    reader.onerror = function() {
+        showError('Gagal membaca file!');
+        event.target.value = '';
+    };
+    
+    reader.readAsText(file);
+}
+
 function updateSiswaDropdowns() {
     // Update dropdown di absensi
     const absensiSelect = document.getElementById('absensiKelas');
@@ -2009,6 +2375,7 @@ function renderGuruList() {
     
     container.innerHTML = html;
     updateGuruDropdowns();
+    updateWaliKelasDropdown();
 }
 
 function hapusGuru(id) {
@@ -2031,31 +2398,76 @@ function updateGuruDropdowns() {
     }
 }
 
-// ==================== KELAS CRUD ====================
-function tambahKelas() {
-    const nama = document.getElementById('kelasNama').value.trim();
-    const tingkat = document.getElementById('kelasTingkat').value;
+// ==================== KELAS CRUD (UNIVERSAL - TANPA TINGKAT) ====================
+function tambahKelasQuick(namaKelas) {
+    // Cek apakah kelas sudah ada
+    const existing = kelasList.find(k => k.nama.toLowerCase() === namaKelas.toLowerCase());
+    if (existing) {
+        showError(`Kelas "${namaKelas}" sudah ada!`);
+        return;
+    }
+    
+    const newKelas = {
+        id: Date.now(),
+        nama: namaKelas,
+        waliKelasId: null // Bisa diset later via edit
+    };
+    
+    kelasList.push(newKelas);
+    localStorage.setItem('data_kelas', JSON.stringify(kelasList));
+    
+    renderKelasList();
+    updateDashboardStats();
+    showToast(`✅ Kelas "${namaKelas}" ditambahkan`);
+}
+
+function tambahKelasManual() {
+    const nama = document.getElementById('kelasNamaManual').value.trim();
+    const waliKelasId = document.getElementById('kelasWaliKelas').value;
     
     if (!nama) {
         showError('Nama kelas harus diisi!');
         return;
     }
     
+    // Cek apakah kelas sudah ada
+    const existing = kelasList.find(k => k.nama.toLowerCase() === nama.toLowerCase());
+    if (existing) {
+        showError(`Kelas "${nama}" sudah ada!`);
+        return;
+    }
+    
     const newKelas = {
         id: Date.now(),
         nama: nama,
-        tingkat: tingkat
+        waliKelasId: waliKelasId || null
     };
     
     kelasList.push(newKelas);
     localStorage.setItem('data_kelas', JSON.stringify(kelasList));
     
     // Clear form
-    document.getElementById('kelasNama').value = '';
+    document.getElementById('kelasNamaManual').value = '';
+    document.getElementById('kelasWaliKelas').value = '';
     
     renderKelasList();
     updateDashboardStats();
-    showToast('✅ Kelas berhasil ditambahkan');
+    updateWaliKelasDropdown();
+    showToast(`✅ Kelas "${nama}" ditambahkan`);
+}
+
+function updateWaliKelasDropdown() {
+    const dropdown = document.getElementById('kelasWaliKelas');
+    if (!dropdown) return;
+    
+    dropdown.innerHTML = '<option value="">-- Pilih Wali Kelas --</option>';
+    
+    guruList.forEach(guru => {
+        const option = document.createElement('option');
+        option.value = guru.id;
+        option.textContent = guru.nama;
+        dropdown.appendChild(option);
+    });
 }
 
 function renderKelasList() {
@@ -2070,13 +2482,26 @@ function renderKelasList() {
     let html = '';
     kelasList.forEach(kelas => {
         const jumlahSiswa = siswaList.filter(s => s.kelasId == kelas.id).length;
+        
+        // Cari wali kelas
+        let waliKelasInfo = '<span style="color: var(--gray); font-size: 13px;">Belum ada wali kelas</span>';
+        if (kelas.waliKelasId) {
+            const waliKelas = guruList.find(g => g.id == kelas.waliKelasId);
+            if (waliKelas) {
+                waliKelasInfo = `<span style="color: var(--primary); font-weight: 600; font-size: 13px;">👨‍🏫 ${waliKelas.nama}</span>`;
+            }
+        }
+        
         html += `
             <div class="data-item">
                 <div class="data-item-info">
                     <h4>${kelas.nama}</h4>
-                    <p>Tingkat: ${kelas.tingkat} | Jumlah Siswa: ${jumlahSiswa}</p>
+                    <p>Jumlah Siswa: ${jumlahSiswa} orang | Wali Kelas: ${waliKelasInfo}</p>
                 </div>
                 <div class="action-buttons">
+                    <button class="btn-edit" onclick="editKelas(${kelas.id}, '${kelas.nama.replace(/'/g, "\\'")}')">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
                     <button class="btn-delete" onclick="hapusKelas(${kelas.id})">
                         <i class="fas fa-trash"></i>
                     </button>
@@ -2089,6 +2514,81 @@ function renderKelasList() {
     updateKelasDropdowns();
 }
 
+function editKelas(id, namaLama) {
+    const kelas = kelasList.find(k => k.id == id);
+    if (!kelas) return;
+    
+    // Create custom dialog for editing
+    const dialogHTML = `
+        <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 10000; display: flex; align-items: center; justify-content: center;" id="editKelasDialog" onclick="if(event.target.id==='editKelasDialog') this.remove()">
+            <div style="background: white; padding: 20px; border-radius: 12px; max-width: 400px; width: 90%;" onclick="event.stopPropagation()">
+                <h3 style="margin: 0 0 15px 0;">✏️ Edit Kelas</h3>
+                
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: 600;">Nama Kelas</label>
+                    <input type="text" id="editKelasNama" value="${namaLama}" style="width: 100%; padding: 10px; border: 2px solid #E2E8F0; border-radius: 8px; font-family: inherit;">
+                </div>
+                
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: 600;">👨‍🏫 Wali Kelas</label>
+                    <select id="editKelasWali" style="width: 100%; padding: 10px; border: 2px solid #E2E8F0; border-radius: 8px; font-family: inherit;">
+                        <option value="">-- Pilih Wali Kelas --</option>
+                        ${guruList.map(g => `<option value="${g.id}" ${kelas.waliKelasId == g.id ? 'selected' : ''}>${g.nama}</option>`).join('')}
+                    </select>
+                </div>
+                
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="saveEditKelas(${id})" style="flex: 1; padding: 10px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                        💾 Simpan
+                    </button>
+                    <button onclick="document.getElementById('editKelasDialog').remove()" style="flex: 1; padding: 10px; background: var(--gray-light); color: var(--dark); border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                        ✖️ Batal
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', dialogHTML);
+}
+
+function saveEditKelas(id) {
+    const namaBaru = document.getElementById('editKelasNama').value.trim();
+    const waliKelasIdBaru = document.getElementById('editKelasWali').value;
+    
+    if (!namaBaru) {
+        showError('Nama kelas tidak boleh kosong!');
+        return;
+    }
+    
+    // Cek duplikat (kecuali kelas yang sedang diedit)
+    const existing = kelasList.find(k => k.id != id && k.nama.toLowerCase() === namaBaru.toLowerCase());
+    if (existing) {
+        showError(`Kelas "${namaBaru}" sudah ada!`);
+        return;
+    }
+    
+    // Update kelas
+    const kelas = kelasList.find(k => k.id == id);
+    if (kelas) {
+        const namaLama = kelas.nama;
+        kelas.nama = namaBaru;
+        kelas.waliKelasId = waliKelasIdBaru || null;
+        
+        localStorage.setItem('data_kelas', JSON.stringify(kelasList));
+        renderKelasList();
+        updateKelasDropdowns();
+        
+        const waliKelas = waliKelasIdBaru ? guruList.find(g => g.id == waliKelasIdBaru) : null;
+        const waliInfo = waliKelas ? ` dengan wali kelas ${waliKelas.nama}` : '';
+        
+        showToast(`✅ Kelas "${namaLama}" berhasil diupdate${waliInfo}`);
+        
+        // Close dialog
+        document.getElementById('editKelasDialog').remove();
+    }
+}
+
 function hapusKelas(id) {
     if (confirm('Yakin ingin menghapus kelas ini?')) {
         kelasList = kelasList.filter(k => k.id != id);
@@ -2097,6 +2597,238 @@ function hapusKelas(id) {
         updateDashboardStats();
         showToast('Kelas dihapus');
     }
+}
+
+// ==================== DASHBOARD WALI KELAS ====================
+function renderDashboardWaliKelas() {
+    const container = document.getElementById('waliKelasContent');
+    if (!container) return;
+    
+    // Get current user (guru)
+    const currentGuru = currentUserData;
+    if (!currentGuru) {
+        container.innerHTML = '<div class="empty-data">Error: Data guru tidak ditemukan</div>';
+        return;
+    }
+    
+    // Find kelas yang dipegang oleh wali kelas ini
+    const kelasWali = kelasList.filter(k => k.waliKelasId == currentGuru.id);
+    
+    if (kelasWali.length === 0) {
+        container.innerHTML = `
+            <div class="empty-data">
+                <p style="font-size: 48px; margin-bottom: 10px;">👨‍🏫</p>
+                <p>Anda belum ditugaskan sebagai wali kelas</p>
+                <p style="font-size: 13px; color: var(--gray); margin-top: 8px;">
+                    Hubungi admin untuk penugasan wali kelas
+                </p>
+            </div>
+        `;
+        return;
+    }
+    
+    let html = '';
+    
+    kelasWali.forEach((kelas, index) => {
+        const siswaKelas = siswaList.filter(s => s.kelasId == kelas.id);
+        const jumlahSiswa = siswaKelas.length;
+        
+        // Get today's date
+        const today = new Date().toISOString().split('T')[0];
+        
+        // Absensi hari ini
+        const absensiHariIni = absensiList.filter(a => {
+            const siswa = siswaList.find(s => s.id == a.siswaId);
+            return siswa && siswa.kelasId == kelas.id && a.tanggal === today;
+        });
+        
+        const hadir = absensiHariIni.filter(a => a.status === 'Hadir').length;
+        const izin = absensiHariIni.filter(a => a.status === 'Izin').length;
+        const sakit = absensiHariIni.filter(a => a.status === 'Sakit').length;
+        const alpa = absensiHariIni.filter(a => a.status === 'Alpa').length;
+        
+        // SPP Status (bulan ini)
+        const currentMonth = new Date().getMonth() + 1;
+        const currentYear = new Date().getFullYear();
+        
+        let sppLunas = 0;
+        let sppBelum = 0;
+        
+        siswaKelas.forEach(siswa => {
+            const pembayaran = pembayaranList.find(p => 
+                p.siswaId == siswa.id && 
+                p.bulan == currentMonth && 
+                p.tahun == currentYear
+            );
+            
+            if (pembayaran && pembayaran.status === 'Lunas') {
+                sppLunas++;
+            } else {
+                sppBelum++;
+            }
+        });
+        
+        // Rata-rata nilai kelas per mapel
+        let nilaiPerMapel = {};
+        mapelList.forEach(mapel => {
+            const nilaiMapel = nilaiList.filter(n => {
+                const siswa = siswaList.find(s => s.id == n.siswaId);
+                return siswa && siswa.kelasId == kelas.id && n.mapelId == mapel.id;
+            });
+            
+            if (nilaiMapel.length > 0) {
+                const totalNilai = nilaiMapel.reduce((sum, n) => {
+                    const rata = ((n.uh || 0) + (n.uts || 0) + (n.uas || 0)) / 3;
+                    return sum + rata;
+                }, 0);
+                nilaiPerMapel[mapel.nama] = Math.round(totalNilai / nilaiMapel.length);
+            }
+        });
+        
+        if (index > 0) html += '<div style="border-top: 2px solid var(--gray-light); margin: 20px 0;"></div>';
+        
+        html += `
+            <div style="background: linear-gradient(135deg, var(--primary), #0A3D31); padding: 20px; border-radius: 12px; color: white; margin-bottom: 20px;">
+                <h3 style="margin: 0 0 8px 0; font-size: 24px;">📚 ${kelas.nama}</h3>
+                <p style="margin: 0; opacity: 0.9; font-size: 14px;">Jumlah Siswa: ${jumlahSiswa} orang</p>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px;">
+                <div style="background: #EFF6FF; padding: 15px; border-radius: 10px; border-left: 4px solid #3B82F6;">
+                    <div style="font-size: 24px; font-weight: bold; color: #1E40AF;">${hadir}</div>
+                    <div style="font-size: 13px; color: var(--gray); margin-top: 4px;">✅ Hadir</div>
+                </div>
+                <div style="background: #FEF3C7; padding: 15px; border-radius: 10px; border-left: 4px solid #F59E0B;">
+                    <div style="font-size: 24px; font-weight: bold; color: #D97706;">${izin}</div>
+                    <div style="font-size: 13px; color: var(--gray); margin-top: 4px;">📝 Izin</div>
+                </div>
+                <div style="background: #FEE2E2; padding: 15px; border-radius: 10px; border-left: 4px solid #EF4444;">
+                    <div style="font-size: 24px; font-weight: bold; color: #DC2626;">${sakit}</div>
+                    <div style="font-size: 13px; color: var(--gray); margin-top: 4px;">🏥 Sakit</div>
+                </div>
+                <div style="background: #F3F4F6; padding: 15px; border-radius: 10px; border-left: 4px solid #6B7280;">
+                    <div style="font-size: 24px; font-weight: bold; color: #374151;">${alpa}</div>
+                    <div style="font-size: 13px; color: var(--gray); margin-top: 4px;">❌ Alpa</div>
+                </div>
+            </div>
+            
+            <div style="background: var(--gray-light); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                <h4 style="margin: 0 0 12px 0; font-size: 15px;">💰 Status SPP Bulan Ini</h4>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+                    <div>
+                        <div style="font-size: 20px; font-weight: bold; color: #10B981;">${sppLunas}</div>
+                        <div style="font-size: 12px; color: var(--gray);">✅ Lunas</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 20px; font-weight: bold; color: #EF4444;">${sppBelum}</div>
+                        <div style="font-size: 12px; color: var(--gray);">⚠️ Belum Bayar</div>
+                    </div>
+                </div>
+            </div>
+            
+            ${Object.keys(nilaiPerMapel).length > 0 ? `
+            <div style="background: var(--gray-light); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                <h4 style="margin: 0 0 12px 0; font-size: 15px;">📈 Rata-rata Nilai Kelas</h4>
+                <div style="display: grid; gap: 8px;">
+                    ${Object.entries(nilaiPerMapel).slice(0, 5).map(([mapel, nilai]) => `
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 13px;">${mapel}</span>
+                            <span style="font-weight: bold; color: var(--primary);">${nilai}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+            ` : ''}
+            
+            <div style="margin-bottom: 20px;">
+                <h4 style="margin: 0 0 12px 0; font-size: 15px;">📋 Daftar Siswa (${jumlahSiswa} orang)</h4>
+                <div style="max-height: 300px; overflow-y: auto; border: 2px solid var(--gray-light); border-radius: 10px;">
+                    ${siswaKelas.length === 0 ? '<div class="empty-data">Belum ada siswa</div>' : 
+                        siswaKelas.map((siswa, i) => `
+                            <div style="padding: 12px; border-bottom: 1px solid var(--gray-light); display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="font-weight: 600;">${i + 1}. ${siswa.nama}</div>
+                                    <div style="font-size: 12px; color: var(--gray); margin-top: 2px;">
+                                        NIS: ${siswa.nis} | ${siswa.jk === 'L' ? '👦' : '👧'} ${siswa.jk === 'L' ? 'Laki-laki' : 'Perempuan'}
+                                    </div>
+                                </div>
+                                <div style="font-size: 11px; color: var(--gray);">
+                                    ${siswa.wa ? '📱 ' + siswa.wa : ''}
+                                </div>
+                            </div>
+                        `).join('')
+                    }
+                </div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                <button class="btn btn-primary" onclick="showAbsensiKelas(${kelas.id})">
+                    <i class="fas fa-check"></i> Rekap Absensi
+                </button>
+                <button class="btn btn-primary" onclick="showNilaiKelas(${kelas.id})">
+                    <i class="fas fa-chart-bar"></i> Rekap Nilai
+                </button>
+                <button class="btn btn-primary" onclick="showPembayaranKelas(${kelas.id})">
+                    <i class="fas fa-money-bill"></i> Rekap SPP
+                </button>
+                <button class="btn btn-blue" onclick="exportKelasData(${kelas.id}, '${kelas.nama}')">
+                    <i class="fas fa-download"></i> Export Data
+                </button>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+}
+
+function showAbsensiKelas(kelasId) {
+    showPagePremium('laporanPage');
+    setTimeout(() => {
+        document.getElementById('laporanType').value = 'absensi';
+        document.getElementById('filterKelasAbsensi').value = kelasId;
+        document.getElementById('laporanType').dispatchEvent(new Event('change'));
+    }, 100);
+}
+
+function showNilaiKelas(kelasId) {
+    showPagePremium('laporanPage');
+    setTimeout(() => {
+        document.getElementById('laporanType').value = 'nilai';
+        document.getElementById('filterKelasNilai').value = kelasId;
+        document.getElementById('laporanType').dispatchEvent(new Event('change'));
+    }, 100);
+}
+
+function showPembayaranKelas(kelasId) {
+    showPagePremium('laporanPage');
+    setTimeout(() => {
+        document.getElementById('laporanType').value = 'pembayaran';
+        document.getElementById('filterKelasPembayaran').value = kelasId;
+        document.getElementById('laporanType').dispatchEvent(new Event('change'));
+    }, 100);
+}
+
+function exportKelasData(kelasId, namaKelas) {
+    const kelas = kelasList.find(k => k.id == kelasId);
+    if (!kelas) return;
+    
+    const siswaKelas = siswaList.filter(s => s.kelasId == kelasId);
+    
+    const data = {
+        kelas: kelas,
+        siswa: siswaKelas,
+        timestamp: new Date().toISOString()
+    };
+    
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `data_kelas_${namaKelas.replace(/\s/g, '_')}_${Date.now()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    
+    showToast(`✅ Data kelas ${namaKelas} berhasil diexport`);
 }
 
 function updateKelasDropdowns() {
@@ -3219,6 +3951,183 @@ if (document.readyState === 'loading') {
     leafletScript.onerror = () => console.warn('⚠️ Leaflet gagal dimuat (maps tidak tersedia)');
     document.head.appendChild(leafletScript);
 })();
+
+// ==================== PWA SETUP ====================
+// Generate and inject manifest
+(function() {
+    const manifest = {
+        name: "SekolahKu - Sistem Manajemen Sekolah",
+        short_name: "SekolahKu",
+        description: "Aplikasi manajemen sekolah, pesantren, dan madrasah lengkap dengan absensi GPS",
+        start_url: "./",
+        display: "standalone",
+        background_color: "#0D5C4A",
+        theme_color: "#0D5C4A",
+        orientation: "portrait",
+        icons: [
+            {
+                src: "https://img.icons8.com/color/192/school.png",
+                sizes: "192x192",
+                type: "image/png",
+                purpose: "any maskable"
+            },
+            {
+                src: "https://img.icons8.com/color/512/school.png",
+                sizes: "512x512",
+                type: "image/png",
+                purpose: "any maskable"
+            }
+        ]
+    };
+    
+    const manifestBlob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
+    const manifestURL = URL.createObjectURL(manifestBlob);
+    document.getElementById('manifest-placeholder').setAttribute('href', manifestURL);
+})();
+
+// Service Worker Registration
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        const swCode = `
+self.addEventListener('install', (event) => {
+    console.log('Service Worker installing...');
+    self.skipWaiting();
+});
+
+self.addEventListener('activate', (event) => {
+    console.log('Service Worker activated');
+    event.waitUntil(clients.claim());
+});
+
+self.addEventListener('fetch', (event) => {
+    // Basic fetch handler - could add offline caching here
+    event.respondWith(
+        fetch(event.request).catch(() => {
+            return new Response('Offline - Please check your connection', {
+                headers: { 'Content-Type': 'text/plain' }
+            });
+        })
+    );
+});
+        `;
+        
+        const swBlob = new Blob([swCode], { type: 'application/javascript' });
+        const swURL = URL.createObjectURL(swBlob);
+        
+        navigator.serviceWorker.register(swURL)
+            .then(registration => {
+                console.log('✅ Service Worker registered:', registration);
+            })
+            .catch(error => {
+                console.warn('⚠️ Service Worker registration failed:', error);
+            });
+    });
+}
+
+// Install Prompt Handler
+let deferredPrompt;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    console.log('💡 Install prompt available');
+    e.preventDefault();
+    deferredPrompt = e;
+    
+    // Show custom install banner
+    setTimeout(() => {
+        if (deferredPrompt && !localStorage.getItem('pwa_install_dismissed')) {
+            showInstallPrompt();
+        }
+    }, 3000); // Show after 3 seconds
+});
+
+function showInstallPrompt() {
+    const installBanner = document.createElement('div');
+    installBanner.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(135deg, #0D5C4A, #0A3D31);
+        color: white;
+        padding: 15px 20px;
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+        z-index: 10000;
+        max-width: 90%;
+        width: 400px;
+        animation: slideUp 0.3s ease-out;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    `;
+    
+    installBanner.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <div style="font-size: 32px;">📱</div>
+            <div style="flex: 1;">
+                <div style="font-weight: bold; margin-bottom: 4px;">Install SekolahKu</div>
+                <div style="font-size: 13px; opacity: 0.9;">Akses lebih cepat dari home screen</div>
+            </div>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 12px;">
+            <button id="install-btn" style="
+                flex: 1;
+                background: white;
+                color: #0D5C4A;
+                border: none;
+                padding: 10px;
+                border-radius: 8px;
+                font-weight: bold;
+                cursor: pointer;
+                font-size: 14px;
+            ">Install</button>
+            <button id="dismiss-btn" style="
+                flex: 1;
+                background: rgba(255,255,255,0.2);
+                color: white;
+                border: none;
+                padding: 10px;
+                border-radius: 8px;
+                font-weight: bold;
+                cursor: pointer;
+                font-size: 14px;
+            ">Nanti</button>
+        </div>
+    `;
+    
+    document.body.appendChild(installBanner);
+    
+    // Install button
+    document.getElementById('install-btn').addEventListener('click', async () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            console.log(`User response: ${outcome}`);
+            deferredPrompt = null;
+        }
+        installBanner.remove();
+    });
+    
+    // Dismiss button
+    document.getElementById('dismiss-btn').addEventListener('click', () => {
+        localStorage.setItem('pwa_install_dismissed', 'true');
+        installBanner.remove();
+    });
+}
+
+// Add slide-up animation
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateX(-50%) translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+    }
+`;
+document.head.appendChild(style);
 
 console.log('%c✅ SekolahKu v2.0 Initialized', 'color: #10B981; font-size: 14px; font-weight: bold;');
 </script>
