@@ -18,6 +18,10 @@
     <link rel="icon" type="image/png" sizes="512x512" href="https://img.icons8.com/color/512/school.png">
     <link rel="apple-touch-icon" href="https://img.icons8.com/color/192/school.png">
     
+    <!-- QR Code Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+    
     <title>SekolahKu - Sistem Manajemen Sekolah (Full PWA)</title>
     
     <!-- OPTIMIZED: Async loading of external resources -->
@@ -615,6 +619,11 @@
             color: white;
         }
         
+        .btn-green {
+            background: var(--green);
+            color: white;
+        }
+        
         .btn-small {
             padding: 10px;
             font-size: 12px;
@@ -1080,6 +1089,16 @@
                 <div class="menu-icon">⚙️</div>
                 <div class="menu-label">Konfigurasi</div>
             </div>
+            <!-- Scan QR Absensi -->
+            <div class="menu-card-premium" onclick="showPagePremium('scanQRPage')">
+                <div class="menu-icon">📷</div>
+                <div class="menu-label">Scan QR</div>
+            </div>
+            <!-- Cetak Label -->
+            <div class="menu-card-premium" onclick="showPagePremium('cetakLabelPage')">
+                <div class="menu-icon">🏷️</div>
+                <div class="menu-label">Cetak Label</div>
+            </div>
         </div>
     </div>
     
@@ -1110,6 +1129,22 @@
                 
                 <p style="font-size: 12px; color: var(--gray); margin-top: 10px;">
                     💡 <strong>Cara:</strong> Download template → Isi data di Excel → Upload kembali
+                </p>
+            </div>
+            
+            <!-- QR Code Section -->
+            <div style="background: #F0FDF4; border: 2px solid #10B981; padding: 15px; border-radius: 12px; margin-bottom: 20px;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                    <i class="fas fa-qrcode" style="font-size: 24px; color: #10B981;"></i>
+                    <strong style="color: var(--dark);">QR Code Absensi</strong>
+                </div>
+                
+                <button class="btn btn-green" onclick="generateAllQRSiswa()" style="width: 100%; background: #10B981;">
+                    <i class="fas fa-download"></i> Generate & Download Semua QR Code
+                </button>
+                
+                <p style="font-size: 12px; color: var(--gray); margin-top: 10px;">
+                    💡 <strong>Tips:</strong> Setiap siswa akan punya QR code unik untuk scan absensi. Klik icon QR di daftar siswa untuk lihat QR per siswa.
                 </p>
             </div>
             
@@ -1728,6 +1763,163 @@
         </div>
     </div>
 
+    <!-- SCAN QR ABSENSI PAGE -->
+    <div id="scanQRPage" class="page">
+        <div class="card-premium">
+            <h3 style="margin: 0 0 20px 0; display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-qrcode" style="color: var(--primary);"></i>
+                Scan QR Absensi
+            </h3>
+            
+            <!-- Sesi Absensi -->
+            <div style="background: var(--gray-light); padding: 16px; border-radius: 12px; margin-bottom: 20px;">
+                <h4 style="margin: 0 0 12px 0; font-size: 15px;">📋 Sesi Absensi</h4>
+                <div style="display: grid; gap: 12px;">
+                    <div>
+                        <label style="display: block; margin-bottom: 6px; font-size: 13px; font-weight: 600;">Pilih Kelas</label>
+                        <select id="scanKelasSelect" class="form-input" onchange="updateScanSesi()">
+                            <option value="">-- Semua Kelas --</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 6px; font-size: 13px; font-weight: 600;">Tanggal</label>
+                        <input type="date" id="scanTanggal" class="form-input" onchange="updateScanSesi()">
+                    </div>
+                    <div style="background: white; padding: 12px; border-radius: 8px; border: 2px solid var(--primary);">
+                        <div style="font-size: 13px; color: var(--gray); margin-bottom: 4px;">Status Sesi</div>
+                        <div style="font-weight: 600; color: var(--primary);" id="scanSesiInfo">Belum ada sesi</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Scanner Area -->
+            <div style="background: #000; border-radius: 12px; overflow: hidden; margin-bottom: 16px; position: relative;">
+                <video id="scannerVideo" style="width: 100%; display: block;" playsinline></video>
+                <canvas id="scannerCanvas" style="display: none;"></canvas>
+                <div id="scannerOverlay" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: white;">
+                    <i class="fas fa-qrcode" style="font-size: 48px; opacity: 0.5;"></i>
+                    <div style="margin-top: 12px; font-size: 14px;">Tekan tombol untuk memulai</div>
+                </div>
+            </div>
+            
+            <!-- Scanner Controls -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+                <button class="btn btn-primary" id="btnStartScan" onclick="startQRScanner()">
+                    <i class="fas fa-camera"></i> Mulai Scan
+                </button>
+                <button class="btn btn-danger" id="btnStopScan" onclick="stopQRScanner()" style="display: none;">
+                    <i class="fas fa-stop"></i> Stop Scan
+                </button>
+            </div>
+            
+            <!-- Scanner Status -->
+            <div id="scannerStatus" style="text-align: center; padding: 12px; background: var(--gray-light); border-radius: 8px; font-size: 14px; color: var(--gray); margin-bottom: 20px;">
+                Scanner siap digunakan
+            </div>
+            
+            <!-- Hasil Scan -->
+            <div id="hasilScanCard" style="display: none; background: var(--gray-light); padding: 16px; border-radius: 12px; margin-bottom: 20px;">
+                <h4 style="margin: 0 0 12px 0; font-size: 15px;">📋 Data Siswa</h4>
+                <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+                    <div id="hasilFoto" style="width: 80px; height: 80px; background: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 40px;">
+                        👤
+                    </div>
+                    <div style="flex: 1;">
+                        <div id="hasilNama" style="font-weight: 600; font-size: 16px; margin-bottom: 4px;">-</div>
+                        <div id="hasilNIS" style="font-size: 13px; color: var(--gray); margin-bottom: 4px;">NIS: -</div>
+                        <div id="hasilKelas" style="font-size: 13px; color: var(--gray);">Kelas: -</div>
+                    </div>
+                </div>
+                <div id="hasilStatus" style="padding: 12px; background: white; border-radius: 8px; text-align: center; font-weight: 600; margin-bottom: 12px;">
+                    Status: -
+                </div>
+                <button class="btn btn-primary" id="btnTandaiHadir" onclick="tandaiHadirQR()" style="width: 100%;">
+                    ✅ Tandai Hadir
+                </button>
+            </div>
+            
+            <!-- Rekap Hari Ini -->
+            <div style="background: var(--gray-light); padding: 16px; border-radius: 12px;">
+                <h4 style="margin: 0 0 12px 0; font-size: 15px;">📊 Rekap Hari Ini</h4>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+                    <div style="background: white; padding: 12px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 24px; font-weight: bold; color: var(--primary);" id="rekapTotal">0</div>
+                        <div style="font-size: 12px; color: var(--gray);">Total Siswa</div>
+                    </div>
+                    <div style="background: white; padding: 12px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 24px; font-weight: bold; color: #10B981;" id="rekapHadir">0</div>
+                        <div style="font-size: 12px; color: var(--gray);">Sudah Hadir</div>
+                    </div>
+                </div>
+                <button class="btn btn-blue" onclick="lihatRekapLengkap()" style="width: 100%; margin-top: 12px;">
+                    <i class="fas fa-list"></i> Lihat Rekap Lengkap
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- CETAK LABEL PAGE -->
+    <div id="cetakLabelPage" class="page">
+        <div class="card-premium">
+            <h3 style="margin: 0 0 20px 0; display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-tags" style="color: var(--primary);"></i>
+                Cetak Label Siswa
+            </h3>
+            
+            <!-- Filter -->
+            <div style="background: var(--gray-light); padding: 16px; border-radius: 12px; margin-bottom: 20px;">
+                <h4 style="margin: 0 0 12px 0; font-size: 15px;">🔍 Filter Data</h4>
+                <div style="display: grid; gap: 12px;">
+                    <div>
+                        <label style="display: block; margin-bottom: 6px; font-size: 13px; font-weight: 600;">Pilih Kelas</label>
+                        <select id="labelKelasSelect" class="form-input" onchange="updateLabelPreview()">
+                            <option value="">-- Semua Kelas --</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 6px; font-size: 13px; font-weight: 600;">Jenis Kelamin</label>
+                        <select id="labelJKSelect" class="form-input" onchange="updateLabelPreview()">
+                            <option value="">Semua</option>
+                            <option value="L">Laki-laki</option>
+                            <option value="P">Perempuan</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Field Selection -->
+            <div style="background: var(--gray-light); padding: 16px; border-radius: 12px; margin-bottom: 20px;">
+                <h4 style="margin: 0 0 12px 0; font-size: 15px;">📋 Pilih Data yang Dicetak</h4>
+                <div id="labelFieldsCheckbox" style="display: grid; gap: 8px;">
+                    <!-- Checkboxes will be inserted here -->
+                </div>
+            </div>
+            
+            <!-- Preview Count -->
+            <div style="background: var(--primary); color: white; padding: 16px; border-radius: 12px; margin-bottom: 20px; text-align: center;">
+                <div style="font-size: 14px; opacity: 0.9; margin-bottom: 4px;">Total Label yang Akan Dicetak</div>
+                <div style="font-size: 32px; font-weight: bold;" id="labelCount">0</div>
+            </div>
+            
+            <!-- Actions -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <button class="btn btn-primary" onclick="cetakLabelBiasa()">
+                    <i class="fas fa-print"></i> Cetak Biasa
+                </button>
+                <button class="btn btn-blue" onclick="cetakLabelGrup()">
+                    <i class="fas fa-layer-group"></i> Cetak Per Grup
+                </button>
+            </div>
+            
+            <!-- Info -->
+            <div style="margin-top: 16px; padding: 12px; background: #EFF6FF; border-left: 4px solid #3B82F6; border-radius: 8px; font-size: 13px;">
+                <strong>💡 Tips:</strong><br>
+                • <strong>Cetak Biasa:</strong> Semua siswa dalam 1 file<br>
+                • <strong>Cetak Per Grup:</strong> Dikelompokkan per kelas
+            </div>
+        </div>
+    </div>
+
     <!-- LAPORAN PAGE -->
     <div id="laporanPage" class="page">
         <div class="card-premium">
@@ -1963,6 +2155,9 @@ function loadAllData() {
         
         // Load configuration
         loadKonfigurasi();
+        
+        // Load absensi QR
+        loadAbsensiQR();
         
         // Update wali kelas dropdown after all data loaded
         setTimeout(() => {
@@ -2334,6 +2529,678 @@ function updateHeaderWithConfig() {
     }
 }
 
+// ==================== QR SCANNER ABSENSI ====================
+let scannerStream = null;
+let scannerAnimFrame = null;
+let currentScanSesi = null;
+let lastScannedSiswa = null;
+let absensiQRList = []; // Format: [{tanggal, kelasId, siswaId, waktu, status}]
+
+function loadAbsensiQR() {
+    const saved = localStorage.getItem('data_absensi_qr');
+    if (saved) {
+        try {
+            absensiQRList = JSON.parse(saved);
+        } catch (e) {
+            absensiQRList = [];
+        }
+    }
+}
+
+function saveAbsensiQR() {
+    localStorage.setItem('data_absensi_qr', JSON.stringify(absensiQRList));
+}
+
+function updateScanSesi() {
+    const kelasId = document.getElementById('scanKelasSelect').value;
+    const tanggal = document.getElementById('scanTanggal').value;
+    
+    if (!tanggal) {
+        document.getElementById('scanSesiInfo').textContent = 'Pilih tanggal terlebih dahulu';
+        return;
+    }
+    
+    currentScanSesi = {
+        kelasId: kelasId || 'all',
+        tanggal: tanggal
+    };
+    
+    const kelasNama = kelasId ? (kelasList.find(k => k.id == kelasId)?.nama || 'Semua Kelas') : 'Semua Kelas';
+    document.getElementById('scanSesiInfo').textContent = `${kelasNama} - ${tanggal}`;
+    
+    updateRekapAbsensi();
+}
+
+function updateRekapAbsensi() {
+    if (!currentScanSesi) {
+        document.getElementById('rekapTotal').textContent = '0';
+        document.getElementById('rekapHadir').textContent = '0';
+        return;
+    }
+    
+    let siswaFiltered = siswaList;
+    if (currentScanSesi.kelasId !== 'all') {
+        siswaFiltered = siswaList.filter(s => s.kelasId == currentScanSesi.kelasId);
+    }
+    
+    const hadirToday = absensiQRList.filter(a => 
+        a.tanggal === currentScanSesi.tanggal &&
+        (currentScanSesi.kelasId === 'all' || a.kelasId == currentScanSesi.kelasId)
+    );
+    
+    document.getElementById('rekapTotal').textContent = siswaFiltered.length;
+    document.getElementById('rekapHadir').textContent = hadirToday.length;
+}
+
+async function startQRScanner() {
+    if (!currentScanSesi || !currentScanSesi.tanggal) {
+        showToast('❌ Pilih tanggal terlebih dahulu!');
+        return;
+    }
+    
+    const video = document.getElementById('scannerVideo');
+    const statusEl = document.getElementById('scannerStatus');
+    const overlay = document.getElementById('scannerOverlay');
+    
+    try {
+        scannerStream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }
+        });
+        
+        video.srcObject = scannerStream;
+        video.play();
+        
+        document.getElementById('btnStartScan').style.display = 'none';
+        document.getElementById('btnStopScan').style.display = 'block';
+        overlay.style.display = 'none';
+        
+        statusEl.textContent = '🔍 Arahkan kamera ke QR Code...';
+        statusEl.style.color = 'var(--primary)';
+        statusEl.style.background = '#EFF6FF';
+        
+        scanQRFrames();
+    } catch (e) {
+        console.error('Camera error:', e);
+        statusEl.textContent = '❌ Izinkan akses kamera!';
+        statusEl.style.color = 'var(--red)';
+        statusEl.style.background = '#FEE2E2';
+        showToast('❌ Gagal akses kamera. Pastikan izin diberikan!');
+    }
+}
+
+function stopQRScanner() {
+    if (scannerStream) {
+        scannerStream.getTracks().forEach(t => t.stop());
+        scannerStream = null;
+    }
+    if (scannerAnimFrame) {
+        cancelAnimationFrame(scannerAnimFrame);
+        scannerAnimFrame = null;
+    }
+    
+    const video = document.getElementById('scannerVideo');
+    const overlay = document.getElementById('scannerOverlay');
+    
+    if (video) video.srcObject = null;
+    
+    document.getElementById('btnStartScan').style.display = 'block';
+    document.getElementById('btnStopScan').style.display = 'none';
+    overlay.style.display = 'flex';
+    
+    const statusEl = document.getElementById('scannerStatus');
+    statusEl.textContent = 'Scanner dihentikan';
+    statusEl.style.color = 'var(--gray)';
+    statusEl.style.background = 'var(--gray-light)';
+}
+
+function scanQRFrames() {
+    const video = document.getElementById('scannerVideo');
+    const canvas = document.getElementById('scannerCanvas');
+    
+    if (!video || !canvas || !scannerStream) return;
+    
+    if (video.readyState === video.HAVE_ENOUGH_DATA) {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const code = jsQR(imageData.data, imageData.width, imageData.height, {
+            inversionAttempts: 'dontInvert'
+        });
+        
+        if (code && code.data) {
+            prosesHasilScanQR(code.data);
+            return;
+        }
+    }
+    
+    scannerAnimFrame = requestAnimationFrame(scanQRFrames);
+}
+
+function prosesHasilScanQR(qrData) {
+    stopQRScanner();
+    
+    const statusEl = document.getElementById('scannerStatus');
+    statusEl.textContent = '✅ QR terbaca! Mencari data siswa...';
+    statusEl.style.color = '#10B981';
+    statusEl.style.background = '#D1FAE5';
+    
+    // QR data format: "NIS:12345" atau hanya "12345"
+    const nis = qrData.replace('NIS:', '').trim();
+    
+    const siswa = siswaList.find(s => s.nis === nis);
+    
+    if (!siswa) {
+        statusEl.textContent = '❌ Siswa tidak ditemukan! NIS: ' + nis;
+        statusEl.style.color = 'var(--red)';
+        statusEl.style.background = '#FEE2E2';
+        document.getElementById('hasilScanCard').style.display = 'none';
+        showToast('❌ Siswa dengan NIS ' + nis + ' tidak ditemukan');
+        return;
+    }
+    
+    lastScannedSiswa = siswa;
+    tampilHasilScanQR(siswa);
+}
+
+function tampilHasilScanQR(siswa) {
+    const kelas = kelasList.find(k => k.id == siswa.kelasId);
+    
+    document.getElementById('hasilNama').textContent = siswa.nama;
+    document.getElementById('hasilNIS').textContent = 'NIS: ' + siswa.nis;
+    document.getElementById('hasilKelas').textContent = 'Kelas: ' + (kelas?.nama || '-');
+    
+    // Check if already present
+    const sudahAbsen = absensiQRList.find(a =>
+        a.tanggal === currentScanSesi.tanggal &&
+        a.siswaId == siswa.id
+    );
+    
+    const statusEl = document.getElementById('hasilStatus');
+    const btnEl = document.getElementById('btnTandaiHadir');
+    
+    if (sudahAbsen) {
+        statusEl.textContent = '✅ Sudah Hadir - ' + sudahAbsen.waktu;
+        statusEl.style.color = '#10B981';
+        statusEl.style.background = '#D1FAE5';
+        btnEl.textContent = '❌ Batalkan Hadir';
+        btnEl.style.background = 'var(--red)';
+    } else {
+        statusEl.textContent = '⏳ Belum Hadir';
+        statusEl.style.color = '#F59E0B';
+        statusEl.style.background = '#FEF3C7';
+        btnEl.textContent = '✅ Tandai Hadir';
+        btnEl.style.background = 'var(--primary)';
+    }
+    
+    document.getElementById('hasilScanCard').style.display = 'block';
+}
+
+function tandaiHadirQR() {
+    if (!lastScannedSiswa || !currentScanSesi) return;
+    
+    const siswa = lastScannedSiswa;
+    const sudahAbsen = absensiQRList.find(a =>
+        a.tanggal === currentScanSesi.tanggal &&
+        a.siswaId == siswa.id
+    );
+    
+    if (sudahAbsen) {
+        // Batalkan hadir
+        const index = absensiQRList.indexOf(sudahAbsen);
+        absensiQRList.splice(index, 1);
+        saveAbsensiQR();
+        showToast('✅ Absensi dibatalkan');
+    } else {
+        // Tandai hadir
+        const now = new Date();
+        const waktu = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+        
+        absensiQRList.push({
+            id: Date.now(),
+            tanggal: currentScanSesi.tanggal,
+            kelasId: siswa.kelasId,
+            siswaId: siswa.id,
+            waktu: waktu,
+            status: 'Hadir'
+        });
+        
+        saveAbsensiQR();
+        showToast('✅ Siswa berhasil diabsen');
+    }
+    
+    updateRekapAbsensi();
+    tampilHasilScanQR(siswa);
+}
+
+function lihatRekapLengkap() {
+    if (!currentScanSesi || !currentScanSesi.tanggal) {
+        showToast('❌ Pilih tanggal terlebih dahulu!');
+        return;
+    }
+    
+    // Redirect to laporan absensi with filters
+    showPagePremium('laporanPage');
+    
+    setTimeout(() => {
+        tampilkanLaporanAbsensi();
+        
+        setTimeout(() => {
+            // Set filters
+            if (currentScanSesi.kelasId !== 'all') {
+                document.getElementById('filterKelasAbsensi').value = currentScanSesi.kelasId;
+            }
+            
+            // Set tanggal (extract month and year)
+            const date = new Date(currentScanSesi.tanggal);
+            document.getElementById('filterBulanAbsensi').value = date.getMonth() + 1;
+            document.getElementById('filterTahunAbsensi').value = date.getFullYear();
+            
+            // Generate
+            setTimeout(() => {
+                generateLaporanAbsensi();
+            }, 100);
+        }, 200);
+    }, 100);
+}
+
+// ==================== QR CODE GENERATOR ====================
+async function generateQRSiswa(siswaId) {
+    const siswa = siswaList.find(s => s.id == siswaId);
+    if (!siswa) return;
+    
+    const qrData = 'NIS:' + siswa.nis;
+    
+    try {
+        const canvas = document.createElement('canvas');
+        await QRCode.toCanvas(canvas, qrData, {
+            width: 300,
+            margin: 2,
+            color: {
+                dark: '#0D5C4A',
+                light: '#FFFFFF'
+            }
+        });
+        
+        // Download QR
+        const link = document.createElement('a');
+        link.download = `QR_${siswa.nama.replace(/\s+/g, '_')}_${siswa.nis}.png`;
+        link.href = canvas.toDataURL();
+        link.click();
+        
+        showToast('✅ QR Code berhasil didownload');
+    } catch (e) {
+        console.error('QR generation error:', e);
+        showToast('❌ Gagal generate QR Code');
+    }
+}
+
+async function generateAllQRSiswa() {
+    if (siswaList.length === 0) {
+        showToast('❌ Tidak ada data siswa');
+        return;
+    }
+    
+    if (!confirm(`Generate QR Code untuk ${siswaList.length} siswa?`)) {
+        return;
+    }
+    
+    showToast('⏳ Generating QR Codes...');
+    
+    for (let i = 0; i < siswaList.length; i++) {
+        await generateQRSiswa(siswaList[i].id);
+        // Small delay to prevent browser freeze
+        await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    
+    showToast('✅ Semua QR Code berhasil didownload');
+}
+
+async function viewQRSiswa(siswaId) {
+    const siswa = siswaList.find(s => s.id == siswaId);
+    if (!siswa) return;
+    
+    const kelas = kelasList.find(k => k.id == siswa.kelasId);
+    const qrData = 'NIS:' + siswa.nis;
+    
+    try {
+        const canvas = document.createElement('canvas');
+        await QRCode.toCanvas(canvas, qrData, {
+            width: 300,
+            margin: 2,
+            color: {
+                dark: '#0D5C4A',
+                light: '#FFFFFF'
+            }
+        });
+        
+        const qrImage = canvas.toDataURL();
+        
+        const html = `
+            <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px;" onclick="this.remove()">
+                <div style="background: white; border-radius: 20px; padding: 24px; max-width: 400px; width: 100%; text-align: center;" onclick="event.stopPropagation()">
+                    <h3 style="margin: 0 0 16px 0; color: var(--primary);">📱 QR Code Siswa</h3>
+                    <div style="margin-bottom: 16px;">
+                        <div style="font-size: 18px; font-weight: bold; margin-bottom: 4px;">${siswa.nama}</div>
+                        <div style="font-size: 14px; color: var(--gray);">NIS: ${siswa.nis}</div>
+                        <div style="font-size: 14px; color: var(--gray);">Kelas: ${kelas?.nama || '-'}</div>
+                    </div>
+                    <div style="background: var(--gray-light); padding: 16px; border-radius: 12px; margin-bottom: 16px;">
+                        <img src="${qrImage}" style="width: 100%; max-width: 250px; height: auto;">
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <button onclick="downloadQRFromModal('${siswa.nama}', '${siswa.nis}', '${qrImage}')" style="padding: 12px; background: var(--primary); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer;">
+                            📥 Download
+                        </button>
+                        <button onclick="this.closest('div[onclick]').click()" style="padding: 12px; background: var(--gray-light); color: var(--dark); border: none; border-radius: 10px; font-weight: 600; cursor: pointer;">
+                            ✕ Tutup
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', html);
+    } catch (e) {
+        console.error('QR view error:', e);
+        showToast('❌ Gagal menampilkan QR Code');
+    }
+}
+
+function downloadQRFromModal(nama, nis, qrImage) {
+    const link = document.createElement('a');
+    link.download = `QR_${nama.replace(/\s+/g, '_')}_${nis}.png`;
+    link.href = qrImage;
+    link.click();
+    showToast('✅ QR Code berhasil didownload');
+}
+
+// ==================== CETAK LABEL ====================
+function updateLabelPreview() {
+    const kelasId = document.getElementById('labelKelasSelect').value;
+    const jk = document.getElementById('labelJKSelect').value;
+    
+    let filtered = siswaList;
+    
+    if (kelasId) {
+        filtered = filtered.filter(s => s.kelasId == kelasId);
+    }
+    
+    if (jk) {
+        filtered = filtered.filter(s => s.jk === jk);
+    }
+    
+    document.getElementById('labelCount').textContent = filtered.length;
+}
+
+function renderLabelFieldCheckboxes() {
+    const container = document.getElementById('labelFieldsCheckbox');
+    const defaultFields = [
+        { id: 'nis', label: 'NIS', checked: true },
+        { id: 'kelas', label: 'Kelas', checked: true },
+        { id: 'jk', label: 'Jenis Kelamin', checked: true },
+        { id: 'tglLahir', label: 'Tanggal Lahir', checked: true },
+        { id: 'wa', label: 'No. WhatsApp', checked: true }
+    ];
+    
+    let html = '';
+    defaultFields.forEach(field => {
+        html += `
+            <label style="display: flex; align-items: center; gap: 8px; padding: 8px; background: white; border-radius: 8px; cursor: pointer;">
+                <input type="checkbox" id="labelField_${field.id}" ${field.checked ? 'checked' : ''} style="width: 18px; height: 18px; cursor: pointer;">
+                <span style="font-size: 14px;">${field.label}</span>
+            </label>
+        `;
+    });
+    
+    container.innerHTML = html;
+}
+
+function cetakLabelBiasa() {
+    const kelasId = document.getElementById('labelKelasSelect').value;
+    const jk = document.getElementById('labelJKSelect').value;
+    
+    let filtered = siswaList;
+    
+    if (kelasId) {
+        filtered = filtered.filter(s => s.kelasId == kelasId);
+    }
+    
+    if (jk) {
+        filtered = filtered.filter(s => s.jk === jk);
+    }
+    
+    if (filtered.length === 0) {
+        showToast('❌ Tidak ada data untuk dicetak!');
+        return;
+    }
+    
+    generateLabelHTML(filtered, 'Semua Siswa');
+}
+
+function cetakLabelGrup() {
+    const kelasId = document.getElementById('labelKelasSelect').value;
+    
+    if (!kelasId) {
+        showToast('❌ Pilih kelas terlebih dahulu untuk cetak per grup!');
+        return;
+    }
+    
+    const kelas = kelasList.find(k => k.id == kelasId);
+    if (!kelas) return;
+    
+    const siswaKelas = siswaList.filter(s => s.kelasId == kelasId);
+    
+    if (siswaKelas.length === 0) {
+        showToast('❌ Tidak ada siswa di kelas ini!');
+        return;
+    }
+    
+    generateLabelHTML(siswaKelas, kelas.nama);
+}
+
+function generateLabelHTML(siswaList, grupNama) {
+    const logo = configLembaga.logo || '';
+    const namaLembaga = configLembaga.nama || 'SekolahKu';
+    
+    const logoHtml = logo
+        ? `<img src="${logo}" style="width:32px;height:32px;object-fit:contain;border-radius:4px;">`
+        : `<div style="font-size:20px;">🏫</div>`;
+    
+    // Get selected fields
+    const showNIS = document.getElementById('labelField_nis')?.checked;
+    const showKelas = document.getElementById('labelField_kelas')?.checked;
+    const showJK = document.getElementById('labelField_jk')?.checked;
+    const showTglLahir = document.getElementById('labelField_tglLahir')?.checked;
+    const showWA = document.getElementById('labelField_wa')?.checked;
+    
+    let cardsHtml = '';
+    
+    siswaList.forEach(siswa => {
+        const kelas = kelasList.find(k => k.id == siswa.kelasId);
+        let fieldsHtml = '';
+        
+        if (showNIS) {
+            fieldsHtml += `<div class="field-row">📌 <b>NIS</b>: ${siswa.nis}</div>`;
+        }
+        if (showKelas && kelas) {
+            fieldsHtml += `<div class="field-row">🏛️ <b>Kelas</b>: ${kelas.nama}</div>`;
+        }
+        if (showJK) {
+            const jkText = siswa.jk === 'L' ? 'Laki-laki' : 'Perempuan';
+            const jkIcon = siswa.jk === 'L' ? '👦' : '👧';
+            fieldsHtml += `<div class="field-row">${jkIcon} <b>JK</b>: ${jkText}</div>`;
+        }
+        if (showTglLahir && siswa.tglLahir) {
+            fieldsHtml += `<div class="field-row">🎂 <b>TTL</b>: ${siswa.tglLahir}</div>`;
+        }
+        if (showWA && siswa.wa) {
+            fieldsHtml += `<div class="field-row">📱 <b>WA</b>: ${siswa.wa}</div>`;
+        }
+        
+        cardsHtml += `
+            <div class="label-card">
+                <div class="card-header">
+                    ${logoHtml}
+                    <div class="card-nama">${siswa.nama}</div>
+                </div>
+                <div class="card-fields">${fieldsHtml || '<div style="color:#888;font-size:10px;">Tidak ada data</div>'}</div>
+                <div class="card-footer">${namaLembaga}</div>
+            </div>
+        `;
+    });
+    
+    const html = `<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cetak Label - ${grupNama}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f0f0f0;
+            padding: 10px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 16px;
+            background: white;
+            border-radius: 12px;
+        }
+        .header h2 {
+            color: #0D5C4A;
+            margin-bottom: 4px;
+        }
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            max-width: 190mm;
+            margin: 0 auto;
+        }
+        .label-card {
+            background: white;
+            border-radius: 8px;
+            padding: 10px;
+            border: 2px solid #0D5C4A;
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1.5px dashed #D4AF37;
+            padding-bottom: 6px;
+            margin-bottom: 6px;
+        }
+        .card-nama {
+            font-size: 12px;
+            font-weight: bold;
+            color: #0D5C4A;
+            text-transform: uppercase;
+            line-height: 1.3;
+            flex: 1;
+        }
+        .card-fields {
+            margin-bottom: 4px;
+        }
+        .field-row {
+            font-size: 10px;
+            color: #444;
+            margin: 2px 0;
+            line-height: 1.4;
+        }
+        .card-footer {
+            text-align: center;
+            margin-top: 6px;
+            padding-top: 4px;
+            border-top: 1px solid #e2e8f0;
+            font-size: 9px;
+            color: #999;
+        }
+        .no-print {
+            text-align: center;
+            margin-top: 20px;
+            padding: 16px;
+        }
+        .no-print button {
+            padding: 12px 32px;
+            margin: 0 8px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        @media print {
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            html, body {
+                margin: 0;
+                padding: 0;
+                background: white;
+                width: 210mm;
+            }
+            .header {
+                background: white;
+                margin-bottom: 10px;
+            }
+            .grid {
+                gap: 5mm;
+                max-width: 190mm;
+                padding: 5mm;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header no-print">
+        <h2>📋 Label Siswa - ${grupNama}</h2>
+        <p>Total: ${siswaList.length} siswa</p>
+    </div>
+    <div class="grid">${cardsHtml}</div>
+    <div class="no-print">
+        <button onclick="window.print()" style="background:#0D5C4A;color:white;">
+            🖨️ CETAK
+        </button>
+        <button onclick="window.close()" style="background:#e2e8f0;color:#333;">
+            ✕ TUTUP
+        </button>
+    </div>
+</body>
+</html>`;
+    
+    const win = window.open('', '_blank');
+    if (!win) {
+        showToast('❌ Izinkan popup untuk cetak!');
+        return;
+    }
+    
+    win.document.write(html);
+    win.document.close();
+    showToast('✅ Jendela cetak dibuka');
+}
+
 // ==================== LOGOUT ====================
 function doLogout() {
     if (confirm('Yakin ingin logout?')) {
@@ -2375,6 +3242,41 @@ function showPagePremium(pageId) {
         renderKonfigurasiForm();
     }
     
+    // Render scan QR page
+    if (pageId === 'scanQRPage') {
+        // Populate kelas dropdown
+        const kelasSelect = document.getElementById('scanKelasSelect');
+        if (kelasSelect) {
+            let html = '<option value="">-- Semua Kelas --</option>';
+            kelasList.forEach(k => {
+                html += `<option value="${k.id}">${k.nama}</option>`;
+            });
+            kelasSelect.innerHTML = html;
+        }
+        
+        // Set today's date
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('scanTanggal').value = today;
+        
+        updateScanSesi();
+    }
+    
+    // Render cetak label page
+    if (pageId === 'cetakLabelPage') {
+        // Populate kelas dropdown
+        const kelasSelect = document.getElementById('labelKelasSelect');
+        if (kelasSelect) {
+            let html = '<option value="">-- Semua Kelas --</option>';
+            kelasList.forEach(k => {
+                html += `<option value="${k.id}">${k.nama}</option>`;
+            });
+            kelasSelect.innerHTML = html;
+        }
+        
+        renderLabelFieldCheckboxes();
+        updateLabelPreview();
+    }
+    
     // Update nav active state
     document.querySelectorAll('.nav-item-premium').forEach(item => {
         item.classList.remove('active');
@@ -2394,6 +3296,8 @@ function showPagePremium(pageId) {
         'laporanPage': 2,
         'dashboardWaliPage': 1,
         'konfigurasiPage': 3,
+        'scanQRPage': 1,
+        'cetakLabelPage': 1,
         'profilPage': 3
     };
     
@@ -2509,6 +3413,9 @@ function renderSiswaList() {
                     </p>
                 </div>
                 <div class="action-buttons">
+                    <button class="btn-edit" onclick="viewQRSiswa(${siswa.id})" title="Lihat QR Code">
+                        <i class="fas fa-qrcode"></i>
+                    </button>
                     <button class="btn-delete" onclick="hapusSiswa(${siswa.id})">
                         <i class="fas fa-trash"></i>
                     </button>
