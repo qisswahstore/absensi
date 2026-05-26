@@ -985,10 +985,12 @@
     <div class="header-premium">
         <div class="header-top">
             <div style="display: flex; align-items: center;">
-                <div class="header-logo">🏫</div>
+                <div class="header-logo" id="headerLogo">
+                    <i class="fas fa-graduation-cap" style="font-size: 32px;"></i>
+                </div>
                 <div class="header-info">
-                    <div class="header-title">SekolahKu</div>
-                    <div class="header-subtitle" id="userName">User</div>
+                    <div class="header-title" id="headerTitle">SekolahKu</div>
+                    <div class="header-subtitle" id="headerSubtitle">Sistem Manajemen Sekolah</div>
                 </div>
             </div>
             <div class="header-actions">
@@ -996,6 +998,12 @@
                     <i class="fas fa-moon" id="darkModeIcon"></i>
                 </button>
             </div>
+        </div>
+        
+        <!-- User Info -->
+        <div style="padding: 8px 20px; font-size: 13px; color: rgba(255,255,255,0.9);">
+            <span id="userName">User</span> • 
+            <span id="currentDate"></span>
         </div>
         
         <!-- Stats Row -->
@@ -1066,6 +1074,11 @@
             <div class="menu-card-premium" id="menuWaliKelas" onclick="showPagePremium('dashboardWaliPage')" style="display: none;">
                 <div class="menu-icon">👨‍🏫</div>
                 <div class="menu-label">Dashboard Wali</div>
+            </div>
+            <!-- Konfigurasi - Show only for Admin -->
+            <div class="menu-card-premium" id="menuKonfigurasi" onclick="showPagePremium('konfigurasiPage')" style="display: none;">
+                <div class="menu-icon">⚙️</div>
+                <div class="menu-label">Konfigurasi</div>
             </div>
         </div>
     </div>
@@ -1575,6 +1588,146 @@
         </div>
     </div>
     
+    <!-- KONFIGURASI PAGE -->
+    <div id="konfigurasiPage" class="page">
+        <div class="card-premium">
+            <h3 style="margin: 0 0 20px 0; display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-cog" style="color: var(--primary);"></i>
+                Konfigurasi Lembaga
+            </h3>
+            
+            <div id="configContent" style="display: flex; flex-direction: column; gap: 20px;">
+                <!-- Logo Section -->
+                <div style="background: var(--gray-light); padding: 20px; border-radius: 12px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600;">
+                        <i class="fas fa-image"></i> Logo Lembaga
+                    </label>
+                    <input type="file" id="logoUpload" accept="image/*" style="display: none;" onchange="handleLogoUpload(event)">
+                    <button class="btn btn-blue" onclick="document.getElementById('logoUpload').click()">
+                        <i class="fas fa-upload"></i> Upload Logo
+                    </button>
+                    <div id="logoPreview" style="margin-top: 15px; text-align: center;">
+                        <!-- Preview will be inserted here -->
+                    </div>
+                    <p style="font-size: 12px; color: var(--gray); margin-top: 8px;">
+                        💡 Rekomendasi: Ukuran 200x200px, format PNG/JPG, maksimal 500KB
+                    </p>
+                </div>
+                
+                <!-- Nama Lembaga -->
+                <div>
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600;">
+                        <i class="fas fa-school"></i> Nama Lembaga/Sekolah/Pesantren *
+                    </label>
+                    <input type="text" id="configNama" class="form-input" placeholder="Contoh: SD Islam Terpadu Al-Ikhlas">
+                </div>
+                
+                <!-- Tagline -->
+                <div>
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600;">
+                        <i class="fas fa-quote-right"></i> Tagline/Motto
+                    </label>
+                    <input type="text" id="configTagline" class="form-input" placeholder="Contoh: Berakhlak Mulia dan Berprestasi">
+                </div>
+                
+                <!-- Alamat -->
+                <div>
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600;">
+                        <i class="fas fa-map-marker-alt"></i> Alamat Lengkap *
+                    </label>
+                    <textarea id="configAlamat" class="form-input" rows="2" placeholder="Jl. Merdeka No. 123"></textarea>
+                </div>
+                
+                <!-- Kota & Kode Pos -->
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 12px;">
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600;">
+                            <i class="fas fa-city"></i> Kota/Kabupaten *
+                        </label>
+                        <input type="text" id="configKota" class="form-input" placeholder="Jakarta">
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600;">Kode Pos</label>
+                        <input type="text" id="configKodePos" class="form-input" placeholder="12345">
+                    </div>
+                </div>
+                
+                <!-- Telepon & Email -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600;">
+                            <i class="fas fa-phone"></i> Telepon *
+                        </label>
+                        <input type="tel" id="configTelepon" class="form-input" placeholder="021-12345678">
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600;">
+                            <i class="fas fa-envelope"></i> Email
+                        </label>
+                        <input type="email" id="configEmail" class="form-input" placeholder="info@sekolah.sch.id">
+                    </div>
+                </div>
+                
+                <!-- Website & NPSN -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600;">
+                            <i class="fas fa-globe"></i> Website
+                        </label>
+                        <input type="text" id="configWebsite" class="form-input" placeholder="www.sekolah.sch.id">
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600;">
+                            <i class="fas fa-id-card"></i> NPSN
+                        </label>
+                        <input type="text" id="configNPSN" class="form-input" placeholder="12345678">
+                    </div>
+                </div>
+                
+                <!-- Kepala Sekolah & Jabatan -->
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 12px;">
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600;">
+                            <i class="fas fa-user-tie"></i> Nama Pimpinan *
+                        </label>
+                        <input type="text" id="configPimpinan" class="form-input" placeholder="Drs. Ahmad Subhan, M.Pd">
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600;">Jabatan</label>
+                        <input type="text" id="configJabatan" class="form-input" placeholder="Kepala Sekolah" value="Kepala Sekolah">
+                    </div>
+                </div>
+                
+                <!-- Buttons -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 10px;">
+                    <button class="btn btn-primary" onclick="saveKonfigurasi()">
+                        <i class="fas fa-save"></i> Simpan
+                    </button>
+                    <button class="btn btn-blue" onclick="exportKonfigurasi()">
+                        <i class="fas fa-download"></i> Export
+                    </button>
+                    <button class="btn btn-gray" onclick="resetKonfigurasi()">
+                        <i class="fas fa-undo"></i> Reset
+                    </button>
+                </div>
+                
+                <!-- Import Config -->
+                <div style="border-top: 2px solid var(--gray-light); padding-top: 20px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600;">
+                        <i class="fas fa-upload"></i> Import Konfigurasi
+                    </label>
+                    <input type="file" id="importConfig" accept=".json" style="display: none;" onchange="handleImportConfig(event)">
+                    <button class="btn btn-blue" onclick="document.getElementById('importConfig').click()">
+                        <i class="fas fa-file-import"></i> Import dari File JSON
+                    </button>
+                    <p style="font-size: 12px; color: var(--gray); margin-top: 8px;">
+                        💡 Import konfigurasi yang sudah di-export sebelumnya
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- LAPORAN PAGE -->
     <div id="laporanPage" class="page">
         <div class="card-premium">
@@ -1808,6 +1961,9 @@ function loadAllData() {
         
         pembayaranList = JSON.parse(localStorage.getItem('data_pembayaran') || '[]');
         
+        // Load configuration
+        loadKonfigurasi();
+        
         // Update wali kelas dropdown after all data loaded
         setTimeout(() => {
             updateWaliKelasDropdown();
@@ -1918,6 +2074,14 @@ function showMainApp() {
     document.getElementById('profilNama').textContent = currentUser.nama;
     document.getElementById('profilRole').textContent = currentUser.role.toUpperCase();
     
+    // Update current date
+    const currentDateEl = document.getElementById('currentDate');
+    if (currentDateEl) {
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        const dateStr = new Date().toLocaleDateString('id-ID', options);
+        currentDateEl.textContent = dateStr;
+    }
+    
     // Show/hide Dashboard Wali Kelas menu based on role
     const menuWaliKelas = document.getElementById('menuWaliKelas');
     if (menuWaliKelas) {
@@ -1931,6 +2095,12 @@ function showMainApp() {
         } else {
             menuWaliKelas.style.display = 'none';
         }
+    }
+    
+    // Show/hide Konfigurasi menu (admin only)
+    const menuKonfigurasi = document.getElementById('menuKonfigurasi');
+    if (menuKonfigurasi) {
+        menuKonfigurasi.style.display = currentUser.role === 'admin' ? 'block' : 'none';
     }
     
     // Update dashboard stats
@@ -1951,6 +2121,220 @@ function showMainApp() {
     console.log('✅ Main app loaded for:', currentUser.nama);
 }
 
+// ==================== KONFIGURASI LEMBAGA ====================
+let configLembaga = {
+    nama: 'SekolahKu',
+    logo: '',
+    tagline: 'Sistem Manajemen Sekolah',
+    alamat: '',
+    kota: '',
+    kodePos: '',
+    telepon: '',
+    email: '',
+    website: '',
+    npsn: '',
+    pimpinan: '',
+    jabatan: 'Kepala Sekolah'
+};
+
+function loadKonfigurasi() {
+    const saved = localStorage.getItem('config_lembaga');
+    if (saved) {
+        try {
+            configLembaga = JSON.parse(saved);
+        } catch (e) {
+            console.error('Error loading config:', e);
+        }
+    }
+    updateHeaderWithConfig();
+}
+
+function renderKonfigurasiForm() {
+    document.getElementById('configNama').value = configLembaga.nama || '';
+    document.getElementById('configTagline').value = configLembaga.tagline || '';
+    document.getElementById('configAlamat').value = configLembaga.alamat || '';
+    document.getElementById('configKota').value = configLembaga.kota || '';
+    document.getElementById('configKodePos').value = configLembaga.kodePos || '';
+    document.getElementById('configTelepon').value = configLembaga.telepon || '';
+    document.getElementById('configEmail').value = configLembaga.email || '';
+    document.getElementById('configWebsite').value = configLembaga.website || '';
+    document.getElementById('configNPSN').value = configLembaga.npsn || '';
+    document.getElementById('configPimpinan').value = configLembaga.pimpinan || '';
+    document.getElementById('configJabatan').value = configLembaga.jabatan || 'Kepala Sekolah';
+    
+    // Show logo preview
+    const logoPreview = document.getElementById('logoPreview');
+    if (configLembaga.logo) {
+        logoPreview.innerHTML = `
+            <img src="${configLembaga.logo}" style="max-width: 150px; max-height: 150px; border-radius: 10px; border: 2px solid var(--gray-light);">
+            <button class="btn btn-danger" onclick="removeLogo()" style="margin-top: 10px; font-size: 12px; padding: 6px 12px;">
+                <i class="fas fa-trash"></i> Hapus Logo
+            </button>
+        `;
+    } else {
+        logoPreview.innerHTML = '<p style="color: var(--gray); font-size: 13px;">Belum ada logo</p>';
+    }
+}
+
+function handleLogoUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    // Validate file size (max 500KB)
+    if (file.size > 500 * 1024) {
+        showError('Ukuran logo terlalu besar! Maksimal 500KB');
+        event.target.value = '';
+        return;
+    }
+    
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+        showError('File harus berupa gambar (PNG/JPG)');
+        event.target.value = '';
+        return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        configLembaga.logo = e.target.result;
+        renderKonfigurasiForm();
+        showToast('✅ Logo berhasil diupload');
+    };
+    reader.readAsDataURL(file);
+}
+
+function removeLogo() {
+    if (confirm('Hapus logo lembaga?')) {
+        configLembaga.logo = '';
+        renderKonfigurasiForm();
+        showToast('✅ Logo dihapus');
+    }
+}
+
+function saveKonfigurasi() {
+    // Get values
+    const nama = document.getElementById('configNama').value.trim();
+    const alamat = document.getElementById('configAlamat').value.trim();
+    const kota = document.getElementById('configKota').value.trim();
+    const telepon = document.getElementById('configTelepon').value.trim();
+    const pimpinan = document.getElementById('configPimpinan').value.trim();
+    
+    // Validate required fields
+    if (!nama || !alamat || !kota || !telepon || !pimpinan) {
+        showError('Mohon isi semua field yang wajib (bertanda *)');
+        return;
+    }
+    
+    // Save all values
+    configLembaga.nama = nama;
+    configLembaga.tagline = document.getElementById('configTagline').value.trim();
+    configLembaga.alamat = alamat;
+    configLembaga.kota = kota;
+    configLembaga.kodePos = document.getElementById('configKodePos').value.trim();
+    configLembaga.telepon = telepon;
+    configLembaga.email = document.getElementById('configEmail').value.trim();
+    configLembaga.website = document.getElementById('configWebsite').value.trim();
+    configLembaga.npsn = document.getElementById('configNPSN').value.trim();
+    configLembaga.pimpinan = pimpinan;
+    configLembaga.jabatan = document.getElementById('configJabatan').value.trim() || 'Kepala Sekolah';
+    
+    // Save to localStorage
+    localStorage.setItem('config_lembaga', JSON.stringify(configLembaga));
+    
+    // Update header
+    updateHeaderWithConfig();
+    
+    showToast('✅ Konfigurasi berhasil disimpan');
+}
+
+function exportKonfigurasi() {
+    const dataStr = JSON.stringify(configLembaga, null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `config_${configLembaga.nama.replace(/\s+/g, '_')}_${Date.now()}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+    showToast('✅ Konfigurasi berhasil di-export');
+}
+
+function handleImportConfig(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const imported = JSON.parse(e.target.result);
+            
+            // Validate structure
+            if (!imported.nama) {
+                showError('File tidak valid! Pastikan file export konfigurasi yang benar.');
+                return;
+            }
+            
+            if (confirm(`Import konfigurasi "${imported.nama}"?\n\nKonfigurasi saat ini akan diganti.`)) {
+                configLembaga = imported;
+                localStorage.setItem('config_lembaga', JSON.stringify(configLembaga));
+                renderKonfigurasiForm();
+                updateHeaderWithConfig();
+                showToast('✅ Konfigurasi berhasil di-import');
+            }
+        } catch (error) {
+            showError('Gagal membaca file! Pastikan format JSON yang benar.');
+        }
+        event.target.value = '';
+    };
+    reader.readAsText(file);
+}
+
+function resetKonfigurasi() {
+    if (confirm('Reset konfigurasi ke default?\n\nSemua data akan kembali ke "SekolahKu"')) {
+        configLembaga = {
+            nama: 'SekolahKu',
+            logo: '',
+            tagline: 'Sistem Manajemen Sekolah',
+            alamat: '',
+            kota: '',
+            kodePos: '',
+            telepon: '',
+            email: '',
+            website: '',
+            npsn: '',
+            pimpinan: '',
+            jabatan: 'Kepala Sekolah'
+        };
+        localStorage.setItem('config_lembaga', JSON.stringify(configLembaga));
+        renderKonfigurasiForm();
+        updateHeaderWithConfig();
+        showToast('✅ Konfigurasi direset ke default');
+    }
+}
+
+function updateHeaderWithConfig() {
+    const headerTitle = document.getElementById('headerTitle');
+    const headerSubtitle = document.getElementById('headerSubtitle');
+    const headerLogo = document.getElementById('headerLogo');
+    
+    if (headerTitle) {
+        headerTitle.textContent = configLembaga.nama || 'SekolahKu';
+    }
+    
+    if (headerSubtitle) {
+        headerSubtitle.textContent = configLembaga.tagline || 'Sistem Manajemen Sekolah';
+    }
+    
+    if (headerLogo) {
+        if (configLembaga.logo) {
+            headerLogo.innerHTML = `<img src="${configLembaga.logo}" style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover;">`;
+        } else {
+            headerLogo.innerHTML = '<i class="fas fa-graduation-cap" style="font-size: 32px;"></i>';
+        }
+    }
+}
+
+// ==================== LOGOUT ====================
 function doLogout() {
     if (confirm('Yakin ingin logout?')) {
         currentUser = null;
@@ -1986,6 +2370,11 @@ function showPagePremium(pageId) {
         renderDashboardWaliKelas();
     }
     
+    // Render konfigurasi form if needed
+    if (pageId === 'konfigurasiPage') {
+        renderKonfigurasiForm();
+    }
+    
     // Update nav active state
     document.querySelectorAll('.nav-item-premium').forEach(item => {
         item.classList.remove('active');
@@ -2004,6 +2393,7 @@ function showPagePremium(pageId) {
         'pembayaranPage': 1,
         'laporanPage': 2,
         'dashboardWaliPage': 1,
+        'konfigurasiPage': 3,
         'profilPage': 3
     };
     
