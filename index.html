@@ -1889,8 +1889,8 @@
 <div style="width:110px; height:110px; background:white; border-radius:28px; display:flex; align-items:center; justify-content:center; margin-bottom:20px; animation:pulse 2s infinite; box-shadow:0 8px 32px rgba(0,0,0,0.2);">
 <div style="font-size:65px;">🎓</div></div>
 <div style="color:white; font-size:32px; font-weight:bold; margin-bottom:6px;">EduKu</div>
-<div style="color:rgba(255,255,255,0.8); font-size:14px; margin-bottom:50px;">Platform Manajemen Pendidikan</div>
-<div id="splashLoading" style="width:100%; max-width:320px;">
+<div style="color:rgba(255,255,255,0.8); font-size:14px; margin-bottom:50px;">Platform Manajemen Lembaga Pendidikan</div>
+<div id="splashLoading" style="width:100%; max-width:320px; display:none;">
 <div style="width:200px; height:4px; background:rgba(255,255,255,0.2); border-radius:2px; margin:0 auto; overflow:hidden;">
 <div style="height:100%; width:100%; background:var(--accent); border-radius:2px;"></div></div>
 <div style="text-align:center;margin-top:30px;">
@@ -1899,152 +1899,180 @@
 </button>
 </div>
 </div>
-<div id="splashChoice" style="display:none; width:100%; max-width:320px;">
-<button onclick="pilihLoginGoogle()" style="width:100%; padding:16px; background:white; color:#333; border:none; border-radius:16px; font-size:16px; font-weight:600; cursor:pointer; margin-bottom:14px; display:flex; align-items:center; justify-content:center; gap:10px; box-shadow:0 4px 20px rgba(0,0,0,0.15);">
-<img src="https://developers.google.com/identity/images/g-logo.png" style="width:22px; height:22px;"> Login dengan Google
-</button>
-<button onclick="pilihTanpaLogin()" style="width:100%; padding:16px; background:rgba(255,255,255,0.15); color:white; border:2px solid rgba(255,255,255,0.4); border-radius:16px; font-size:16px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px; backdrop-filter:blur(10px);">
-🚀 Mulai Tanpa Login
+<div id="splashChoice" style="display:block; width:100%; max-width:320px;">
+<button onclick="mulaiEduKu()" style="width:100%; padding:18px; background:white; color:var(--primary); border:none; border-radius:16px; font-size:17px; font-weight:700; cursor:pointer; margin-bottom:12px; box-shadow:0 4px 20px rgba(0,0,0,0.2);">
+🎓 Mulai EduKu
 </button>
 </div>
 </div>
 
-<!-- FIRST TIME SETUP WIZARD -->
-<div id="setupWizard" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:100000; overflow-y:auto;">
-    <div style="min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px;">
-        <div style="background:white; border-radius:24px; max-width:500px; width:100%; padding:32px; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
-            
-            <!-- Step 1: Welcome -->
-            <div id="setupStep1" class="setup-step">
-                <div style="text-align:center; margin-bottom:24px;">
-                    <div style="font-size:64px; margin-bottom:16px;">🎓</div>
-                    <h2 style="color:var(--primary); margin-bottom:8px;">Selamat Datang di EduKu!</h2>
-                    <p style="color:var(--gray); font-size:14px;">Platform Manajemen Lembaga Pendidikan Universal</p>
-                </div>
-                
-                <div style="background:var(--gray-light); padding:20px; border-radius:16px; margin-bottom:24px;">
-                    <p style="margin-bottom:12px; color:var(--dark);"><strong>✨ Fitur Lengkap:</strong></p>
-                    <ul style="margin:0; padding-left:20px; color:var(--gray);">
-                        <li>📱 QR Scanner Absensi</li>
-                        <li>🏷️ Cetak Label/Kartu</li>
-                        <li>📁 Upload & Kelola Dokumen</li>
-                        <li>💰 Manajemen Pembayaran</li>
-                        <li>📊 Dashboard & Laporan</li>
-                        <li>⚙️ Dynamic Fields & Custom</li>
-                    </ul>
-                </div>
-                
-                <button onclick="goToSetupStep(2)" style="width:100%; padding:16px; background:var(--primary); color:white; border:none; border-radius:12px; font-size:16px; font-weight:600; cursor:pointer;">
-                    Mulai Setup → 
-                </button>
-            </div>
-            
-            <!-- Step 2: Choose Template -->
-            <div id="setupStep2" class="setup-step" style="display:none;">
-                <div style="margin-bottom:24px;">
-                    <h2 style="color:var(--primary); margin-bottom:8px;">Pilih Jenis Lembaga</h2>
-                    <p style="color:var(--gray); font-size:14px;">Kami akan menyesuaikan terminologi sesuai pilihan Anda</p>
-                </div>
-                
-                <div style="display:grid; gap:12px; margin-bottom:24px;">
-                    <div onclick="selectTemplate('pesantren')" id="tmpl_pesantren" class="template-card">
-                        <div style="font-size:32px; margin-bottom:8px;">🕌</div>
-                        <div style="font-weight:600; margin-bottom:4px;">Pondok Pesantren</div>
-                        <div style="font-size:12px; color:var(--gray);">Santri, Ustadz, Syahriyah, Hafalan</div>
-                    </div>
-                    
-                    <div onclick="selectTemplate('sekolah')" id="tmpl_sekolah" class="template-card">
-                        <div style="font-size:32px; margin-bottom:8px;">🏫</div>
-                        <div style="font-weight:600; margin-bottom:4px;">Sekolah</div>
-                        <div style="font-size:12px; color:var(--gray);">Siswa, Guru, SPP, Ekstrakurikuler</div>
-                    </div>
-                    
-                    <div onclick="selectTemplate('madrasah')" id="tmpl_madrasah" class="template-card">
-                        <div style="font-size:32px; margin-bottom:8px;">📚</div>
-                        <div style="font-weight:600; margin-bottom:4px;">Madrasah</div>
-                        <div style="font-size:12px; color:var(--gray);">Siswa, Ustadz/Guru, BTQ, Tahfidz</div>
-                    </div>
-                    
-                    <div onclick="selectTemplate('custom')" id="tmpl_custom" class="template-card">
-                        <div style="font-size:32px; margin-bottom:8px;">⚙️</div>
-                        <div style="font-weight:600; margin-bottom:4px;">Custom</div>
-                        <div style="font-size:12px; color:var(--gray);">Setup manual sesuai kebutuhan</div>
-                    </div>
-                </div>
-                
-                <div style="display:flex; gap:12px;">
-                    <button onclick="goToSetupStep(1)" style="flex:1; padding:12px; background:var(--gray-light); color:var(--dark); border:none; border-radius:12px; font-weight:600; cursor:pointer;">
-                        ← Kembali
-                    </button>
-                    <button onclick="goToSetupStep(3)" id="btnNextStep2" style="flex:2; padding:12px; background:var(--primary); color:white; border:none; border-radius:12px; font-weight:600; cursor:pointer;" disabled>
-                        Lanjut →
-                    </button>
-                </div>
-            </div>
-            
-            <!-- Step 3: Basic Info -->
-            <div id="setupStep3" class="setup-step" style="display:none;">
-                <div style="margin-bottom:24px;">
-                    <h2 style="color:var(--primary); margin-bottom:8px;">Informasi Lembaga</h2>
-                    <p style="color:var(--gray); font-size:14px;">Data dasar lembaga Anda</p>
-                </div>
-                
-                <div style="display:grid; gap:16px; margin-bottom:24px;">
-                    <div>
-                        <label style="display:block; margin-bottom:6px; font-weight:600; color:var(--dark);">Nama Lembaga</label>
-                        <input type="text" id="setupNamaLembaga" placeholder="Contoh: Pondok Pesantren Al-Hikmah" style="width:100%; padding:12px; border:2px solid var(--gray-light); border-radius:10px; font-size:14px;">
-                    </div>
-                    
-                    <div>
-                        <label style="display:block; margin-bottom:6px; font-weight:600; color:var(--dark);">Alamat</label>
-                        <textarea id="setupAlamat" placeholder="Alamat lengkap lembaga" rows="2" style="width:100%; padding:12px; border:2px solid var(--gray-light); border-radius:10px; font-size:14px; resize:none;"></textarea>
-                    </div>
-                    
-                    <div>
-                        <label style="display:block; margin-bottom:6px; font-weight:600; color:var(--dark);">No. Telepon/WhatsApp</label>
-                        <input type="tel" id="setupTelp" placeholder="08123456789" style="width:100%; padding:12px; border:2px solid var(--gray-light); border-radius:10px; font-size:14px;">
-                    </div>
-                </div>
-                
-                <div style="display:flex; gap:12px;">
-                    <button onclick="goToSetupStep(2)" style="flex:1; padding:12px; background:var(--gray-light); color:var(--dark); border:none; border-radius:12px; font-weight:600; cursor:pointer;">
-                        ← Kembali
-                    </button>
-                    <button onclick="completeSetup()" style="flex:2; padding:12px; background:var(--primary); color:white; border:none; border-radius:12px; font-weight:600; cursor:pointer;">
-                        ✓ Selesai
-                    </button>
-                </div>
-            </div>
-            
+
+<!-- SETUP WIZARD -->
+<div id="setupWizard" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:100000;overflow-y:auto;">
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:white;border-radius:24px;max-width:480px;width:100%;padding:28px;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+      
+      <!-- Step 1: Welcome -->
+      <div id="wizStep1" class="setup-step">
+        <div style="text-align:center;margin-bottom:24px;">
+          <div style="font-size:64px;margin-bottom:12px;">🎓</div>
+          <h2 style="color:var(--primary);margin:0 0 8px 0;">Selamat Datang di EduKu!</h2>
+          <p style="color:#64748b;margin:0;font-size:14px;">Platform Manajemen Lembaga Pendidikan Universal</p>
         </div>
+        <div style="background:#f8fafc;padding:16px;border-radius:12px;margin-bottom:20px;">
+          <p style="font-weight:600;margin:0 0 10px 0;">✨ Semua Fitur Lengkap:</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:13px;color:#475569;">
+            <div>📱 QR Scanner Absensi</div><div>🏷️ Cetak Label/Kartu</div>
+            <div>📁 Upload Dokumen</div><div>💰 Kelola Pembayaran</div>
+            <div>📊 Dashboard & Laporan</div><div>⚙️ Dynamic Fields</div>
+          </div>
+        </div>
+        <button onclick="wizGo(2)" style="width:100%;padding:14px;background:var(--primary);color:white;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;">
+          Mulai Setup →
+        </button>
+      </div>
+      
+      <!-- Step 2: Template -->
+      <div id="wizStep2" class="setup-step" style="display:none;">
+        <h2 style="color:var(--primary);margin:0 0 6px 0;">Pilih Jenis Lembaga</h2>
+        <p style="color:#64748b;margin:0 0 20px 0;font-size:13px;">Terminologi akan disesuaikan otomatis. Bisa diubah kapan saja.</p>
+        <div style="display:grid;gap:10px;margin-bottom:20px;">
+          <div onclick="pickTmpl('pesantren')" id="tmpl_pesantren" class="template-card">
+            <div style="font-size:28px;">🕌</div>
+            <div style="font-weight:600;font-size:15px;">Pondok Pesantren</div>
+            <div style="font-size:12px;color:#64748b;margin-top:4px;">Santri · Ustadz · Syahriyah · Hafalan</div>
+          </div>
+          <div onclick="pickTmpl('sekolah')" id="tmpl_sekolah" class="template-card">
+            <div style="font-size:28px;">🏫</div>
+            <div style="font-weight:600;font-size:15px;">Sekolah (SD/SMP/SMA)</div>
+            <div style="font-size:12px;color:#64748b;margin-top:4px;">Siswa · Guru · SPP · Kelas</div>
+          </div>
+          <div onclick="pickTmpl('madrasah')" id="tmpl_madrasah" class="template-card">
+            <div style="font-size:28px;">📚</div>
+            <div style="font-weight:600;font-size:15px;">Madrasah</div>
+            <div style="font-size:12px;color:#64748b;margin-top:4px;">Siswa · Ustadz/Guru · BTQ · Tahfidz</div>
+          </div>
+          <div onclick="pickTmpl('custom')" id="tmpl_custom" class="template-card">
+            <div style="font-size:28px;">⚙️</div>
+            <div style="font-weight:600;font-size:15px;">Custom / Lainnya</div>
+            <div style="font-size:12px;color:#64748b;margin-top:4px;">Setup terminologi sendiri</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <button onclick="wizGo(1)" style="flex:1;padding:12px;background:#f1f5f9;color:#333;border:none;border-radius:10px;font-weight:600;cursor:pointer;">← Kembali</button>
+          <button onclick="wizGo(3)" id="wizBtnNext2" style="flex:2;padding:12px;background:var(--primary);color:white;border:none;border-radius:10px;font-weight:600;cursor:pointer;opacity:0.4;" disabled>Lanjut →</button>
+        </div>
+      </div>
+      
+      <!-- Step 3: Info Lembaga -->
+      <div id="wizStep3" class="setup-step" style="display:none;">
+        <h2 style="color:var(--primary);margin:0 0 6px 0;">Info Lembaga</h2>
+        <p style="color:#64748b;margin:0 0 20px 0;font-size:13px;">Data dasar lembaga Anda (bisa diubah di Konfigurasi)</p>
+        <div style="display:grid;gap:14px;margin-bottom:20px;">
+          <div>
+            <label style="display:block;margin-bottom:6px;font-weight:600;font-size:13px;">Nama Lembaga *</label>
+            <input type="text" id="wizNama" placeholder="Contoh: Pondok Pesantren Al-Hikmah">
+          </div>
+          <div>
+            <label style="display:block;margin-bottom:6px;font-weight:600;font-size:13px;">Alamat</label>
+            <textarea id="wizAlamat" rows="2" placeholder="Alamat lengkap lembaga" style="resize:none;"></textarea>
+          </div>
+          <div>
+            <label style="display:block;margin-bottom:6px;font-weight:600;font-size:13px;">No. WhatsApp/Telepon</label>
+            <input type="tel" id="wizTelp" placeholder="08xxxxxxxxxx">
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <button onclick="wizGo(2)" style="flex:1;padding:12px;background:#f1f5f9;color:#333;border:none;border-radius:10px;font-weight:600;cursor:pointer;">← Kembali</button>
+          <button onclick="wizSelesai()" style="flex:2;padding:12px;background:var(--primary);color:white;border:none;border-radius:10px;font-weight:600;cursor:pointer;">✓ Selesai & Mulai!</button>
+        </div>
+      </div>
+      
     </div>
+  </div>
+</div>
+
+<!-- KONFIGURASI TERMINOLOGI MODAL -->
+<div id="terminologiModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;overflow-y:auto;">
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:white;border-radius:20px;max-width:480px;width:100%;padding:24px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+        <h3 style="margin:0;color:var(--primary);">⚙️ Konfigurasi Terminologi</h3>
+        <button onclick="closeTerminologiModal()" style="background:none;border:none;font-size:20px;cursor:pointer;">✕</button>
+      </div>
+      <p style="color:#64748b;font-size:13px;margin-bottom:16px;">Sesuaikan istilah yang digunakan di seluruh aplikasi</p>
+      
+      <div style="display:grid;gap:14px;margin-bottom:20px;">
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Peserta Didik</label>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;" id="termPesertaOptions">
+            <button onclick="setTerm('pesertaDidik','Santri',this)" class="term-btn">Santri</button>
+            <button onclick="setTerm('pesertaDidik','Siswa',this)" class="term-btn">Siswa</button>
+            <button onclick="setTerm('pesertaDidik','Peserta',this)" class="term-btn">Peserta</button>
+            <button onclick="setTerm('pesertaDidik','Murid',this)" class="term-btn">Murid</button>
+          </div>
+          <input type="text" id="termPesertaCustom" placeholder="atau ketik custom..." style="margin-top:8px;width:100%;padding:8px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;box-sizing:border-box;">
+        </div>
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Pengajar</label>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button onclick="setTerm('pengajar','Ustadz',this)" class="term-btn">Ustadz</button>
+            <button onclick="setTerm('pengajar','Guru',this)" class="term-btn">Guru</button>
+            <button onclick="setTerm('pengajar','Pengajar',this)" class="term-btn">Pengajar</button>
+          </div>
+          <input type="text" id="termPengajarCustom" placeholder="atau ketik custom..." style="margin-top:8px;width:100%;padding:8px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;box-sizing:border-box;">
+        </div>
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Jenis Pembayaran Rutin</label>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button onclick="setTerm('pembayaranType','Syahriyah',this)" class="term-btn">Syahriyah</button>
+            <button onclick="setTerm('pembayaranType','SPP',this)" class="term-btn">SPP</button>
+            <button onclick="setTerm('pembayaranType','Iuran',this)" class="term-btn">Iuran</button>
+          </div>
+        </div>
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Pimpinan</label>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button onclick="setTerm('pimpinan','Kyai/Pengasuh',this)" class="term-btn">Kyai/Pengasuh</button>
+            <button onclick="setTerm('pimpinan','Kepala Sekolah',this)" class="term-btn">Kepala Sekolah</button>
+            <button onclick="setTerm('pimpinan','Direktur',this)" class="term-btn">Direktur</button>
+          </div>
+        </div>
+      </div>
+      
+      <div style="background:#f0fdf4;padding:14px;border-radius:10px;margin-bottom:16px;font-size:13px;color:#166534;">
+        <strong>Preview:</strong> Data <span id="prevPeserta">Santri</span> · 
+        <span id="prevPengajar">Ustadz</span> · 
+        Pembayaran <span id="prevPembayaran">Syahriyah</span>
+      </div>
+      
+      <button onclick="simpanTerminologi()" style="width:100%;padding:14px;background:var(--primary);color:white;border:none;border-radius:10px;font-weight:600;cursor:pointer;font-size:15px;">
+        💾 Simpan Terminologi
+      </button>
+    </div>
+  </div>
 </div>
 
 <style>
-.template-card {
-    padding:16px;
-    border:2px solid var(--gray-light);
-    border-radius:12px;
-    cursor:pointer;
-    transition:all 0.2s;
-    text-align:center;
+.term-btn {
+    padding: 6px 14px;
+    border: 2px solid #e2e8f0;
+    border-radius: 20px;
+    background: white;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s;
+    font-family: inherit;
 }
-.template-card:hover {
-    border-color:var(--primary);
-    background:rgba(13,92,74,0.05);
-}
-.template-card.selected {
-    border-color:var(--primary);
-    background:rgba(13,92,74,0.1);
-    box-shadow:0 4px 12px rgba(13,92,74,0.2);
-}
+.term-btn:hover { border-color: var(--primary); background: rgba(13,92,74,0.05); }
+.term-btn.active { border-color: var(--primary); background: var(--primary); color: white; }
 </style>
 
 <!-- HOME PAGE -->
 <div id="page-home" class="page active">
     <div class="header-premium">
         <div class="logo-area">
-            <div class="logo-icon" id="headerLogo"><i class="fas fa-kaaba"></i></div>
+            <div class="logo-icon" id="headerLogo"><i class="fas fa-graduation-cap"></i></div>
             <div class="logo-text"><h1 id="headerInstansi1">Safara</h1><p id="headerInstansi2">Safara</p></div>
         </div>
         <div class="greeting">
@@ -2097,7 +2125,7 @@
 <div id="page-estimasi" class="page">
     <div class="header-premium header-premium-small"><div class="back-header"><i class="fas fa-arrow-left" onclick="showPage('home')"></i><h2>Cuan Plan Umroh</h2><div style="width:30px;"></div></div></div>
     <div class="card-premium">
-        <div class="logo-box text-center"><img src="https://img.icons8.com/color/96/kaaba.png" style="width:50px;"></div>
+        <div class="logo-box text-center"><img src="https://img.icons8.com/color/96/school.png" style="width:50px;"></div>
         <p class="text-center" style="color:var(--gray); font-size:0.8rem;" id="dashFooterNama">Safara</p>
         <div class="section-title" style="margin-top:15px;"><span>DATA ROMBONGAN</span></div>
         <div class="input-group"><label>Nama Paket / Lokasi</label><input type="text" id="lokasiPaket" value="Program 9 HARI"></div>
@@ -2161,7 +2189,7 @@
 
 <!-- JAMAAH PAGE -->
 <div id="page-jamaah" class="page">
-    <div class="header-premium header-premium-small"><div class="back-header"><i class="fas fa-arrow-left" onclick="showPage('home')"></i><h2>Database Jamaah</h2><div style="width:30px;"></div></div></div>
+    <div class="header-premium header-premium-small"><div class="back-header"><i class="fas fa-arrow-left" onclick="showPage('home')"></i><h2>Data Peserta Didik</h2><div style="width:30px;"></div></div></div>
     <div class="card-premium">
         <div id="jamaahAdminPanel" class="setting-card" style="display:none"><h3 style="color:var(--primary);"> Panel Admin Jamaah</h3><button class="btn btn-primary btn-small mt-2" onclick="openTambahJamaahModal()"> + Tambah database</button><button class="btn btn-blue btn-small mt-2" onclick="openManageFieldsModal()"> Kelola Field Dinamis</button><button class="btn btn-teal btn-small mt-2" onclick="downloadTemplateExcel()" style="background:#1D6F42;">⬇️ Download Template Excel</button><button class="btn btn-teal btn-small mt-2" onclick="exportJamaahToExcel()"> Export ke Excel</button><button class="btn btn-orange btn-small mt-2" onclick="document.getElementById('importExcelFile').click()"> IMPORT EXCEL</button><input type="file" id="importExcelFile" accept=".xlsx,.xls" style="display:none" onchange="importJamaahFromExcel(this)"><button class="btn btn-danger btn-small mt-2" onclick="confirmDeleteAllJamaah()"> HAPUS SEMUA database</button></div>
         <div class="section-title"><span>DAFTAR JAMAAH</span></div>
@@ -2182,7 +2210,7 @@
     <div class="header-premium header-premium-small">
         <div class="back-header">
             <i class="fas fa-arrow-left" onclick="showPage('home')"></i>
-            <h2>⏳ Jamaah On Proses</h2>
+            <h2>⏳ Peserta Aktif</h2>
             <div style="width:30px;"></div>
         </div>
     </div>
@@ -2395,7 +2423,20 @@
     <div class="card-premium">
         <div class="config-section"><h3><i class="fas fa-building"></i> Data Instansi Utama</h3>
             <div class="config-row"><label>Logo Instansi</label><input type="file" id="cfg_logo1" accept="image/*" onchange="previewLogo(this, 'previewLogo1')"><img id="previewLogo1" class="logo-preview"><small style="display:block; color:var(--gray); margin-top:4px;">Logo akan tampil di header HOME</small></div>
-            <div class="config-row"><label>Nama Instansi</label><input type="text" id="cfg_nama1" placeholder="Safara"></div>
+            <div class="config-row" style="background:linear-gradient(135deg,#0D5C4A,#0a3d31);border-radius:12px;padding:16px;margin-bottom:4px;">
+    <div style="color:white;">
+        <div style="font-weight:700;font-size:15px;margin-bottom:4px;">⚙️ Konfigurasi Terminologi</div>
+        <div style="font-size:12px;opacity:0.85;margin-bottom:10px;">Sesuaikan istilah: Santri/Siswa, Ustadz/Guru, dll</div>
+        <div style="font-size:13px;opacity:0.9;">
+            Peserta Didik: <strong id="dispPeserta">...</strong> &nbsp;·&nbsp;
+            Pengajar: <strong id="dispPengajar">...</strong>
+        </div>
+    </div>
+    <button onclick="openTerminologiModal()" style="background:rgba(255,255,255,0.2);color:white;border:2px solid rgba(255,255,255,0.4);padding:10px 16px;border-radius:10px;font-weight:600;cursor:pointer;font-size:13px;white-space:nowrap;">
+        ✏️ Ubah
+    </button>
+</div>
+<div class="config-row"><label>Nama Instansi</label><input type="text" id="cfg_nama1" placeholder="EduKu"></div>
             <div class="config-row"><label>Alamat Lengkap</label><textarea id="cfg_alamat1" rows="2" placeholder="Jl. Siwalankerto Utara II No. 30, Wonocolo, Surabaya"></textarea></div>
             <div class="row"><div class="config-row"><label>Telepon</label><input type="text" id="cfg_telp1" placeholder="081391485440"></div><div class="config-row"><label>Email</label><input type="email" id="cfg_email1"></div></div>
             <div class="row"><div class="config-row"><label>NPWP</label><input type="text" id="cfg_npwp1"></div><div class="config-row"><label>Website</label><input type="text" id="cfg_web1"></div></div>
@@ -2405,7 +2446,7 @@
         <div class="config-section"><h3><i class="fas fa-mosque"></i> Data Instansi Kedua</h3>
             <div class="config-row" style="display:flex; justify-content:space-between; align-items:center;"><label>Aktifkan Instansi Kedua</label><label class="switch"><input type="checkbox" id="cfg_instansi2_aktif"><span class="slider"></span></label></div>
             <div class="config-row"><label>Logo</label><input type="file" id="cfg_logo2" accept="image/*" onchange="previewLogo(this, 'previewLogo2')"><img id="previewLogo2" class="logo-preview"></div>
-            <div class="config-row"><label>Nama Instansi</label><input type="text" id="cfg_nama2" placeholder="Safara"></div>
+            <div class="config-row"><label>Nama Instansi</label><input type="text" id="cfg_nama2" placeholder="EduKu"></div>
             <div class="config-row"><label>Alamat</label><textarea id="cfg_alamat2" rows="2" placeholder="Jl. Siwalankerto Utara II No. 30, Wonocolo, Surabaya"></textarea></div>
             <div class="row"><div class="config-row"><label>Telepon</label><input type="text" id="cfg_telp2"></div><div class="config-row"><label>Email</label><input type="email" id="cfg_email2"></div></div>
             <div class="row"><div class="config-row"><label>No. Izin</label><input type="text" id="cfg_izin2"></div><div class="config-row"><label>Pimpinan</label><input type="text" id="cfg_pimpinan2"></div></div>
@@ -2413,7 +2454,7 @@
         </div>
         <div class="config-section"><h3><i class="fas fa-watermark"></i> Watermark</h3>
             <div class="config-row" style="display:flex; justify-content:space-between; align-items:center;"><label>Aktifkan Watermark</label><label class="switch"><input type="checkbox" id="cfg_watermark_enabled" checked><span class="slider"></span></label></div>
-            <div class="config-row"><label>Teks Watermark</label><input type="text" id="cfg_watermark_text" value="Safara"></div>
+            <div class="config-row"><label>Teks Watermark</label><input type="text" id="cfg_watermark_text" value="EduKu"></div>
             <div class="config-row"><label>Opacity</label><div class="opacity-slider"><input type="range" id="cfg_watermark_opacity" min="0.05" max="0.4" step="0.05" value="0.15"><span id="opacityValue">0.15</span></div></div>
             <div class="row"><div class="config-row"><label>Ukuran Font</label><select id="cfg_watermark_fontsize"><option value="30">Sangat Kecil (30)</option><option value="40">Kecil (40)</option><option value="60" selected>Sedang (60)</option><option value="80">Besar (80)</option></select></div><div class="config-row"><label>Posisi</label><select id="cfg_watermark_position"><option value="diagonal" selected>Diagonal</option><option value="center">Tengah</option><option value="tile">Ulangi (Tile)</option></select></div></div>
             <div class="preview-btn" onclick="previewWatermark()"><i class="fas fa-eye"></i> Preview Watermark</div>
@@ -2755,7 +2796,7 @@
     <div class="container">
         <div class="card-premium">
             <div class="section-title"><span> PENYIMPANAN INTERNAL</span></div>
-            <div class="storage-info" style="display: flex; justify-content: space-between; margin-bottom: 8px;"><span style="font-size: 12px;">/storage/emulated/0/Safara</span><span style="font-size: 12px;" id="storageUsage">Menghitung...</span></div>
+            <div class="storage-info" style="display: flex; justify-content: space-between; margin-bottom: 8px;"><span style="font-size: 12px;">/storage/emulated/0/EduKu</span><span style="font-size: 12px;" id="storageUsage">Menghitung...</span></div>
             <div class="storage-bar" style="background: var(--gray-light); border-radius: 10px; height: 8px; overflow: hidden;"><div id="storageFill" style="width: 0%; background: var(--primary); height: 100%; border-radius: 10px;"></div></div>
             <div class="text-muted text-center mt-2" style="font-size: 11px;"> Data aplikasi tersimpan di sini</div>
         </div>
@@ -2954,6 +2995,10 @@ function internalShowPage(pageId) {
     if (pageId === 'datamaster') { if(window.loadMasterData) window.loadMasterData(); if(window.renderDynamicModeSwitcher) window.renderDynamicModeSwitcher(); }
     if (pageId === 'konfigurasi') { if(window.loadKonfigurasiPro) window.loadKonfigurasiPro(); }
     if (pageId === 'catatan') { if(window.renderCatatanList) window.renderCatatanList(); }
+    // EduKu - new pages
+    if (pageId === 'pengajar') { renderPengajarList(); }
+    if (pageId === 'nilai') { renderNilaiList(); }
+    if (pageId === 'jadwal') { renderJadwalList(); }
     if (pageId === 'uploaddokumen') { 
         // PENTING: Reload jamaah data DAN dokumen data untuk memastikan semua ter-load
         Promise.all([
@@ -3098,16 +3143,17 @@ function initDarkMode() {
 
 // Menu Grid
 const menuItemsPremium = [
-    { id: 'estimasi', icon: '📊', label: 'Cuan Plan', badge: 'Estimasi' }, 
-    { id: 'kas', icon: '💰', label: 'Uang Kas', badge: 'Kas' }, 
-    { id: 'jamaah', icon: '🗂️', label: 'Database', badge: 'Jamaah' }, 
-    { id: 'jamaahkita', icon: '⏳', label: 'Jamaah on proses', badge: 'Proses' }, 
-    { id: 'catatan', icon: '📝', label: 'Catatan', badge: 'Notes' }, 
-    { id: 'zakat', icon: '💸', label: 'Zakat', badge: 'Kalkulator' }, 
-    { id: 'pembayaran', icon: '🧾', label: 'Pembayaran', badge: 'Tagihan' }, 
-    { id: 'datamaster', icon: '🗓️', label: 'Multi Event', badge: 'Event' }, 
-    { id: 'konfigurasi', icon: '⚙️', label: 'Konfigurasi', badge: 'Setting' }, 
-    { id: 'fitur', icon: '🚀', label: 'LENGKAP', badge: 'Fitur' }
+    { id: 'jamaah',       icon: '🗂️',  label: 'Data Peserta',    badge: 'Peserta' }, 
+    { id: 'jamaahkita',   icon: '⏳',  label: 'Peserta Aktif',   badge: 'Proses' }, 
+    { id: 'pengajar',     icon: '👨‍🏫', label: 'Pengajar',        badge: 'Guru' }, 
+    { id: 'nilai',        icon: '📊',  label: 'Nilai',           badge: 'Nilai' }, 
+    { id: 'jadwal',       icon: '📅',  label: 'Jadwal',          badge: 'Jadwal' }, 
+    { id: 'pembayaran',   icon: '🧾',  label: 'Pembayaran',      badge: 'Tagihan' }, 
+    { id: 'kas',          icon: '💰',  label: 'Uang Kas',        badge: 'Kas' }, 
+    { id: 'catatan',      icon: '📝',  label: 'Catatan',         badge: 'Notes' }, 
+    { id: 'datamaster',   icon: '🗓️',  label: 'Multi Event',     badge: 'Event' }, 
+    { id: 'konfigurasi',  icon: '⚙️',  label: 'Konfigurasi',     badge: 'Setting' }, 
+    { id: 'fitur',        icon: '🚀',  label: 'LENGKAP',         badge: 'Fitur' }
 ];
 
 let isAdminModePremium = false;
@@ -3205,7 +3251,7 @@ function loadThemePremium() {
 function updateHeaderFromConfig() {
     const cfg = getKonfigurasiProData();
     const cacheBuster = Date.now();
-    const instansi1 = cfg.instansi1.nama || 'Safara';
+    const instansi1 = cfg.instansi1.nama || 'EduKu';
     const instansi2 = (cfg.instansi2.aktif && cfg.instansi2.nama) ? cfg.instansi2.nama : 'Safara';
     document.getElementById('headerInstansi1').innerText = instansi1;
     document.getElementById('headerInstansi2').innerText = instansi2;
@@ -3229,7 +3275,7 @@ function updateHeaderFromConfig() {
             }
             logoIcon.innerHTML = `<img src="${logoUrl}" style="width:100%; height:100%; object-fit:cover; border-radius:20px;">`;
         } else {
-            logoIcon.innerHTML = '<i class="fas fa-kaaba"></i>';
+            logoIcon.innerHTML = '<i class="fas fa-graduation-cap"></i>';
         }
     }
 }
@@ -3794,7 +3840,7 @@ function buatLaporanWA() {
     dataKas.forEach(i=>{ 
         detail+=`${i.tipe==='masuk'?'✅':'❌'} ${i.tgl} | [${i.kegiatan}] ${i.ket}\n    ${f(i.nom)}\n\n`; 
     }); 
-    lastWAText=`📊 *LAPORAN KEUANGAN ${judul.toUpperCase()}*\n\n📅 *${judul}*\n📅 ${new Date().toLocaleDateString('id-ID')}\n\n\n💰 *TOTAL MASUK:* ${f(masuk)}\n💸 *TOTAL KELUAR:* ${f(keluar)}\n\n💵 *SALDO AKHIR:* *${f(masuk-keluar)}*\n\n\n📋 *DETAIL TRANSAKSI:*\n\n\n${detail}\n✨ Generated by ${getKonfigurasiProData().instansi1.nama || 'Safara'}`;
+    lastWAText=`📊 *LAPORAN KEUANGAN ${judul.toUpperCase()}*\n\n📅 *${judul}*\n📅 ${new Date().toLocaleDateString('id-ID')}\n\n\n💰 *TOTAL MASUK:* ${f(masuk)}\n💸 *TOTAL KELUAR:* ${f(keluar)}\n\n💵 *SALDO AKHIR:* *${f(masuk-keluar)}*\n\n\n📋 *DETAIL TRANSAKSI:*\n\n\n${detail}\n✨ Generated by ${getKonfigurasiProData().instansi1.nama || 'EduKu'}`;
     const hasilWA=document.getElementById('hasilWA'); 
     hasilWA.innerHTML=`<div class="res-item"><span>Total Masuk</span><span style="color:#2ecc71">${f(masuk)}</span></div><div class="res-item"><span>Total Keluar</span><span style="color:#e74c3c">${f(keluar)}</span></div><div class="res-item"><span>SALDO AKHIR</span><span class="highlight">${f(masuk-keluar)}</span></div><button class="btn" onclick="salinLaporanWA()" style="background:#34495e; margin-top:15px;">SALIN LAPORAN WA</button>`; 
     hasilWA.style.display='block'; 
@@ -3811,10 +3857,10 @@ function salinLaporanWA() {
 
 function backupKasData() { 
     if(dataKas.length===0) return showToast("Tidak ada data!"); 
-    const backup={app:"Safara - Kas", version:"1.0", created:new Date().toISOString(), kegiatan:document.getElementById('kegiatan').value, data:dataKas}; 
+    const backup={app:"EduKu - Kas", version:"1.0", created:new Date().toISOString(), kegiatan:document.getElementById('kegiatan').value, data:dataKas}; 
     const a=document.createElement('a'); 
     a.href=URL.createObjectURL(new Blob([JSON.stringify(backup,null,2)],{type:'application/json'})); 
-    a.download=`Safara_Kas_Backup_${new Date().toLocaleDateString('id-ID').replace(/\//g,'-')}.json`; 
+    a.download=`EduKu_Kas_Backup_${new Date().toLocaleDateString('id-ID').replace(/\//g,'-')}.json`; 
     a.click(); 
     showToast('Backup kas berhasil'); 
 }
@@ -3941,158 +3987,6 @@ function confirmResetKas() {
     } 
 }
 
-// ==================== TERMINOLOGY SYSTEM ====================
-// Universal terminology untuk adaptasi ke berbagai lembaga pendidikan
-
-const DEFAULT_TERMINOLOGY = {
-    // Core entities
-    pesertaDidik: 'Peserta Didik',
-    pesertaDidikSingle: 'Peserta Didik',
-    pesertaDidikPlural: 'Peserta Didik',
-    nomorInduk: 'Nomor Induk',
-    nomorIndukShort: 'NIS',
-    
-    // Staff/Pengajar
-    pengajar: 'Pengajar',
-    pengajarSingle: 'Pengajar',
-    pengajarPlural: 'Para Pengajar',
-    
-    // Pembayaran
-    pembayaran: 'Pembayaran',
-    pembayaranType: 'Iuran',
-    
-    // Pimpinan
-    pimpinan: 'Pimpinan',
-    
-    // Jenis Lembaga
-    jenisLembaga: 'Lembaga Pendidikan',
-    
-    // Kelas/Tingkat
-    kelasTingkat: 'Kelas'
-};
-
-// Template presets untuk berbagai jenis lembaga
-const TERMINOLOGY_TEMPLATES = {
-    pesantren: {
-        pesertaDidik: 'Santri',
-        pesertaDidikSingle: 'Santri',
-        pesertaDidikPlural: 'Santri',
-        nomorInduk: 'Nomor Induk Santri',
-        nomorIndukShort: 'NIS',
-        pengajar: 'Ustadz/Ustadzah',
-        pengajarSingle: 'Ustadz/Ustadzah',
-        pengajarPlural: 'Para Ustadz',
-        pembayaran: 'Pembayaran',
-        pembayaranType: 'Syahriyah',
-        pimpinan: 'Pengasuh Pondok',
-        jenisLembaga: 'Pondok Pesantren',
-        kelasTingkat: 'Tingkat',
-        templateName: 'Pondok Pesantren',
-        defaultFields: [
-            { name: 'hafalan', label: 'Hafalan Qur\'an', type: 'text', icon: '📖', isRequired: false },
-            { name: 'kitab', label: 'Kitab yang Dikaji', type: 'text', icon: '📚', isRequired: false },
-            { name: 'kamar', label: 'No Kamar Asrama', type: 'text', icon: '🏠', isRequired: false },
-            { name: 'wali_santri', label: 'Wali Santri', type: 'text', icon: '👤', isRequired: false }
-        ]
-    },
-    
-    sekolah: {
-        pesertaDidik: 'Siswa',
-        pesertaDidikSingle: 'Siswa',
-        pesertaDidikPlural: 'Siswa-siswi',
-        nomorInduk: 'Nomor Induk Siswa',
-        nomorIndukShort: 'NIS',
-        pengajar: 'Guru',
-        pengajarSingle: 'Guru',
-        pengajarPlural: 'Para Guru',
-        pembayaran: 'Pembayaran',
-        pembayaranType: 'SPP',
-        pimpinan: 'Kepala Sekolah',
-        jenisLembaga: 'Sekolah',
-        kelasTingkat: 'Kelas',
-        templateName: 'Sekolah',
-        defaultFields: [
-            { name: 'ekstrakurikuler', label: 'Ekstrakurikuler', type: 'text', icon: '⚽', isRequired: false },
-            { name: 'prestasi', label: 'Prestasi', type: 'textarea', icon: '🏆', isRequired: false },
-            { name: 'hobi', label: 'Hobi', type: 'text', icon: '🎨', isRequired: false },
-            { name: 'nama_orangtua', label: 'Nama Orangtua', type: 'text', icon: '👨‍👩‍👧', isRequired: false }
-        ]
-    },
-    
-    madrasah: {
-        pesertaDidik: 'Siswa',
-        pesertaDidikSingle: 'Siswa',
-        pesertaDidikPlural: 'Siswa-siswi',
-        nomorInduk: 'Nomor Induk Siswa',
-        nomorIndukShort: 'NIS',
-        pengajar: 'Ustadz/Guru',
-        pengajarSingle: 'Ustadz/Guru',
-        pengajarPlural: 'Para Ustadz & Guru',
-        pembayaran: 'Pembayaran',
-        pembayaranType: 'Iuran',
-        pimpinan: 'Kepala Madrasah',
-        jenisLembaga: 'Madrasah',
-        kelasTingkat: 'Kelas',
-        templateName: 'Madrasah',
-        defaultFields: [
-            { name: 'btq_level', label: 'Level BTQ', type: 'text', icon: '📖', isRequired: false },
-            { name: 'tahfidz', label: 'Tahfidz', type: 'text', icon: '📿', isRequired: false },
-            { name: 'hafalan_surat', label: 'Hafalan Surat', type: 'text', icon: '📜', isRequired: false },
-            { name: 'nama_orangtua', label: 'Nama Orangtua', type: 'text', icon: '👨‍👩‍👧', isRequired: false }
-        ]
-    }
-};
-
-// Active terminology (loaded from storage or default)
-let activeTerminology = {...DEFAULT_TERMINOLOGY};
-
-// Get terminology label
-function getLabel(key) {
-    return activeTerminology[key] || DEFAULT_TERMINOLOGY[key] || key;
-}
-
-// Load terminology from storage
-async function loadTerminology() {
-    try {
-        const saved = await idbGet(STORE_CONFIG, 'terminology');
-        if (saved) {
-            activeTerminology = {...DEFAULT_TERMINOLOGY, ...saved};
-        }
-    } catch (e) {
-        console.log('Loading default terminology');
-    }
-}
-
-// Save terminology to storage
-async function saveTerminology(terminology) {
-    activeTerminology = {...DEFAULT_TERMINOLOGY, ...terminology};
-    await idbSet(STORE_CONFIG, 'terminology', activeTerminology);
-}
-
-// Apply template preset
-async function applyTerminologyTemplate(templateName) {
-    const template = TERMINOLOGY_TEMPLATES[templateName];
-    if (!template) return false;
-    
-    await saveTerminology(template);
-    
-    // Apply default fields if exists
-    if (template.defaultFields) {
-        dynamicFieldsJamaah = template.defaultFields;
-        await idbSet(STORE_JAMAAH, 'jamaah_fields', dynamicFieldsJamaah);
-    }
-    
-    return true;
-}
-
-// Check if first time setup needed
-async function checkFirstTimeSetup() {
-    const setupDone = await idbGet(STORE_CONFIG, 'setup_complete');
-    if (!setupDone) {
-        showFirstTimeSetupWizard();
-    }
-}
-
 // ==================== DATABASE JAMAAH ====================
 let jamaahList=[], dynamicFieldsJamaah=[], ingJamaahId=null, currentJamaahPage=1, perPageJamaah=10, jamaahFilteredList=[], currentSort='urutan_asli', currentSearch='';
 
@@ -4116,7 +4010,7 @@ async function loadDynamicFieldsJamaah() {
     } else {
         dynamicFieldsJamaah = [
             { name: 'nama_paspor',   label: 'Nama Paspor',   type: 'text',     icon: '👤', isRequired: false },
-            { name: 'no_porsi',      label: 'No Porsi',       type: 'text',     icon: '🔢', isRequired: false },
+            { name: 'no_porsi',      label: 'Nomor Induk (NIS)',       type: 'text',     icon: '🔢', isRequired: false },
             { name: 'jenis_kelamin', label: 'Jenis Kelamin',  type: 'text',     icon: '👤', isRequired: false },
             { name: 'tempat_lahir',  label: 'Tempat Lahir',   type: 'text',     icon: '📍', isRequired: false },
             { name: 'tgl_lahir',     label: 'Tanggal Lahir',  type: 'date',     icon: '🗓️', isRequired: false },
@@ -4985,7 +4879,7 @@ function renderRekapAbsensi() {
             html += `<div style="padding:8px;border-bottom:1px solid #eee;font-size:12px;display:flex;align-items:center;justify-content:space-between;">
                 <div>
                     <div style="font-weight:bold;">✅ ${escapeHtml(a.nama)}</div>
-                    <div style="color:#888;">No Porsi: ${a.no_porsi} | ${a.waktu}</div>
+                    <div style="color:#888;">NIS: ${a.no_porsi} | ${a.waktu}</div>
                 </div>
                 <button onclick="batalkanHadir(${a.jamaahId})" style="padding:4px 8px;background:#EF4444;color:white;border:none;border-radius:6px;font-size:11px;cursor:pointer;flex-shrink:0;">Batal</button>
             </div>`;
@@ -5000,7 +4894,7 @@ function eksporAbsensi() {
     const sesi = getSesiAktif();
     if (!sesi) return showToast('Pilih sesi dulu!');
     if (sesi.absensi.length === 0) return showToast('Belum ada data absensi!');
-    const namaInstansi = getKonfigurasiProData().instansi1.nama || 'Safara';
+    const namaInstansi = getKonfigurasiProData().instansi1.nama || 'EduKu';
     let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Rekap Absensi</title>
     <style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:Arial,sans-serif;padding:20px;}
     h2{color:#0D5C4A;margin-bottom:4px;}.sub{color:#888;font-size:12px;margin-bottom:16px;}
@@ -5013,7 +4907,7 @@ function eksporAbsensi() {
     </style></head><body>
     <h2>📋 REKAP ABSENSI — ${escapeHtml(sesi.nama)}</h2>
     <div class="sub">${namaInstansi} | ${sesi.tanggal} | Total Hadir: ${sesi.absensi.length} jamaah</div>
-    <table><thead><tr><th>No</th><th>Nama Jamaah</th><th>No Porsi</th><th>Kamar</th><th>Bus</th><th>Rombongan</th><th>Waktu Hadir</th></tr></thead><tbody>`;
+    <table><thead><tr><th>No</th><th>Nama Jamaah</th><th>Nomor Induk (NIS)</th><th>Kamar</th><th>Bus</th><th>Rombongan</th><th>Waktu Hadir</th></tr></thead><tbody>`;
     sesi.absensi.forEach((a, i) => {
         html += `<tr><td>${i+1}</td><td>${escapeHtml(a.nama)}</td><td>${a.no_porsi}</td><td>${a.kamar||'-'}</td><td>${a.bus||'-'}</td><td>${a.rombongan||'-'}</td><td>${a.waktu}</td></tr>`;
     });
@@ -5116,7 +5010,7 @@ function eksporAbsensiExcel() {
     const sesi = getSesiAktif();
     if (!sesi) return showToast('Pilih sesi dulu!');
     if (sesi.absensi.length === 0) return showToast('Belum ada data absensi!');
-    const namaInstansi = getKonfigurasiProData().instansi1.nama || 'Safara';
+    const namaInstansi = getKonfigurasiProData().instansi1.nama || 'EduKu';
     const ws_data = [
         ['REKAP ABSENSI — ' + sesi.nama],
         [namaInstansi + ' | ' + sesi.tanggal + ' | Total Hadir: ' + sesi.absensi.length],
@@ -5351,7 +5245,7 @@ function shareSingleJamaahById(id){
         const val=j.additional_fields?.[field.name]||''; 
         if(val) text+=`*${field.label}:* ${val}\n`; 
     } 
-    text+=`\n📅 *Tgl Input:* ${j.created_at||'-'}\n#${getKonfigurasiProData().instansi1.nama || 'Safara'}`;
+    text+=`\n📅 *Tgl Input:* ${j.created_at||'-'}\n#${getKonfigurasiProData().instansi1.nama || 'EduKu'}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`); 
 }
 
@@ -5477,7 +5371,7 @@ function downloadTemplateExcel() {
         wch: i === 0 ? 30 : h.length < 10 ? 15 : 22
     }));
 
-    XLSX.utils.book_append_sheet(wb, ws, 'Data Jamaah');
+    XLSX.utils.book_append_sheet(wb, ws, 'Data Peserta Didik');
 
     // Sheet petunjuk
     const petunjuk = [
@@ -5771,7 +5665,7 @@ let jamaahKitaList = [], dynamicFieldsJamaahKita = [], selectedJamaahKitaIds = [
 
 const defaultJamaahKitaFields = [
     { name: 'nama_paspor',   label: 'Nama Paspor',   type: 'text',     icon: '👤', isRequired: false },
-    { name: 'no_porsi',      label: 'No Porsi',       type: 'text',     icon: '🔢', isRequired: false },
+    { name: 'no_porsi',      label: 'Nomor Induk (NIS)',       type: 'text',     icon: '🔢', isRequired: false },
     { name: 'jenis_kelamin', label: 'Jenis Kelamin',  type: 'text',     icon: '👤', isRequired: false },
     { name: 'tempat_lahir',  label: 'Tempat Lahir',   type: 'text',     icon: '📍', isRequired: false },
     { name: 'tgl_lahir',     label: 'Tanggal Lahir',  type: 'date',     icon: '🗓️', isRequired: false },
@@ -5801,7 +5695,7 @@ async function loadJamaahKitaData() {
     jamaahKitaList = saved || [];
     dynamicFieldsJamaahKita = savedFields || defaultJamaahKitaFields;
 
-    // Sinkronkan urutan + icon + label field On Proses mengikuti Database Jamaah
+    // Sinkronkan urutan + icon + label field On Proses mengikuti Data Peserta Didik
     const dbFields = dynamicFieldsJamaah.length > 0 ? dynamicFieldsJamaah : 
         JSON.parse(localStorage.getItem('safara_jamaah_fields') || '[]');
     if (dbFields.length > 0) {
@@ -5967,7 +5861,7 @@ function autoFillJamaahKitaFields(selectedIndex) {
         input.value = val;
     });
 
-    showToast('✅ Data jamaah berhasil dimuat!');
+    showToast('✅ Data peserta berhasil dimuat!');
 }
 
 function tambahJamaahKita() {
@@ -6088,7 +5982,7 @@ function hapusPilihanOnProses() {
     saveJamaahKitaData();
     renderJamaahKitaList();
     filterPilihJamaahKita();
-    showToast(`🗑️ ${ids.length} jamaah berhasil dihapus!`);
+    showToast(`🗑️ ${ids.length} peserta berhasil dihapus!`);
 }
 
 function resetJamaahKitaFilter() {
@@ -6143,7 +6037,7 @@ function sendBatchWA() {
         if (wa) msg += `   📞 WA: ${wa}\n`;
         msg += "\n";
     });
-    msg += `━━━━━━━━━━━━━━━━━━\n_${getKonfigurasiProData().instansi1.nama || 'Safara'}_`;
+    msg += `━━━━━━━━━━━━━━━━━━\n_${getKonfigurasiProData().instansi1.nama || 'EduKu'}_`;
     window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
     clearJamaahKitaSelection();
 }
@@ -6206,7 +6100,7 @@ function shareAllJamaahKitaToWA() {
         });
         msg += "\n";
     });
-    msg += `━━━━━━━━━━━━━━━━━━\n_${getKonfigurasiProData().instansi1.nama || 'Safara'}_`;
+    msg += `━━━━━━━━━━━━━━━━━━\n_${getKonfigurasiProData().instansi1.nama || 'EduKu'}_`;
     window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
 }
 
@@ -6214,7 +6108,7 @@ function cetakLabelJamaahKita() {
     if (jamaahKitaList.length === 0) return showToast('Tidak ada data untuk dicetak!');
     const cfg = getKonfigurasiProData();
     const logo = cfg.instansi1?.logo || '';
-    const namaInstansi = cfg.instansi2?.nama || cfg.instansi1?.nama || 'Safara';
+    const namaInstansi = cfg.instansi2?.nama || cfg.instansi1?.nama || 'EduKu';
     const printFieldNames = getOnProsesPrintFields();
     const printFields = dynamicFieldsJamaahKita.filter(f => printFieldNames.includes(f.name) && f.name !== 'whatsapp');
     const logoHtml = logo
@@ -6392,7 +6286,7 @@ async function printGroupedPDFJamaahKita() {
         });
         html += `</tbody></table></div>`;
     });
-    html += `<div class="footer">Dicetak dari ${getKonfigurasiProData().instansi1.nama || 'Safara'}</div>
+    html += `<div class="footer">Dicetak dari ${getKonfigurasiProData().instansi1.nama || 'EduKu'}</div>
     </div></div>
     <div class="no-print">
         <button onclick="window.print()" style="background:#0D5C4A;color:white;">🖨️ CETAK</button>
@@ -6569,7 +6463,7 @@ function confirmDeleteAllJamaahKita() {
 
 function backupJamaahKitaData() {
     if (jamaahKitaList.length === 0 && dynamicFieldsJamaahKita.length === 0) return showToast("Tidak ada data!");
-    const backup = { app: "Safara - Jamaah On Proses", version: "2.0", date: new Date().toISOString(), onProsesList: jamaahKitaList, dynamicFields: dynamicFieldsJamaahKita };
+    const backup = { app: "Safara - Peserta Aktif", version: "2.0", date: new Date().toISOString(), onProsesList: jamaahKitaList, dynamicFields: dynamicFieldsJamaahKita };
     const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -6689,7 +6583,7 @@ function hitungZakat(){
     const bersih=totalHarta-totalZakat; 
     const f=n=>"Rp "+formatRupiah(n); 
     const garis="━━━━━━━━━━━━━━━━━━━"; 
-    lastZakatText=`🕌 *KALKULATOR ZAKAT*\n${garis}\n📌 *Jenis Zakat:* ${jenis==='mal'?'Zakat Mal':(jenis==='pertanian'?'Zakat Pertanian':'Zakat Perdagangan')}\n💰 *Total Harta:* ${f(totalHarta)}\n📊 *Nisab:* ${f(nisab)}\n📋 *Status:* ${status}\n${garis}\n💵 *Total Zakat:* ${f(totalZakat)}\n✨ *Bersih:* ${f(bersih)}\n${garis}\n#${getKonfigurasiProData().instansi1.nama || 'Safara'}`;
+    lastZakatText=`🕌 *KALKULATOR ZAKAT*\n${garis}\n📌 *Jenis Zakat:* ${jenis==='mal'?'Zakat Mal':(jenis==='pertanian'?'Zakat Pertanian':'Zakat Perdagangan')}\n💰 *Total Harta:* ${f(totalHarta)}\n📊 *Nisab:* ${f(nisab)}\n📋 *Status:* ${status}\n${garis}\n💵 *Total Zakat:* ${f(totalZakat)}\n✨ *Bersih:* ${f(bersih)}\n${garis}\n#${getKonfigurasiProData().instansi1.nama || 'EduKu'}`;
     let detailHtml=''; 
     for(const d of detailZakat){ 
         detailHtml+=`<div class="res-item"><span>📌</span><span>${d}</span></div>`; 
@@ -7011,7 +6905,7 @@ function prepareInvoice(idJamaah) {
     const jamaah = jamaahList.find(j => j.id == idJamaah); 
     if (!jamaah) return; 
     const cfg = getKonfigurasiProData();
-    const instansiNama = cfg.instansi1.nama || 'Safara';
+    const instansiNama = cfg.instansi1.nama || 'EduKu';
     const footerNama = (cfg.instansi2.aktif && cfg.instansi2.nama) ? cfg.instansi2.nama : instansiNama;
     
     const transaksiList = paymentTransaksiList.filter(t => t.id_jamaah == idJamaah).sort((a,b) => new Date(a.tanggal) - new Date(b.tanggal)); 
@@ -7540,13 +7434,13 @@ function viewDetailCatatan(idx) {
 function shareDetailToWA() { 
     const item = catatanList[currentDetailIndex]; 
     if(!item) return; 
-    const text = `📝 *${item.judul}*\n\n${item.isi}\n\n#${getKonfigurasiProData().instansi1.nama || 'Safara'}`; 
+    const text = `📝 *${item.judul}*\n\n${item.isi}\n\n#${getKonfigurasiProData().instansi1.nama || 'EduKu'}`; 
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`); 
 }
 
 function shareCatatanItem(idx) { 
     const item = catatanList[idx]; 
-    const text = `📝 *${item.judul}*\n\n${item.isi}\n\n#${getKonfigurasiProData().instansi1.nama || 'Safara'}`; 
+    const text = `📝 *${item.judul}*\n\n${item.isi}\n\n#${getKonfigurasiProData().instansi1.nama || 'EduKu'}`; 
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`); 
 }
 
@@ -7681,7 +7575,7 @@ function hapusPilihanFolder(folderId) {
     folder.jamaahIds = folder.jamaahIds.filter(id => !ids.includes(id));
     saveFolderData();
     openFolderDetail(folderId);
-    showToast(`🗑️ ${ids.length} jamaah berhasil dihapus dari folder!`);
+    showToast(`🗑️ ${ids.length} peserta berhasil dihapus dari folder!`);
 }
 
 function filterFolderJamaahSelect() {
@@ -7865,7 +7759,7 @@ async function exportFolderToPDF(folderId) {
     const jamaahInFolder = folder.jamaahIds.map(id => allJamaah.find(j => j.id == id)).filter(j => j);
     if(jamaahInFolder.length === 0) { showToast('Tidak ada jamaah dalam folder ini'); return; }
     const cfgFolder = getKonfigurasiProData();
-    const namaInstansi = cfgFolder.instansi1.nama || 'Safara';
+    const namaInstansi = cfgFolder.instansi1.nama || 'EduKu';
     const watermarkHtmlFolder = buildPrintWatermark(cfgFolder);
     const tanggal = new Date().toLocaleDateString('id-ID', {day:'2-digit', month:'long', year:'numeric'});
     const allDynFields = dynamicFieldsJamaah.length > 0 ? dynamicFieldsJamaah : [];
@@ -7966,7 +7860,7 @@ function exportFolderToExcel(folderId) {
 // ==================== UPLOAD DOKUMEN ====================
 let dokumenJenisList = [], dokumenData = {}, db = null;
 // ==================== INDEXEDDB TERPUSAT ====================
-const DB_NAME = 'SafaraDB', DB_VERSION = 3, 
+const DB_NAME = 'EduKuDB', DB_VERSION = 1, 
     STORE_NAME = 'dokumen', 
     JENIS_STORE_NAME = 'dokumenJenis',
     STORE_JAMAAH = 'jamaahData',
@@ -7982,10 +7876,10 @@ const DB_NAME = 'SafaraDB', DB_VERSION = 3,
 function resetIndexedDBDarurat() {
     if (!confirm('Reset SEMUA database? Semua data akan dihapus permanen!')) return;
     // Hapus semua localStorage keys Safara
-    Object.keys(localStorage).filter(k => k.startsWith('safara_')).forEach(k => localStorage.removeItem(k));
+    Object.keys(localStorage).filter(k => k.startsWith('safara_') || k.startsWith('eduku_')).forEach(k => localStorage.removeItem(k));
     // Hapus IndexedDB
-    const req = indexedDB.deleteDatabase('SafaraDB');
-    const req2 = indexedDB.deleteDatabase('SafaraDokumenDB');
+    const req = indexedDB.deleteDatabase('EduKuDB');
+    const req2 = indexedDB.deleteDatabase('EduKuDB');
     db = null;
     req.onsuccess = () => {
         showToast('✅ Database direset! Memuat ulang...');
@@ -8176,7 +8070,7 @@ function renderDokumenList() {
         container.innerHTML = `
             <div class="card-premium" style="margin:0; padding: 40px; text-align: center;">
                 <div style="font-size: 48px; margin-bottom: 16px;">📋</div>
-                <h3 style="color: var(--primary); margin-bottom: 12px;">Belum Ada Data Jamaah</h3>
+                <h3 style="color: var(--primary); margin-bottom: 12px;">Belum Ada Data Peserta Didik</h3>
                 <p style="color: var(--gray); margin-bottom: 20px;">Silakan tambah jamaah terlebih dahulu di menu Jamaah</p>
                 <button onclick="showPage('jamaah')" style="padding: 12px 24px; background: var(--primary); color: white; border: none; border-radius: 24px; font-weight: 600; cursor: pointer;">
                     ➕ Tambah Jamaah
@@ -8329,7 +8223,7 @@ function remindAllKurangDokumen() {
         const status = getStatusKelengkapanDokumen(j.id); 
         text += `${i+1}. ${j.nama_lengkap} (${status.ada}/${status.total} dokumen)\n`; 
     }); 
-    text += `\n📌 Mohon segera melengkapi dokumen.\n#${getKonfigurasiProData().instansi1.nama || 'Safara'}`; 
+    text += `\n📌 Mohon segera melengkapi dokumen.\n#${getKonfigurasiProData().instansi1.nama || 'EduKu'}`; 
     navigator.clipboard.writeText(text); 
     showToast(`📋 Teks reminder untuk ${kurang.length} jamaah tersalin! Bisa paste ke WA`); 
 }
@@ -8960,7 +8854,7 @@ async function cetakTiketMulti() {
     const checked = document.querySelectorAll('#multiTiketJamaahSelect input:checked');
     if(checked.length === 0) return showToast('Pilih minimal 1 jamaah!');
     showToast('Menyiapkan tiket...');
-    const namaInstansi = getKonfigurasiProData().instansi1.nama || 'Safara';
+    const namaInstansi = getKonfigurasiProData().instansi1.nama || 'EduKu';
     let cardsHtml = '';
     for(const cb of checked) {
         const jamaah = jamaahList.find(j => j.id == cb.value);
@@ -9204,8 +9098,8 @@ async function confirmResetAllData() {
         // Hapus IndexedDB
         db = null;
         await new Promise((resolve) => {
-            const r1 = indexedDB.deleteDatabase('SafaraDB');
-            const r2 = indexedDB.deleteDatabase('SafaraDokumenDB');
+            const r1 = indexedDB.deleteDatabase('EduKuDB');
+            const r2 = indexedDB.deleteDatabase('EduKuDB');
             r1.onsuccess = r2.onsuccess = resolve;
             r1.onerror = r2.onerror = resolve;
         });
@@ -9257,7 +9151,7 @@ async function applyPDFConfig(doc, options = {}) {
         doc.setFontSize(12);
         doc.setFont('helvetica', 'bold');
         if (cfg.settings.header_mode === 'both' || cfg.settings.header_mode === 'instansi1') {
-            doc.text(cfg.instansi1.nama || 'Safara', pageWidth/2, currentY, { align: 'center' });
+            doc.text(cfg.instansi1.nama || 'EduKu', pageWidth/2, currentY, { align: 'center' });
             currentY += 7;
         }
         if (cfg.settings.header_mode === 'both' && cfg.instansi2.aktif && cfg.instansi2.nama) {
@@ -9460,7 +9354,7 @@ async function generateAndCetakTiket(jamaah) {
     const noPorsiQR = jamaah.additional_fields?.no_porsi || jamaah.id.toString();
     await QRCode.toCanvas(canvas, noPorsiQR, { width: 150, height: 150 });
     const qrDataUrl = canvas.toDataURL('image/png');
-    const namaInstansi = getKonfigurasiProData().instansi1.nama || 'Safara';
+    const namaInstansi = getKonfigurasiProData().instansi1.nama || 'EduKu';
     const win = window.open('', '_blank');
     if(!win) { showToast('Izinkan popup untuk cetak!'); return; }
     const htmlTiket = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Tiket - ' + escapeHtml(jamaah.nama_lengkap) + '</title>'
@@ -9498,7 +9392,7 @@ async function generateAndShareTiketWA(jamaah) {
         if(num.length >= 10) waNumber = num;
     }
     if(!waNumber) { showToast(`${jamaah.nama_lengkap}: No WA tidak ada, dilewati`); return; }
-    const text = `🎫 *E-TIKET ${jamaah.nama_lengkap}*\n\n👤 Nama: ${jamaah.nama_lengkap}\n📦 Paket: ${jamaah.paket || '-'}\n📅 Tanggal: ${new Date().toLocaleDateString('id-ID')}\n\n#${getKonfigurasiProData().instansi1.nama || 'Safara'}`;
+    const text = `🎫 *E-TIKET ${jamaah.nama_lengkap}*\n\n👤 Nama: ${jamaah.nama_lengkap}\n📦 Paket: ${jamaah.paket || '-'}\n📅 Tanggal: ${new Date().toLocaleDateString('id-ID')}\n\n#${getKonfigurasiProData().instansi1.nama || 'EduKu'}`;
     window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(text)}`, '_blank');
     await new Promise(r => setTimeout(r, 1000));
 }
@@ -9525,7 +9419,7 @@ function shareTiketWA() {
         if(num.startsWith('0')) num = '62' + num.substring(1);
         if(num.length >= 10) waNumber = num;
     }
-    const text = `🎫 *E-TIKET ${jamaah.nama_lengkap}*\n\n👤 Nama: ${jamaah.nama_lengkap}\n📦 Paket: ${jamaah.paket || '-'}\n📅 Tanggal: ${new Date().toLocaleDateString('id-ID')}\n\n#${getKonfigurasiProData().instansi1.nama || 'Safara'}`;
+    const text = `🎫 *E-TIKET ${jamaah.nama_lengkap}*\n\n👤 Nama: ${jamaah.nama_lengkap}\n📦 Paket: ${jamaah.paket || '-'}\n📅 Tanggal: ${new Date().toLocaleDateString('id-ID')}\n\n#${getKonfigurasiProData().instansi1.nama || 'EduKu'}`;
     window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(text)}`, '_blank');
 }
 
@@ -9817,7 +9711,7 @@ function shareSingleMasterToWA(id) {
         if(val) text += `*${field.label}:* ${val}\n`;
     }
     if(item.items && item.items.length) text += `📦 *Item:* ${item.items.join(', ')}\n`;
-    text += `\n#${getKonfigurasiProData().instansi1.nama || 'Safara'}`;
+    text += `\n#${getKonfigurasiProData().instansi1.nama || 'EduKu'}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
 }
 
@@ -9833,7 +9727,7 @@ function shareAllMasterToWA() {
         if(item.items && item.items.length) text += `   📦 Item: ${item.items.join(', ')}\n`;
         text += `\n`;
     });
-    text += `\n#${getKonfigurasiProData().instansi1.nama || 'Safara'}`;
+    text += `\n#${getKonfigurasiProData().instansi1.nama || 'EduKu'}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
 }
 
@@ -9841,7 +9735,7 @@ async function cetakMasterHTML() {
     if(masterDataList.length === 0) { showToast('Tidak ada data!'); return; }
     const cfgMaster = getKonfigurasiProData();
     const judul = getMasterJudul();
-    const namaInstansi = cfgMaster.instansi1.nama || 'Safara';
+    const namaInstansi = cfgMaster.instansi1.nama || 'EduKu';
     const watermarkHtmlMaster = buildPrintWatermark(cfgMaster);
     const tanggal = new Date().toLocaleDateString('id-ID', {day:'2-digit', month:'long', year:'numeric'});
     let thHtml = '<th style="width:36px;">No</th><th>Nama Lengkap</th>';
@@ -10163,7 +10057,7 @@ function saveModes() {
 let konfigurasiPro = {
     instansi1: { nama: '', alamat: '', telp: '', email: '', npwp: '', web: '', pimpinan: '', jabatan: '', logo: '' },
     instansi2: { aktif: false, nama: '', alamat: '', telp: '', email: '', izin: '', pimpinan: '', jabatan: '', logo: '' },
-    watermark: { enabled: true, text: getKonfigurasiProData().instansi1?.nama || 'Safara', opacity: 0.15, fontsize: 60, position: 'diagonal' },
+    watermark: { enabled: true, text: getKonfigurasiProData().instansi1?.nama || 'EduKu', opacity: 0.15, fontsize: 60, position: 'diagonal' },
     qr: { enabled: true, text: 'Dokumen Resmi - Divalidasi oleh Sistem Safara', size: 80 },
     settings: { header_mode: 'both', ttd_mode: 'both', invoice_prefix: 'INV/SAFARA' },
     harga_paket: { seragam: false, nominal: 0 },
@@ -10194,7 +10088,7 @@ async function loadKonfigurasiPro() {
     document.getElementById('cfg_jabatan2').value = konfigurasiPro.instansi2.jabatan || '';
     if(konfigurasiPro.instansi2.logo) document.getElementById('previewLogo2').src = konfigurasiPro.instansi2.logo;
     document.getElementById('cfg_watermark_enabled').checked = konfigurasiPro.watermark.enabled !== false;
-    document.getElementById('cfg_watermark_text').value = konfigurasiPro.watermark.text || 'Safara';
+    document.getElementById('cfg_watermark_text').value = konfigurasiPro.watermark.text || 'EduKu';
     document.getElementById('cfg_watermark_opacity').value = konfigurasiPro.watermark.opacity || 0.15;
     document.getElementById('opacityValue').innerText = (konfigurasiPro.watermark.opacity || 0.15).toFixed(2);
     document.getElementById('cfg_watermark_fontsize').value = konfigurasiPro.watermark.fontsize || 60;
@@ -10486,21 +10380,21 @@ function hideInstallPopup() {
 
 // ==================== INITIALIZATION ====================
 async function initPremium() {
+    try {
     const savedAdmin = localStorage.getItem('premium_admin_mode') === 'true';
     if(savedAdmin) isAdminModePremium = true;
     const adminSwitch = document.getElementById('adminMode');
     if(adminSwitch) adminSwitch.checked = isAdminModePremium;
     
     renderMenuPremium();
-    renderMenuSettingsPremium();
-    renderColorOptionsPremium();
-    loadThemePremium();
-    initDarkMode();
+    try { renderMenuSettingsPremium(); } catch(e) {}
+    try { renderColorOptionsPremium(); } catch(e) {}
+    try { loadThemePremium(); } catch(e) {}
+    try { initDarkMode(); } catch(e) {}
     
-    loadEstimasiData();
+    try { loadEstimasiData(); } catch(e) {}
     // Load semua data dari IndexedDB secara berurutan
     await openIndexedDB(); // Pastikan DB terbuka dulu
-    await loadTerminology(); // Load terminology system
     await loadKonfigurasiPro();
     await loadDynamicFieldsJamaah();
     await loadJamaahData();
@@ -10509,19 +10403,23 @@ async function initPremium() {
     await loadPaymentData();
     await loadMasterData();
     await loadFolderData();
-    loadModesFromStorage();
-    renderDynamicModeSwitcher();
-    loadCatatanData();
+    try { loadModesFromStorage(); } catch(e) {}
+    try { renderDynamicModeSwitcher(); } catch(e) {}
+    try { loadCatatanData(); } catch(e) {}
     await loadDokumenData();
-    loadPengingatData();
+    try { loadPengingatData(); } catch(e) {}
     await loadAbsensiData();
-    loadSumberHartaList();
+    try { loadSumberHartaList(); } catch(e) {}
     
     // UPDATE STATS SETELAH SEMUA DATA LOAD!
-    updateHomeStats();
+    try { updateHomeStats(); } catch(e) {}
     
-    // Check first-time setup
-    await checkFirstTimeSetup();
+    // EduKu: Check first time setup
+    try { checkEduKuSetup(); } catch(e) {}
+    
+    } catch(fatalErr) {
+        console.error('initPremium error:', fatalErr);
+    }
     
     document.getElementById('adminModeToggleBtn')?.addEventListener('click', (e) => { e.preventDefault(); toggleAdminMode(); });
     document.getElementById('paymentFabOpen')?.addEventListener('click', () => openPaymentModal());
@@ -10543,7 +10441,7 @@ async function initPremium() {
     setTimeout(() => {
         const splashLoading = document.getElementById('splashLoading');
         const splashChoice = document.getElementById('splashChoice');
-        const sudahPilih = localStorage.getItem('safara_mode');
+        const sudahPilih = localStorage.getItem('safara_mode') || localStorage.getItem('eduku_setup_done');
         if(sudahPilih) {
             tutupSplash();
             // Tampilkan popup install setelah splash selesai
@@ -10554,7 +10452,7 @@ async function initPremium() {
             if(splashLoading) splashLoading.style.display = 'none';
             if(splashChoice) splashChoice.style.display = 'block';
         }
-    }, 1500);
+    }, 1200);
 }
 
 function tutupSplash() {
@@ -10777,6 +10675,276 @@ async function cetakDariBlob(generateFn) {
             }, 600);
         };
     <\/script>
+
+<!-- ==================== HALAMAN DATA PENGAJAR ==================== -->
+<div id="page-pengajar" class="page" style="display:none;">
+  <div class="header-premium header-premium-small">
+    <div class="back-header">
+      <i class="fas fa-arrow-left" onclick="showPage('home')"></i>
+      <h2 id="hdrPengajar">Data Pengajar</h2>
+      <button onclick="openFormPengajar()" style="background:var(--primary);color:white;border:none;border-radius:8px;padding:6px 12px;font-size:13px;cursor:pointer;font-weight:600;">
+        + Tambah
+      </button>
+    </div>
+  </div>
+  <div class="page-content">
+    <div class="card-premium">
+      <div style="margin-bottom:14px;">
+        <input type="text" id="searchPengajar" oninput="renderPengajarList()" placeholder="Cari pengajar..." style="width:100%;padding:10px 14px;border:2px solid #e2e8f0;border-radius:10px;font-size:14px;box-sizing:border-box;outline:none;">
+      </div>
+      <div id="pengajarList">
+        <div style="text-align:center;padding:40px 20px;color:#94a3b8;">
+          <div style="font-size:40px;margin-bottom:10px;">👨‍🏫</div>
+          <div style="font-weight:600;">Belum ada data pengajar</div>
+          <div style="font-size:13px;margin-top:4px;">Klik tombol + Tambah untuk menambahkan</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL FORM PENGAJAR -->
+<div id="modalPengajar" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;overflow-y:auto;">
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:white;border-radius:20px;max-width:480px;width:100%;padding:24px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:20px;">
+        <h3 style="margin:0;color:var(--primary);" id="formPengajarTitle">Tambah Pengajar</h3>
+        <button onclick="closeFormPengajar()" style="background:none;border:none;font-size:20px;cursor:pointer;">✕</button>
+      </div>
+      <input type="hidden" id="pengajarEditId">
+      <div style="display:grid;gap:14px;">
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Nama Lengkap *</label>
+          <input type="text" id="fPengajarNama" placeholder="Nama pengajar" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;">
+        </div>
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">NIP / Kode</label>
+          <input type="text" id="fPengajarNIP" placeholder="Nomor induk pengajar (opsional)" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;">
+        </div>
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Bidang Mengajar</label>
+          <input type="text" id="fPengajarBidang" placeholder="Contoh: Matematika / Fiqh / Nahwu" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;">
+        </div>
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">No. WhatsApp</label>
+          <input type="tel" id="fPengajarWA" placeholder="08xxxxxxxxxx" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;">
+        </div>
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Alamat</label>
+          <textarea id="fPengajarAlamat" rows="2" placeholder="Alamat pengajar (opsional)" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;resize:none;"></textarea>
+        </div>
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Catatan</label>
+          <textarea id="fPengajarCatatan" rows="2" placeholder="Catatan tambahan (opsional)" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;resize:none;"></textarea>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:20px;">
+        <button onclick="closeFormPengajar()" style="flex:1;padding:12px;background:#f1f5f9;color:#333;border:none;border-radius:10px;font-weight:600;cursor:pointer;">Batal</button>
+        <button onclick="simpanPengajar()" style="flex:2;padding:12px;background:var(--primary);color:white;border:none;border-radius:10px;font-weight:600;cursor:pointer;">💾 Simpan</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== HALAMAN NILAI ==================== -->
+<div id="page-nilai" class="page" style="display:none;">
+  <div class="header-premium header-premium-small">
+    <div class="back-header">
+      <i class="fas fa-arrow-left" onclick="showPage('home')"></i>
+      <h2>Nilai & Hasil Belajar</h2>
+      <button onclick="openFormNilai()" style="background:var(--primary);color:white;border:none;border-radius:8px;padding:6px 12px;font-size:13px;cursor:pointer;font-weight:600;">
+        + Input
+      </button>
+    </div>
+  </div>
+  <div class="page-content">
+    <div class="card-premium">
+      <!-- Filter -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+        <select id="filterNilaiJamaah" onchange="renderNilaiList()" style="padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:13px;">
+          <option value="">Semua Peserta</option>
+        </select>
+        <select id="filterNilaiJenis" onchange="renderNilaiList()" style="padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:13px;">
+          <option value="">Semua Jenis</option>
+          <option value="UH">Ulangan Harian</option>
+          <option value="UTS">UTS / Tengah Semester</option>
+          <option value="UAS">UAS / Akhir Semester</option>
+          <option value="Hafalan">Hafalan</option>
+          <option value="Praktik">Praktik</option>
+          <option value="Lainnya">Lainnya</option>
+        </select>
+      </div>
+      <div id="nilaiList">
+        <div style="text-align:center;padding:40px 20px;color:#94a3b8;">
+          <div style="font-size:40px;margin-bottom:10px;">📊</div>
+          <div style="font-weight:600;">Belum ada data nilai</div>
+          <div style="font-size:13px;margin-top:4px;">Klik tombol + Input untuk menambahkan</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL FORM NILAI -->
+<div id="modalNilai" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;overflow-y:auto;">
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:white;border-radius:20px;max-width:480px;width:100%;padding:24px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:20px;">
+        <h3 style="margin:0;color:var(--primary);" id="formNilaiTitle">Input Nilai</h3>
+        <button onclick="closeFormNilai()" style="background:none;border:none;font-size:20px;cursor:pointer;">✕</button>
+      </div>
+      <input type="hidden" id="nilaiEditId">
+      <div style="display:grid;gap:14px;">
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Peserta Didik *</label>
+          <select id="fNilaiJamaah" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;">
+            <option value="">Pilih peserta...</option>
+          </select>
+        </div>
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Mata Pelajaran / Kitab</label>
+          <input type="text" id="fNilaiMapel" placeholder="Contoh: Matematika / Fiqh" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;">
+        </div>
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Jenis Penilaian *</label>
+          <select id="fNilaiJenis" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;">
+            <option value="UH">Ulangan Harian</option>
+            <option value="UTS">UTS / Tengah Semester</option>
+            <option value="UAS">UAS / Akhir Semester</option>
+            <option value="Hafalan">Hafalan</option>
+            <option value="Praktik">Praktik</option>
+            <option value="Lainnya">Lainnya</option>
+          </select>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div>
+            <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Nilai *</label>
+            <input type="number" id="fNilaiAngka" min="0" max="100" placeholder="0-100" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Tanggal *</label>
+            <input type="date" id="fNilaiTanggal" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;">
+          </div>
+        </div>
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Keterangan</label>
+          <textarea id="fNilaiKeterangan" rows="2" placeholder="Keterangan tambahan (opsional)" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;resize:none;"></textarea>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:20px;">
+        <button onclick="closeFormNilai()" style="flex:1;padding:12px;background:#f1f5f9;color:#333;border:none;border-radius:10px;font-weight:600;cursor:pointer;">Batal</button>
+        <button onclick="simpanNilai()" style="flex:2;padding:12px;background:var(--primary);color:white;border:none;border-radius:10px;font-weight:600;cursor:pointer;">💾 Simpan</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== HALAMAN JADWAL ==================== -->
+<div id="page-jadwal" class="page" style="display:none;">
+  <div class="header-premium header-premium-small">
+    <div class="back-header">
+      <i class="fas fa-arrow-left" onclick="showPage('home')"></i>
+      <h2>Jadwal Pelajaran</h2>
+      <button onclick="openFormJadwal()" style="background:var(--primary);color:white;border:none;border-radius:8px;padding:6px 12px;font-size:13px;cursor:pointer;font-weight:600;">
+        + Tambah
+      </button>
+    </div>
+  </div>
+  <div class="page-content">
+    <div class="card-premium">
+      <!-- Filter Hari -->
+      <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;margin-bottom:16px;">
+        <button onclick="filterJadwalHari('')" id="jadwalHariAll" class="jadwal-day-btn active">Semua</button>
+        <button onclick="filterJadwalHari('Senin')" id="jadwalHariSenin" class="jadwal-day-btn">Senin</button>
+        <button onclick="filterJadwalHari('Selasa')" id="jadwalHariSelasa" class="jadwal-day-btn">Selasa</button>
+        <button onclick="filterJadwalHari('Rabu')" id="jadwalHariRabu" class="jadwal-day-btn">Rabu</button>
+        <button onclick="filterJadwalHari('Kamis')" id="jadwalHariKamis" class="jadwal-day-btn">Kamis</button>
+        <button onclick="filterJadwalHari('Jumat')" id="jadwalHariJumat" class="jadwal-day-btn">Jumat</button>
+        <button onclick="filterJadwalHari('Sabtu')" id="jadwalHariSabtu" class="jadwal-day-btn">Sabtu</button>
+      </div>
+      <div id="jadwalList">
+        <div style="text-align:center;padding:40px 20px;color:#94a3b8;">
+          <div style="font-size:40px;margin-bottom:10px;">📅</div>
+          <div style="font-weight:600;">Belum ada jadwal</div>
+          <div style="font-size:13px;margin-top:4px;">Klik tombol + Tambah untuk membuat jadwal</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL FORM JADWAL -->
+<div id="modalJadwal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;overflow-y:auto;">
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:white;border-radius:20px;max-width:480px;width:100%;padding:24px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:20px;">
+        <h3 style="margin:0;color:var(--primary);" id="formJadwalTitle">Tambah Jadwal</h3>
+        <button onclick="closeFormJadwal()" style="background:none;border:none;font-size:20px;cursor:pointer;">✕</button>
+      </div>
+      <input type="hidden" id="jadwalEditId">
+      <div style="display:grid;gap:14px;">
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Hari *</label>
+          <select id="fJadwalHari" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;">
+            <option>Senin</option><option>Selasa</option><option>Rabu</option>
+            <option>Kamis</option><option>Jumat</option><option>Sabtu</option><option>Ahad/Minggu</option>
+          </select>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div>
+            <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Jam Mulai *</label>
+            <input type="time" id="fJadwalMulai" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Jam Selesai</label>
+            <input type="time" id="fJadwalSelesai" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;">
+          </div>
+        </div>
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Mata Pelajaran / Kegiatan *</label>
+          <input type="text" id="fJadwalMapel" placeholder="Contoh: Matematika / Ngaji Subuh" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;">
+        </div>
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Pengajar</label>
+          <input type="text" id="fJadwalPengajar" placeholder="Nama pengajar (opsional)" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;">
+        </div>
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Kelas / Tingkat</label>
+          <input type="text" id="fJadwalKelas" placeholder="Contoh: Kelas 7 / Tingkat Ula" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;">
+        </div>
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Ruangan / Lokasi</label>
+          <input type="text" id="fJadwalRuangan" placeholder="Contoh: Kelas A / Masjid / Aula" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;">
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:20px;">
+        <button onclick="closeFormJadwal()" style="flex:1;padding:12px;background:#f1f5f9;color:#333;border:none;border-radius:10px;font-weight:600;cursor:pointer;">Batal</button>
+        <button onclick="simpanJadwal()" style="flex:2;padding:12px;background:var(--primary);color:white;border:none;border-radius:10px;font-weight:600;cursor:pointer;">💾 Simpan</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.jadwal-day-btn {
+  padding: 8px 14px;
+  border: 2px solid #e2e8f0;
+  border-radius: 20px;
+  background: white;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+.jadwal-day-btn.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+</style>
+
 </body>
 </html>`);
         win.document.close();
@@ -11067,6 +11235,276 @@ function cetakDariPreview() {
             };
         }
     <\/script>
+
+<!-- ==================== HALAMAN DATA PENGAJAR ==================== -->
+<div id="page-pengajar" class="page" style="display:none;">
+  <div class="header-premium header-premium-small">
+    <div class="back-header">
+      <i class="fas fa-arrow-left" onclick="showPage('home')"></i>
+      <h2 id="hdrPengajar">Data Pengajar</h2>
+      <button onclick="openFormPengajar()" style="background:var(--primary);color:white;border:none;border-radius:8px;padding:6px 12px;font-size:13px;cursor:pointer;font-weight:600;">
+        + Tambah
+      </button>
+    </div>
+  </div>
+  <div class="page-content">
+    <div class="card-premium">
+      <div style="margin-bottom:14px;">
+        <input type="text" id="searchPengajar" oninput="renderPengajarList()" placeholder="Cari pengajar..." style="width:100%;padding:10px 14px;border:2px solid #e2e8f0;border-radius:10px;font-size:14px;box-sizing:border-box;outline:none;">
+      </div>
+      <div id="pengajarList">
+        <div style="text-align:center;padding:40px 20px;color:#94a3b8;">
+          <div style="font-size:40px;margin-bottom:10px;">👨‍🏫</div>
+          <div style="font-weight:600;">Belum ada data pengajar</div>
+          <div style="font-size:13px;margin-top:4px;">Klik tombol + Tambah untuk menambahkan</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL FORM PENGAJAR -->
+<div id="modalPengajar" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;overflow-y:auto;">
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:white;border-radius:20px;max-width:480px;width:100%;padding:24px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:20px;">
+        <h3 style="margin:0;color:var(--primary);" id="formPengajarTitle">Tambah Pengajar</h3>
+        <button onclick="closeFormPengajar()" style="background:none;border:none;font-size:20px;cursor:pointer;">✕</button>
+      </div>
+      <input type="hidden" id="pengajarEditId">
+      <div style="display:grid;gap:14px;">
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Nama Lengkap *</label>
+          <input type="text" id="fPengajarNama" placeholder="Nama pengajar" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;">
+        </div>
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">NIP / Kode</label>
+          <input type="text" id="fPengajarNIP" placeholder="Nomor induk pengajar (opsional)" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;">
+        </div>
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Bidang Mengajar</label>
+          <input type="text" id="fPengajarBidang" placeholder="Contoh: Matematika / Fiqh / Nahwu" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;">
+        </div>
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">No. WhatsApp</label>
+          <input type="tel" id="fPengajarWA" placeholder="08xxxxxxxxxx" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;">
+        </div>
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Alamat</label>
+          <textarea id="fPengajarAlamat" rows="2" placeholder="Alamat pengajar (opsional)" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;resize:none;"></textarea>
+        </div>
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Catatan</label>
+          <textarea id="fPengajarCatatan" rows="2" placeholder="Catatan tambahan (opsional)" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;resize:none;"></textarea>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:20px;">
+        <button onclick="closeFormPengajar()" style="flex:1;padding:12px;background:#f1f5f9;color:#333;border:none;border-radius:10px;font-weight:600;cursor:pointer;">Batal</button>
+        <button onclick="simpanPengajar()" style="flex:2;padding:12px;background:var(--primary);color:white;border:none;border-radius:10px;font-weight:600;cursor:pointer;">💾 Simpan</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== HALAMAN NILAI ==================== -->
+<div id="page-nilai" class="page" style="display:none;">
+  <div class="header-premium header-premium-small">
+    <div class="back-header">
+      <i class="fas fa-arrow-left" onclick="showPage('home')"></i>
+      <h2>Nilai & Hasil Belajar</h2>
+      <button onclick="openFormNilai()" style="background:var(--primary);color:white;border:none;border-radius:8px;padding:6px 12px;font-size:13px;cursor:pointer;font-weight:600;">
+        + Input
+      </button>
+    </div>
+  </div>
+  <div class="page-content">
+    <div class="card-premium">
+      <!-- Filter -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+        <select id="filterNilaiJamaah" onchange="renderNilaiList()" style="padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:13px;">
+          <option value="">Semua Peserta</option>
+        </select>
+        <select id="filterNilaiJenis" onchange="renderNilaiList()" style="padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:13px;">
+          <option value="">Semua Jenis</option>
+          <option value="UH">Ulangan Harian</option>
+          <option value="UTS">UTS / Tengah Semester</option>
+          <option value="UAS">UAS / Akhir Semester</option>
+          <option value="Hafalan">Hafalan</option>
+          <option value="Praktik">Praktik</option>
+          <option value="Lainnya">Lainnya</option>
+        </select>
+      </div>
+      <div id="nilaiList">
+        <div style="text-align:center;padding:40px 20px;color:#94a3b8;">
+          <div style="font-size:40px;margin-bottom:10px;">📊</div>
+          <div style="font-weight:600;">Belum ada data nilai</div>
+          <div style="font-size:13px;margin-top:4px;">Klik tombol + Input untuk menambahkan</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL FORM NILAI -->
+<div id="modalNilai" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;overflow-y:auto;">
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:white;border-radius:20px;max-width:480px;width:100%;padding:24px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:20px;">
+        <h3 style="margin:0;color:var(--primary);" id="formNilaiTitle">Input Nilai</h3>
+        <button onclick="closeFormNilai()" style="background:none;border:none;font-size:20px;cursor:pointer;">✕</button>
+      </div>
+      <input type="hidden" id="nilaiEditId">
+      <div style="display:grid;gap:14px;">
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Peserta Didik *</label>
+          <select id="fNilaiJamaah" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;">
+            <option value="">Pilih peserta...</option>
+          </select>
+        </div>
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Mata Pelajaran / Kitab</label>
+          <input type="text" id="fNilaiMapel" placeholder="Contoh: Matematika / Fiqh" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;">
+        </div>
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Jenis Penilaian *</label>
+          <select id="fNilaiJenis" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;">
+            <option value="UH">Ulangan Harian</option>
+            <option value="UTS">UTS / Tengah Semester</option>
+            <option value="UAS">UAS / Akhir Semester</option>
+            <option value="Hafalan">Hafalan</option>
+            <option value="Praktik">Praktik</option>
+            <option value="Lainnya">Lainnya</option>
+          </select>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div>
+            <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Nilai *</label>
+            <input type="number" id="fNilaiAngka" min="0" max="100" placeholder="0-100" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Tanggal *</label>
+            <input type="date" id="fNilaiTanggal" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;">
+          </div>
+        </div>
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Keterangan</label>
+          <textarea id="fNilaiKeterangan" rows="2" placeholder="Keterangan tambahan (opsional)" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;resize:none;"></textarea>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:20px;">
+        <button onclick="closeFormNilai()" style="flex:1;padding:12px;background:#f1f5f9;color:#333;border:none;border-radius:10px;font-weight:600;cursor:pointer;">Batal</button>
+        <button onclick="simpanNilai()" style="flex:2;padding:12px;background:var(--primary);color:white;border:none;border-radius:10px;font-weight:600;cursor:pointer;">💾 Simpan</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== HALAMAN JADWAL ==================== -->
+<div id="page-jadwal" class="page" style="display:none;">
+  <div class="header-premium header-premium-small">
+    <div class="back-header">
+      <i class="fas fa-arrow-left" onclick="showPage('home')"></i>
+      <h2>Jadwal Pelajaran</h2>
+      <button onclick="openFormJadwal()" style="background:var(--primary);color:white;border:none;border-radius:8px;padding:6px 12px;font-size:13px;cursor:pointer;font-weight:600;">
+        + Tambah
+      </button>
+    </div>
+  </div>
+  <div class="page-content">
+    <div class="card-premium">
+      <!-- Filter Hari -->
+      <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;margin-bottom:16px;">
+        <button onclick="filterJadwalHari('')" id="jadwalHariAll" class="jadwal-day-btn active">Semua</button>
+        <button onclick="filterJadwalHari('Senin')" id="jadwalHariSenin" class="jadwal-day-btn">Senin</button>
+        <button onclick="filterJadwalHari('Selasa')" id="jadwalHariSelasa" class="jadwal-day-btn">Selasa</button>
+        <button onclick="filterJadwalHari('Rabu')" id="jadwalHariRabu" class="jadwal-day-btn">Rabu</button>
+        <button onclick="filterJadwalHari('Kamis')" id="jadwalHariKamis" class="jadwal-day-btn">Kamis</button>
+        <button onclick="filterJadwalHari('Jumat')" id="jadwalHariJumat" class="jadwal-day-btn">Jumat</button>
+        <button onclick="filterJadwalHari('Sabtu')" id="jadwalHariSabtu" class="jadwal-day-btn">Sabtu</button>
+      </div>
+      <div id="jadwalList">
+        <div style="text-align:center;padding:40px 20px;color:#94a3b8;">
+          <div style="font-size:40px;margin-bottom:10px;">📅</div>
+          <div style="font-weight:600;">Belum ada jadwal</div>
+          <div style="font-size:13px;margin-top:4px;">Klik tombol + Tambah untuk membuat jadwal</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL FORM JADWAL -->
+<div id="modalJadwal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;overflow-y:auto;">
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:white;border-radius:20px;max-width:480px;width:100%;padding:24px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:20px;">
+        <h3 style="margin:0;color:var(--primary);" id="formJadwalTitle">Tambah Jadwal</h3>
+        <button onclick="closeFormJadwal()" style="background:none;border:none;font-size:20px;cursor:pointer;">✕</button>
+      </div>
+      <input type="hidden" id="jadwalEditId">
+      <div style="display:grid;gap:14px;">
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Hari *</label>
+          <select id="fJadwalHari" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;">
+            <option>Senin</option><option>Selasa</option><option>Rabu</option>
+            <option>Kamis</option><option>Jumat</option><option>Sabtu</option><option>Ahad/Minggu</option>
+          </select>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div>
+            <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Jam Mulai *</label>
+            <input type="time" id="fJadwalMulai" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Jam Selesai</label>
+            <input type="time" id="fJadwalSelesai" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;">
+          </div>
+        </div>
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Mata Pelajaran / Kegiatan *</label>
+          <input type="text" id="fJadwalMapel" placeholder="Contoh: Matematika / Ngaji Subuh" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;">
+        </div>
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Pengajar</label>
+          <input type="text" id="fJadwalPengajar" placeholder="Nama pengajar (opsional)" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;">
+        </div>
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Kelas / Tingkat</label>
+          <input type="text" id="fJadwalKelas" placeholder="Contoh: Kelas 7 / Tingkat Ula" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;">
+        </div>
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Ruangan / Lokasi</label>
+          <input type="text" id="fJadwalRuangan" placeholder="Contoh: Kelas A / Masjid / Aula" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;">
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:20px;">
+        <button onclick="closeFormJadwal()" style="flex:1;padding:12px;background:#f1f5f9;color:#333;border:none;border-radius:10px;font-weight:600;cursor:pointer;">Batal</button>
+        <button onclick="simpanJadwal()" style="flex:2;padding:12px;background:var(--primary);color:white;border:none;border-radius:10px;font-weight:600;cursor:pointer;">💾 Simpan</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.jadwal-day-btn {
+  padding: 8px 14px;
+  border: 2px solid #e2e8f0;
+  border-radius: 20px;
+  background: white;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+.jadwal-day-btn.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+</style>
+
 </body>
 </html>`);
         win.document.close();
@@ -11171,6 +11609,276 @@ async function printPDFDirect(pdfDoc, filename = 'document.pdf') {
             }, 100);
         };
     <\/script>
+
+<!-- ==================== HALAMAN DATA PENGAJAR ==================== -->
+<div id="page-pengajar" class="page" style="display:none;">
+  <div class="header-premium header-premium-small">
+    <div class="back-header">
+      <i class="fas fa-arrow-left" onclick="showPage('home')"></i>
+      <h2 id="hdrPengajar">Data Pengajar</h2>
+      <button onclick="openFormPengajar()" style="background:var(--primary);color:white;border:none;border-radius:8px;padding:6px 12px;font-size:13px;cursor:pointer;font-weight:600;">
+        + Tambah
+      </button>
+    </div>
+  </div>
+  <div class="page-content">
+    <div class="card-premium">
+      <div style="margin-bottom:14px;">
+        <input type="text" id="searchPengajar" oninput="renderPengajarList()" placeholder="Cari pengajar..." style="width:100%;padding:10px 14px;border:2px solid #e2e8f0;border-radius:10px;font-size:14px;box-sizing:border-box;outline:none;">
+      </div>
+      <div id="pengajarList">
+        <div style="text-align:center;padding:40px 20px;color:#94a3b8;">
+          <div style="font-size:40px;margin-bottom:10px;">👨‍🏫</div>
+          <div style="font-weight:600;">Belum ada data pengajar</div>
+          <div style="font-size:13px;margin-top:4px;">Klik tombol + Tambah untuk menambahkan</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL FORM PENGAJAR -->
+<div id="modalPengajar" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;overflow-y:auto;">
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:white;border-radius:20px;max-width:480px;width:100%;padding:24px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:20px;">
+        <h3 style="margin:0;color:var(--primary);" id="formPengajarTitle">Tambah Pengajar</h3>
+        <button onclick="closeFormPengajar()" style="background:none;border:none;font-size:20px;cursor:pointer;">✕</button>
+      </div>
+      <input type="hidden" id="pengajarEditId">
+      <div style="display:grid;gap:14px;">
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Nama Lengkap *</label>
+          <input type="text" id="fPengajarNama" placeholder="Nama pengajar" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;">
+        </div>
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">NIP / Kode</label>
+          <input type="text" id="fPengajarNIP" placeholder="Nomor induk pengajar (opsional)" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;">
+        </div>
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Bidang Mengajar</label>
+          <input type="text" id="fPengajarBidang" placeholder="Contoh: Matematika / Fiqh / Nahwu" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;">
+        </div>
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">No. WhatsApp</label>
+          <input type="tel" id="fPengajarWA" placeholder="08xxxxxxxxxx" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;">
+        </div>
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Alamat</label>
+          <textarea id="fPengajarAlamat" rows="2" placeholder="Alamat pengajar (opsional)" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;resize:none;"></textarea>
+        </div>
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Catatan</label>
+          <textarea id="fPengajarCatatan" rows="2" placeholder="Catatan tambahan (opsional)" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;resize:none;"></textarea>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:20px;">
+        <button onclick="closeFormPengajar()" style="flex:1;padding:12px;background:#f1f5f9;color:#333;border:none;border-radius:10px;font-weight:600;cursor:pointer;">Batal</button>
+        <button onclick="simpanPengajar()" style="flex:2;padding:12px;background:var(--primary);color:white;border:none;border-radius:10px;font-weight:600;cursor:pointer;">💾 Simpan</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== HALAMAN NILAI ==================== -->
+<div id="page-nilai" class="page" style="display:none;">
+  <div class="header-premium header-premium-small">
+    <div class="back-header">
+      <i class="fas fa-arrow-left" onclick="showPage('home')"></i>
+      <h2>Nilai & Hasil Belajar</h2>
+      <button onclick="openFormNilai()" style="background:var(--primary);color:white;border:none;border-radius:8px;padding:6px 12px;font-size:13px;cursor:pointer;font-weight:600;">
+        + Input
+      </button>
+    </div>
+  </div>
+  <div class="page-content">
+    <div class="card-premium">
+      <!-- Filter -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+        <select id="filterNilaiJamaah" onchange="renderNilaiList()" style="padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:13px;">
+          <option value="">Semua Peserta</option>
+        </select>
+        <select id="filterNilaiJenis" onchange="renderNilaiList()" style="padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:13px;">
+          <option value="">Semua Jenis</option>
+          <option value="UH">Ulangan Harian</option>
+          <option value="UTS">UTS / Tengah Semester</option>
+          <option value="UAS">UAS / Akhir Semester</option>
+          <option value="Hafalan">Hafalan</option>
+          <option value="Praktik">Praktik</option>
+          <option value="Lainnya">Lainnya</option>
+        </select>
+      </div>
+      <div id="nilaiList">
+        <div style="text-align:center;padding:40px 20px;color:#94a3b8;">
+          <div style="font-size:40px;margin-bottom:10px;">📊</div>
+          <div style="font-weight:600;">Belum ada data nilai</div>
+          <div style="font-size:13px;margin-top:4px;">Klik tombol + Input untuk menambahkan</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL FORM NILAI -->
+<div id="modalNilai" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;overflow-y:auto;">
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:white;border-radius:20px;max-width:480px;width:100%;padding:24px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:20px;">
+        <h3 style="margin:0;color:var(--primary);" id="formNilaiTitle">Input Nilai</h3>
+        <button onclick="closeFormNilai()" style="background:none;border:none;font-size:20px;cursor:pointer;">✕</button>
+      </div>
+      <input type="hidden" id="nilaiEditId">
+      <div style="display:grid;gap:14px;">
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Peserta Didik *</label>
+          <select id="fNilaiJamaah" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;">
+            <option value="">Pilih peserta...</option>
+          </select>
+        </div>
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Mata Pelajaran / Kitab</label>
+          <input type="text" id="fNilaiMapel" placeholder="Contoh: Matematika / Fiqh" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;">
+        </div>
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Jenis Penilaian *</label>
+          <select id="fNilaiJenis" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;">
+            <option value="UH">Ulangan Harian</option>
+            <option value="UTS">UTS / Tengah Semester</option>
+            <option value="UAS">UAS / Akhir Semester</option>
+            <option value="Hafalan">Hafalan</option>
+            <option value="Praktik">Praktik</option>
+            <option value="Lainnya">Lainnya</option>
+          </select>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div>
+            <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Nilai *</label>
+            <input type="number" id="fNilaiAngka" min="0" max="100" placeholder="0-100" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Tanggal *</label>
+            <input type="date" id="fNilaiTanggal" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;">
+          </div>
+        </div>
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Keterangan</label>
+          <textarea id="fNilaiKeterangan" rows="2" placeholder="Keterangan tambahan (opsional)" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;resize:none;"></textarea>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:20px;">
+        <button onclick="closeFormNilai()" style="flex:1;padding:12px;background:#f1f5f9;color:#333;border:none;border-radius:10px;font-weight:600;cursor:pointer;">Batal</button>
+        <button onclick="simpanNilai()" style="flex:2;padding:12px;background:var(--primary);color:white;border:none;border-radius:10px;font-weight:600;cursor:pointer;">💾 Simpan</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== HALAMAN JADWAL ==================== -->
+<div id="page-jadwal" class="page" style="display:none;">
+  <div class="header-premium header-premium-small">
+    <div class="back-header">
+      <i class="fas fa-arrow-left" onclick="showPage('home')"></i>
+      <h2>Jadwal Pelajaran</h2>
+      <button onclick="openFormJadwal()" style="background:var(--primary);color:white;border:none;border-radius:8px;padding:6px 12px;font-size:13px;cursor:pointer;font-weight:600;">
+        + Tambah
+      </button>
+    </div>
+  </div>
+  <div class="page-content">
+    <div class="card-premium">
+      <!-- Filter Hari -->
+      <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;margin-bottom:16px;">
+        <button onclick="filterJadwalHari('')" id="jadwalHariAll" class="jadwal-day-btn active">Semua</button>
+        <button onclick="filterJadwalHari('Senin')" id="jadwalHariSenin" class="jadwal-day-btn">Senin</button>
+        <button onclick="filterJadwalHari('Selasa')" id="jadwalHariSelasa" class="jadwal-day-btn">Selasa</button>
+        <button onclick="filterJadwalHari('Rabu')" id="jadwalHariRabu" class="jadwal-day-btn">Rabu</button>
+        <button onclick="filterJadwalHari('Kamis')" id="jadwalHariKamis" class="jadwal-day-btn">Kamis</button>
+        <button onclick="filterJadwalHari('Jumat')" id="jadwalHariJumat" class="jadwal-day-btn">Jumat</button>
+        <button onclick="filterJadwalHari('Sabtu')" id="jadwalHariSabtu" class="jadwal-day-btn">Sabtu</button>
+      </div>
+      <div id="jadwalList">
+        <div style="text-align:center;padding:40px 20px;color:#94a3b8;">
+          <div style="font-size:40px;margin-bottom:10px;">📅</div>
+          <div style="font-weight:600;">Belum ada jadwal</div>
+          <div style="font-size:13px;margin-top:4px;">Klik tombol + Tambah untuk membuat jadwal</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL FORM JADWAL -->
+<div id="modalJadwal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;overflow-y:auto;">
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:white;border-radius:20px;max-width:480px;width:100%;padding:24px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:20px;">
+        <h3 style="margin:0;color:var(--primary);" id="formJadwalTitle">Tambah Jadwal</h3>
+        <button onclick="closeFormJadwal()" style="background:none;border:none;font-size:20px;cursor:pointer;">✕</button>
+      </div>
+      <input type="hidden" id="jadwalEditId">
+      <div style="display:grid;gap:14px;">
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Hari *</label>
+          <select id="fJadwalHari" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;">
+            <option>Senin</option><option>Selasa</option><option>Rabu</option>
+            <option>Kamis</option><option>Jumat</option><option>Sabtu</option><option>Ahad/Minggu</option>
+          </select>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div>
+            <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Jam Mulai *</label>
+            <input type="time" id="fJadwalMulai" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Jam Selesai</label>
+            <input type="time" id="fJadwalSelesai" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;">
+          </div>
+        </div>
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Mata Pelajaran / Kegiatan *</label>
+          <input type="text" id="fJadwalMapel" placeholder="Contoh: Matematika / Ngaji Subuh" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;">
+        </div>
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Pengajar</label>
+          <input type="text" id="fJadwalPengajar" placeholder="Nama pengajar (opsional)" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;">
+        </div>
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Kelas / Tingkat</label>
+          <input type="text" id="fJadwalKelas" placeholder="Contoh: Kelas 7 / Tingkat Ula" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;">
+        </div>
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Ruangan / Lokasi</label>
+          <input type="text" id="fJadwalRuangan" placeholder="Contoh: Kelas A / Masjid / Aula" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;">
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:20px;">
+        <button onclick="closeFormJadwal()" style="flex:1;padding:12px;background:#f1f5f9;color:#333;border:none;border-radius:10px;font-weight:600;cursor:pointer;">Batal</button>
+        <button onclick="simpanJadwal()" style="flex:2;padding:12px;background:var(--primary);color:white;border:none;border-radius:10px;font-weight:600;cursor:pointer;">💾 Simpan</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.jadwal-day-btn {
+  padding: 8px 14px;
+  border: 2px solid #e2e8f0;
+  border-radius: 20px;
+  background: white;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+.jadwal-day-btn.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+</style>
+
 </body>
 </html>`);
         win.document.close();
@@ -11183,89 +11891,544 @@ async function printPDFDirect(pdfDoc, filename = 'document.pdf') {
     }
 }
 
-// ==================== SETUP WIZARD FUNCTIONS ====================
-let selectedTemplate = null;
 
-function showFirstTimeSetupWizard() {
-    document.getElementById('setupWizard').style.display = 'flex';
-    goToSetupStep(1);
+// ==================== DATA PENGAJAR ====================
+let pengajarList = JSON.parse(localStorage.getItem('eduku_pengajar') || '[]');
+
+function savePengajar() {
+    localStorage.setItem('eduku_pengajar', JSON.stringify(pengajarList));
 }
 
-function goToSetupStep(step) {
-    // Hide all steps
-    document.querySelectorAll('.setup-step').forEach(el => el.style.display = 'none');
-    // Show target step
-    document.getElementById(`setupStep${step}`).style.display = 'block';
+function openFormPengajar(id = null) {
+    document.getElementById('pengajarEditId').value = id || '';
+    document.getElementById('fPengajarNama').value = '';
+    document.getElementById('fPengajarNIP').value = '';
+    document.getElementById('fPengajarBidang').value = '';
+    document.getElementById('fPengajarWA').value = '';
+    document.getElementById('fPengajarAlamat').value = '';
+    document.getElementById('fPengajarCatatan').value = '';
+    
+    if (id) {
+        const p = pengajarList.find(x => x.id == id);
+        if (p) {
+            document.getElementById('formPengajarTitle').textContent = 'Edit ' + getTerm('pengajar');
+            document.getElementById('fPengajarNama').value = p.nama || '';
+            document.getElementById('fPengajarNIP').value = p.nip || '';
+            document.getElementById('fPengajarBidang').value = p.bidang || '';
+            document.getElementById('fPengajarWA').value = p.wa || '';
+            document.getElementById('fPengajarAlamat').value = p.alamat || '';
+            document.getElementById('fPengajarCatatan').value = p.catatan || '';
+        }
+    } else {
+        document.getElementById('formPengajarTitle').textContent = 'Tambah ' + getTerm('pengajar');
+    }
+    document.getElementById('modalPengajar').style.display = 'flex';
 }
 
-function selectTemplate(templateId) {
-    selectedTemplate = templateId;
-    
-    // Remove selected class from all
-    document.querySelectorAll('.template-card').forEach(el => el.classList.remove('selected'));
-    
-    // Add selected class to chosen
-    document.getElementById(`tmpl_${templateId}`).classList.add('selected');
-    
-    // Enable next button
-    document.getElementById('btnNextStep2').disabled = false;
-    document.getElementById('btnNextStep2').style.opacity = '1';
+function closeFormPengajar() {
+    document.getElementById('modalPengajar').style.display = 'none';
 }
 
-async function completeSetup() {
-    const namaLembaga = document.getElementById('setupNamaLembaga').value.trim();
-    const alamat = document.getElementById('setupAlamat').value.trim();
-    const telp = document.getElementById('setupTelp').value.trim();
+function simpanPengajar() {
+    const nama = document.getElementById('fPengajarNama').value.trim();
+    if (!nama) { showToast('❌ Nama harus diisi!'); return; }
     
-    if (!namaLembaga) {
-        showToast('❌ Nama lembaga harus diisi!');
+    const id = document.getElementById('pengajarEditId').value;
+    const data = {
+        id: id || Date.now(),
+        nama, 
+        nip: document.getElementById('fPengajarNIP').value.trim(),
+        bidang: document.getElementById('fPengajarBidang').value.trim(),
+        wa: document.getElementById('fPengajarWA').value.trim(),
+        alamat: document.getElementById('fPengajarAlamat').value.trim(),
+        catatan: document.getElementById('fPengajarCatatan').value.trim(),
+        createdAt: id ? (pengajarList.find(x=>x.id==id)?.createdAt || new Date().toISOString()) : new Date().toISOString()
+    };
+    
+    if (id) {
+        const idx = pengajarList.findIndex(x => x.id == id);
+        if (idx >= 0) pengajarList[idx] = data;
+    } else {
+        pengajarList.push(data);
+    }
+    
+    savePengajar();
+    closeFormPengajar();
+    renderPengajarList();
+    showToast('✅ Data ' + getTerm('pengajar') + ' berhasil disimpan!');
+}
+
+function hapusPengajar(id) {
+    if (!confirm('Hapus data ' + getTerm('pengajar') + ' ini?')) return;
+    pengajarList = pengajarList.filter(x => x.id != id);
+    savePengajar();
+    renderPengajarList();
+    showToast('✅ Data berhasil dihapus!');
+}
+
+function renderPengajarList() {
+    const search = (document.getElementById('searchPengajar')?.value || '').toLowerCase();
+    const container = document.getElementById('pengajarList');
+    
+    // Update header
+    const hdr = document.getElementById('hdrPengajar');
+    if (hdr) hdr.textContent = 'Data ' + getTerm('pengajar');
+    
+    let filtered = pengajarList;
+    if (search) filtered = filtered.filter(p => 
+        (p.nama||'').toLowerCase().includes(search) || 
+        (p.bidang||'').toLowerCase().includes(search)
+    );
+    
+    if (!filtered.length) {
+        container.innerHTML = `<div style="text-align:center;padding:40px 20px;color:#94a3b8;">
+            <div style="font-size:40px;margin-bottom:10px;">👨‍🏫</div>
+            <div style="font-weight:600;">Belum ada data ${getTerm('pengajar')}</div>
+        </div>`;
         return;
     }
     
-    try {
-        // Apply selected template
-        if (selectedTemplate && selectedTemplate !== 'custom') {
-            await applyTerminologyTemplate(selectedTemplate);
+    container.innerHTML = filtered.map(p => `
+        <div style="background:#f8fafc;border-radius:12px;padding:14px;margin-bottom:10px;display:flex;gap:12px;align-items:flex-start;">
+            <div style="width:44px;height:44px;background:var(--primary);color:white;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">👨‍🏫</div>
+            <div style="flex:1;min-width:0;">
+                <div style="font-weight:700;font-size:15px;margin-bottom:2px;">${p.nama}</div>
+                ${p.nip ? `<div style="font-size:12px;color:#64748b;">NIP: ${p.nip}</div>` : ''}
+                ${p.bidang ? `<div style="font-size:12px;color:#64748b;">📚 ${p.bidang}</div>` : ''}
+                ${p.wa ? `<div style="font-size:12px;color:#64748b;">📱 ${p.wa}</div>` : ''}
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
+                <button onclick="openFormPengajar(${p.id})" style="background:var(--primary);color:white;border:none;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer;">✏️</button>
+                <button onclick="hapusPengajar(${p.id})" style="background:#ef4444;color:white;border:none;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer;">🗑️</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// ==================== DATA NILAI ====================
+let nilaiList = JSON.parse(localStorage.getItem('eduku_nilai') || '[]');
+
+function saveNilai() { localStorage.setItem('eduku_nilai', JSON.stringify(nilaiList)); }
+
+function openFormNilai(id = null) {
+    // Populate peserta dropdown
+    const sel = document.getElementById('fNilaiJamaah');
+    sel.innerHTML = '<option value="">Pilih ' + getTerm('pesertaDidik') + '...</option>' +
+        jamaahList.map(j => `<option value="${j.id}">${j.nama||j.nama_paspor||'Tanpa Nama'}</option>`).join('');
+    
+    // Reset form
+    document.getElementById('nilaiEditId').value = id || '';
+    document.getElementById('fNilaiJamaah').value = '';
+    document.getElementById('fNilaiMapel').value = '';
+    document.getElementById('fNilaiJenis').value = 'UH';
+    document.getElementById('fNilaiAngka').value = '';
+    document.getElementById('fNilaiTanggal').value = new Date().toISOString().split('T')[0];
+    document.getElementById('fNilaiKeterangan').value = '';
+    
+    if (id) {
+        const n = nilaiList.find(x => x.id == id);
+        if (n) {
+            document.getElementById('fNilaiJamaah').value = n.jamaahId || '';
+            document.getElementById('fNilaiMapel').value = n.mapel || '';
+            document.getElementById('fNilaiJenis').value = n.jenis || 'UH';
+            document.getElementById('fNilaiAngka').value = n.nilai || '';
+            document.getElementById('fNilaiTanggal').value = n.tanggal || '';
+            document.getElementById('fNilaiKeterangan').value = n.keterangan || '';
         }
-        
-        // Save basic config
-        const config = {
-            instansi1: {
-                nama: namaLembaga,
-                alamat: alamat,
-                telp: telp,
-                logo: ''
-            },
-            instansi2: {
-                aktif: false,
-                nama: '',
-                alamat: '',
-                telp: '',
-                logo: ''
-            }
-        };
-        
-        await idbSet(STORE_CONFIG, 'config_pro', config);
-        await idbSet(STORE_CONFIG, 'setup_complete', true);
-        
-        // Update header
-        document.getElementById('headerInstansi1').textContent = namaLembaga;
-        document.getElementById('headerInstansi2').textContent = namaLembaga;
-        
-        // Close wizard
-        document.getElementById('setupWizard').style.display = 'none';
-        
-        // Show success message
-        showToast('✅ Setup selesai! Selamat menggunakan EduKu!');
-        
-        // Refresh config display
-        await loadKonfigurasiPro();
-        updateHeaderFromConfig();
-        
-    } catch (e) {
-        console.error('Setup error:', e);
-        showToast('❌ Gagal menyimpan konfigurasi');
     }
+    
+    document.getElementById('modalNilai').style.display = 'flex';
+}
+
+function closeFormNilai() { document.getElementById('modalNilai').style.display = 'none'; }
+
+function simpanNilai() {
+    const jamaahId = document.getElementById('fNilaiJamaah').value;
+    const nilai = document.getElementById('fNilaiAngka').value;
+    if (!jamaahId || !nilai) { showToast('❌ Peserta dan nilai harus diisi!'); return; }
+    
+    const id = document.getElementById('nilaiEditId').value;
+    const data = {
+        id: id || Date.now(),
+        jamaahId,
+        mapel: document.getElementById('fNilaiMapel').value.trim(),
+        jenis: document.getElementById('fNilaiJenis').value,
+        nilai: parseFloat(nilai),
+        tanggal: document.getElementById('fNilaiTanggal').value,
+        keterangan: document.getElementById('fNilaiKeterangan').value.trim()
+    };
+    
+    if (id) {
+        const idx = nilaiList.findIndex(x => x.id == id);
+        if (idx >= 0) nilaiList[idx] = data;
+    } else {
+        nilaiList.push(data);
+    }
+    
+    saveNilai();
+    closeFormNilai();
+    renderNilaiList();
+    showToast('✅ Nilai berhasil disimpan!');
+}
+
+function hapusNilai(id) {
+    if (!confirm('Hapus data nilai ini?')) return;
+    nilaiList = nilaiList.filter(x => x.id != id);
+    saveNilai();
+    renderNilaiList();
+    showToast('✅ Nilai berhasil dihapus!');
+}
+
+function renderNilaiList() {
+    // Populate filter
+    const fJamaah = document.getElementById('filterNilaiJamaah');
+    if (fJamaah && fJamaah.options.length <= 1) {
+        fJamaah.innerHTML = '<option value="">Semua ' + getTerm('pesertaDidik') + '</option>' +
+            jamaahList.map(j => `<option value="${j.id}">${j.nama||j.nama_paspor||'Tanpa Nama'}</option>`).join('');
+    }
+    
+    const filterJamaah = document.getElementById('filterNilaiJamaah')?.value || '';
+    const filterJenis = document.getElementById('filterNilaiJenis')?.value || '';
+    const container = document.getElementById('nilaiList');
+    
+    let filtered = nilaiList;
+    if (filterJamaah) filtered = filtered.filter(n => n.jamaahId == filterJamaah);
+    if (filterJenis) filtered = filtered.filter(n => n.jenis == filterJenis);
+    filtered = filtered.sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal));
+    
+    if (!filtered.length) {
+        container.innerHTML = `<div style="text-align:center;padding:40px 20px;color:#94a3b8;">
+            <div style="font-size:40px;margin-bottom:10px;">📊</div>
+            <div style="font-weight:600;">Belum ada data nilai</div>
+        </div>`;
+        return;
+    }
+    
+    const nilaiColor = (n) => n >= 90 ? '#10b981' : n >= 75 ? '#3b82f6' : n >= 60 ? '#f59e0b' : '#ef4444';
+    
+    container.innerHTML = filtered.map(n => {
+        const j = jamaahList.find(x => x.id == n.jamaahId);
+        const nama = j ? (j.nama||j.nama_paspor||'?') : '?';
+        return `
+        <div style="background:#f8fafc;border-radius:12px;padding:14px;margin-bottom:10px;display:flex;gap:12px;align-items:center;">
+            <div style="width:52px;height:52px;background:${nilaiColor(n.nilai)};color:white;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;flex-shrink:0;">${n.nilai}</div>
+            <div style="flex:1;min-width:0;">
+                <div style="font-weight:700;font-size:14px;">${nama}</div>
+                <div style="font-size:12px;color:#64748b;">${n.mapel || '-'} · ${n.jenis}</div>
+                <div style="font-size:12px;color:#94a3b8;">${n.tanggal || '-'}</div>
+            </div>
+            <div style="display:flex;gap:6px;flex-shrink:0;">
+                <button onclick="openFormNilai(${n.id})" style="background:var(--primary);color:white;border:none;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer;">✏️</button>
+                <button onclick="hapusNilai(${n.id})" style="background:#ef4444;color:white;border:none;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer;">🗑️</button>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+// ==================== DATA JADWAL ====================
+let jadwalList = JSON.parse(localStorage.getItem('eduku_jadwal') || '[]');
+let jadwalFilterHari = '';
+
+function saveJadwal() { localStorage.setItem('eduku_jadwal', JSON.stringify(jadwalList)); }
+
+function openFormJadwal(id = null) {
+    document.getElementById('jadwalEditId').value = id || '';
+    document.getElementById('fJadwalHari').value = 'Senin';
+    document.getElementById('fJadwalMulai').value = '';
+    document.getElementById('fJadwalSelesai').value = '';
+    document.getElementById('fJadwalMapel').value = '';
+    document.getElementById('fJadwalPengajar').value = '';
+    document.getElementById('fJadwalKelas').value = '';
+    document.getElementById('fJadwalRuangan').value = '';
+    
+    if (id) {
+        const j = jadwalList.find(x => x.id == id);
+        if (j) {
+            document.getElementById('formJadwalTitle').textContent = 'Edit Jadwal';
+            document.getElementById('fJadwalHari').value = j.hari || 'Senin';
+            document.getElementById('fJadwalMulai').value = j.mulai || '';
+            document.getElementById('fJadwalSelesai').value = j.selesai || '';
+            document.getElementById('fJadwalMapel').value = j.mapel || '';
+            document.getElementById('fJadwalPengajar').value = j.pengajar || '';
+            document.getElementById('fJadwalKelas').value = j.kelas || '';
+            document.getElementById('fJadwalRuangan').value = j.ruangan || '';
+        }
+    } else {
+        document.getElementById('formJadwalTitle').textContent = 'Tambah Jadwal';
+    }
+    document.getElementById('modalJadwal').style.display = 'flex';
+}
+
+function closeFormJadwal() { document.getElementById('modalJadwal').style.display = 'none'; }
+
+function simpanJadwal() {
+    const mapel = document.getElementById('fJadwalMapel').value.trim();
+    const mulai = document.getElementById('fJadwalMulai').value;
+    if (!mapel || !mulai) { showToast('❌ Pelajaran dan jam mulai harus diisi!'); return; }
+    
+    const id = document.getElementById('jadwalEditId').value;
+    const data = {
+        id: id || Date.now(),
+        hari: document.getElementById('fJadwalHari').value,
+        mulai,
+        selesai: document.getElementById('fJadwalSelesai').value,
+        mapel,
+        pengajar: document.getElementById('fJadwalPengajar').value.trim(),
+        kelas: document.getElementById('fJadwalKelas').value.trim(),
+        ruangan: document.getElementById('fJadwalRuangan').value.trim()
+    };
+    
+    if (id) {
+        const idx = jadwalList.findIndex(x => x.id == id);
+        if (idx >= 0) jadwalList[idx] = data;
+    } else {
+        jadwalList.push(data);
+    }
+    
+    saveJadwal();
+    closeFormJadwal();
+    renderJadwalList();
+    showToast('✅ Jadwal berhasil disimpan!');
+}
+
+function hapusJadwal(id) {
+    if (!confirm('Hapus jadwal ini?')) return;
+    jadwalList = jadwalList.filter(x => x.id != id);
+    saveJadwal();
+    renderJadwalList();
+    showToast('✅ Jadwal berhasil dihapus!');
+}
+
+function filterJadwalHari(hari) {
+    jadwalFilterHari = hari;
+    document.querySelectorAll('.jadwal-day-btn').forEach(b => b.classList.remove('active'));
+    const id = 'jadwalHari' + (hari || 'All');
+    document.getElementById(id)?.classList.add('active');
+    renderJadwalList();
+}
+
+const URUTAN_HARI = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Ahad/Minggu'];
+const WARNA_HARI = { Senin:'#3b82f6',Selasa:'#10b981',Rabu:'#f59e0b',Kamis:'#8b5cf6',Jumat:'#0D5C4A',Sabtu:'#ec4899','Ahad/Minggu':'#ef4444' };
+
+function renderJadwalList() {
+    const container = document.getElementById('jadwalList');
+    
+    let filtered = jadwalList;
+    if (jadwalFilterHari) filtered = filtered.filter(j => j.hari === jadwalFilterHari);
+    
+    filtered = filtered.sort((a, b) => {
+        const ha = URUTAN_HARI.indexOf(a.hari), hb = URUTAN_HARI.indexOf(b.hari);
+        if (ha !== hb) return ha - hb;
+        return (a.mulai || '').localeCompare(b.mulai || '');
+    });
+    
+    if (!filtered.length) {
+        container.innerHTML = `<div style="text-align:center;padding:40px 20px;color:#94a3b8;">
+            <div style="font-size:40px;margin-bottom:10px;">📅</div>
+            <div style="font-weight:600;">Belum ada jadwal</div>
+        </div>`;
+        return;
+    }
+    
+    container.innerHTML = filtered.map(j => `
+        <div style="background:#f8fafc;border-radius:12px;padding:14px;margin-bottom:10px;display:flex;gap:12px;align-items:flex-start;border-left:4px solid ${WARNA_HARI[j.hari]||'#64748b'};">
+            <div style="flex:1;min-width:0;">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                    <span style="background:${WARNA_HARI[j.hari]||'#64748b'};color:white;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;">${j.hari}</span>
+                    <span style="font-size:12px;color:#64748b;">${j.mulai||''}${j.selesai?' - '+j.selesai:''}</span>
+                </div>
+                <div style="font-weight:700;font-size:15px;">${j.mapel}</div>
+                ${j.pengajar ? `<div style="font-size:12px;color:#64748b;">👨‍🏫 ${j.pengajar}</div>` : ''}
+                ${j.kelas ? `<div style="font-size:12px;color:#64748b;">🏛️ ${j.kelas}</div>` : ''}
+                ${j.ruangan ? `<div style="font-size:12px;color:#64748b;">📍 ${j.ruangan}</div>` : ''}
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
+                <button onclick="openFormJadwal(${j.id})" style="background:var(--primary);color:white;border:none;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer;">✏️</button>
+                <button onclick="hapusJadwal(${j.id})" style="background:#ef4444;color:white;border:none;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer;">🗑️</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// ==================== TERMINOLOGY SYSTEM ====================
+const EDUKU_TEMPLATES = {
+    pesantren: { pesertaDidik:'Santri', pengajar:'Ustadz', pembayaranType:'Syahriyah', pimpinan:'Kyai/Pengasuh', jenisLembaga:'Pondok Pesantren' },
+    sekolah:   { pesertaDidik:'Siswa',  pengajar:'Guru',   pembayaranType:'SPP',        pimpinan:'Kepala Sekolah', jenisLembaga:'Sekolah' },
+    madrasah:  { pesertaDidik:'Siswa',  pengajar:'Ustadz/Guru', pembayaranType:'Iuran', pimpinan:'Kepala Madrasah', jenisLembaga:'Madrasah' },
+    custom:    { pesertaDidik:'Peserta Didik', pengajar:'Pengajar', pembayaranType:'Iuran', pimpinan:'Pimpinan', jenisLembaga:'Lembaga Pendidikan' }
+};
+
+let edukuTerms = JSON.parse(localStorage.getItem('eduku_terminology') || 'null') || EDUKU_TEMPLATES.pesantren;
+
+function getTerm(key) { return edukuTerms[key] || key; }
+
+function applyTermsToDOM() {
+    // Update display in config
+    const dp = document.getElementById('dispPeserta');
+    const dg = document.getElementById('dispPengajar');
+    if(dp) dp.textContent = getTerm('pesertaDidik');
+    if(dg) dg.textContent = getTerm('pengajar');
+    
+    // Update menu labels dynamically
+    const mPengajar = document.getElementById('menuPengajarLabel');
+    if (mPengajar) mPengajar.textContent = getTerm('pengajar');
+    const hdrPengajar = document.getElementById('hdrPengajar');
+    if (hdrPengajar) hdrPengajar.textContent = 'Data ' + getTerm('pengajar');
+    // Semua elemen dengan data-term attribute
+    document.querySelectorAll('[data-term]').forEach(el => {
+        el.textContent = getTerm(el.getAttribute('data-term'));
+    });
+    
+    // Update preview di modal
+    const prev1 = document.getElementById('prevPeserta');
+    const prev2 = document.getElementById('prevPengajar');
+    const prev3 = document.getElementById('prevPembayaran');
+    if (prev1) prev1.textContent = getTerm('pesertaDidik');
+    if (prev2) prev2.textContent = getTerm('pengajar');
+    if (prev3) prev3.textContent = getTerm('pembayaranType');
+}
+
+function saveTerms() {
+    localStorage.setItem('eduku_terminology', JSON.stringify(edukuTerms));
+    applyTermsToDOM();
+}
+
+// WIZARD functions
+let wizSelectedTmpl = null;
+
+function wizGo(step) {
+    document.querySelectorAll('.setup-step').forEach(el => el.style.display = 'none');
+    document.getElementById('wizStep' + step).style.display = 'block';
+}
+
+function pickTmpl(id) {
+    wizSelectedTmpl = id;
+    document.querySelectorAll('.template-card').forEach(el => el.classList.remove('selected'));
+    document.getElementById('tmpl_' + id).classList.add('selected');
+    const btn = document.getElementById('wizBtnNext2');
+    btn.disabled = false; btn.style.opacity = '1';
+}
+
+async function wizSelesai() {
+    const nama = document.getElementById('wizNama').value.trim();
+    if (!nama) { showToast('❌ Nama lembaga harus diisi!'); return; }
+    
+    // Apply template terminology
+    if (wizSelectedTmpl && EDUKU_TEMPLATES[wizSelectedTmpl]) {
+        edukuTerms = {...EDUKU_TEMPLATES[wizSelectedTmpl]};
+        saveTerms();
+    }
+    
+    // Save config
+    try {
+        const cfg = await idbGet(STORE_KONFIGURASI,'config_pro') || {};
+        cfg.instansi1 = cfg.instansi1 || {};
+        cfg.instansi1.nama = nama;
+        cfg.instansi1.alamat = document.getElementById('wizAlamat').value.trim();
+        cfg.instansi1.telp = document.getElementById('wizTelp').value.trim();
+        await idbSet(STORE_KONFIGURASI,'config_pro',cfg);
+        localStorage.setItem('eduku_setup_done','1');
+        localStorage.setItem('safara_mode','tanpa_login');
+        document.getElementById('headerInstansi1').textContent = nama;
+        document.getElementById('headerInstansi2').textContent = cfg.instansi1.alamat || getTerm('jenisLembaga');
+    } catch(e) { console.error(e); }
+    
+    document.getElementById('setupWizard').style.display = 'none';
+    pilihTanpaLogin();
+    showToast('✅ Selamat datang di EduKu, ' + nama + '!');
+    applyTermsToDOM();
+}
+
+function showWizard() {
+    document.getElementById('setupWizard').style.display = 'flex';
+    wizGo(1);
+}
+
+// TERMINOLOGI MODAL
+let termDraft = {};
+
+function openTerminologiModal() {
+    termDraft = {...edukuTerms};
+    document.getElementById('termPesertaCustom').value = '';
+    document.getElementById('termPengajarCustom').value = '';
+    
+    // Highlight active buttons
+    document.querySelectorAll('.term-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    document.getElementById('terminologiModal').style.display = 'flex';
+    applyTermsToDOM();
+}
+
+function closeTerminologiModal() {
+    document.getElementById('terminologiModal').style.display = 'none';
+}
+
+function setTerm(key, value, btn) {
+    termDraft[key] = value;
+    
+    // Update preview
+    const prev = document.getElementById('prevPeserta');
+    const prev2 = document.getElementById('prevPengajar');
+    const prev3 = document.getElementById('prevPembayaran');
+    if (key==='pesertaDidik' && prev) prev.textContent = value;
+    if (key==='pengajar' && prev2) prev2.textContent = value;
+    if (key==='pembayaranType' && prev3) prev3.textContent = value;
+    
+    // Update button active state - same key buttons
+    if (btn) {
+        btn.closest('div').querySelectorAll('.term-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+}
+
+function simpanTerminologi() {
+    // Check custom inputs
+    const customPeserta = document.getElementById('termPesertaCustom').value.trim();
+    const customPengajar = document.getElementById('termPengajarCustom').value.trim();
+    if (customPeserta) termDraft.pesertaDidik = customPeserta;
+    if (customPengajar) termDraft.pengajar = customPengajar;
+    
+    edukuTerms = {...termDraft};
+    saveTerms();
+    closeTerminologiModal();
+    showToast('✅ Terminologi berhasil disimpan!');
+    applyTermsToDOM();
+}
+
+// Check first time setup
+
+function mulaiEduKu() {
+    const done = localStorage.getItem('eduku_setup_done');
+    // Sembunyikan splash
+    const splash = document.getElementById('splashScreen');
+    if(splash) { splash.style.opacity='0'; setTimeout(()=>{ splash.style.display='none'; },400); }
+    
+    if (!done) {
+        // Pengguna baru: wizard setup
+        setTimeout(() => {
+            const wiz = document.getElementById('setupWizard');
+            if(wiz) { wiz.style.display='flex'; wizGo(1); }
+        }, 100);
+    } else {
+        // Pengguna lama: langsung masuk
+        localStorage.setItem('safara_mode','tanpa_login');
+        try { applyTermsToDOM(); } catch(e) {}
+    }
+}
+
+function checkEduKuSetup() {
+    // Apply terminology for returning users
+    try { applyTermsToDOM(); } catch(e) {}
+    // Update header from localStorage if available
+    try {
+        const namaLembaga = localStorage.getItem('eduku_nama_lembaga');
+        if(namaLembaga) {
+            const h1 = document.getElementById('headerInstansi1');
+            if(h1) h1.textContent = namaLembaga;
+        }
+    } catch(e) {}
 }
 
 </script>
