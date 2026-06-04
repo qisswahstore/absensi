@@ -2085,9 +2085,9 @@
     </div>
     <div class="stats-row">
         <div class="stat-mini-card"><i class="fas fa-coins"></i><div class="stat-label">Total Kas</div><div class="stat-number" id="homeStatKas">Rp 0</div></div>
-        <div class="stat-mini-card"><i class="fas fa-users"></i><div class="stat-label">Jamaah</div><div class="stat-number" id="homeStatJamaah">0</div></div>
+        <div class="stat-mini-card"><i class="fas fa-users"></i><div class="stat-label" id="statLabelJamaah">Peserta</div><div class="stat-number" id="homeStatJamaah">0</div></div>
         <div class="stat-mini-card"><i class="fas fa-money-bill-wave"></i><div class="stat-label">Total Piutang</div><div class="stat-number" id="homeStatPiutang">Rp 0</div></div>
-        <div class="stat-mini-card"><i class="fas fa-user-check"></i><div class="stat-label">Jamaah Lunas</div><div class="stat-number" id="homeStatLunas">0</div></div>
+        <div class="stat-mini-card"><i class="fas fa-user-check"></i><div class="stat-label" id="statLabelLunas">Peserta Lunas</div><div class="stat-number" id="homeStatLunas">0</div></div>
     </div>
     <div class="menu-container">
         <div class="section-title"><span><i class="fas fa-th-large"></i> Menu Utama</span></div>
@@ -2104,13 +2104,13 @@
         <div class="dashboard-card">
             <div class="dashboard-stats">
                 <div class="dashboard-stat-card"><div class="label"> TOTAL KAS</div><div class="value" id="dashTotalKas">Rp 0</div></div>
-                <div class="dashboard-stat-card"><div class="label"> TOTAL JAMAAH</div><div class="value" id="dashTotalJamaah">0</div></div>
-                <div class="dashboard-stat-card"><div class="label"> JAMAAH LUNAS</div><div class="value" id="dashTotalLunas">0</div></div>
+                <div class="dashboard-stat-card"><div class="label" id="dashLabelTotal"> TOTAL PESERTA</div><div class="value" id="dashTotalJamaah">0</div></div>
+                <div class="dashboard-stat-card"><div class="label" id="dashLabelLunas"> PESERTA LUNAS</div><div class="value" id="dashTotalLunas">0</div></div>
                 <div class="dashboard-stat-card"><div class="label"> TOTAL PIUTANG</div><div class="value" id="dashTotalPiutang">Rp 0</div></div>
             </div>
             <div class="chart-container"><canvas id="kasChart"></canvas></div>
             <div class="chart-container"><canvas id="paymentChart"></canvas></div>
-            <div class="section-title"><span> 5 JAMAAH DENGAN TAGIHAN TERBESAR</span></div>
+            <div class="section-title"><span> 5 PESERTA DENGAN TAGIHAN TERBESAR</span></div>
             <div id="topPiutangList"></div>
             <div class="row" style="margin-top:16px;">
                 <button class="btn btn-purple btn-small" onclick="downloadDashboardPDF()" style="flex:1"><i class="fas fa-download"></i> DOWNLOAD PDF</button>
@@ -2192,13 +2192,13 @@
     <div class="header-premium header-premium-small"><div class="back-header"><i class="fas fa-arrow-left" onclick="showPage('home')"></i><h2>Data Peserta Didik</h2><div style="width:30px;"></div></div></div>
     <div class="card-premium">
         <div id="jamaahAdminPanel" class="setting-card" style="display:none"><h3 style="color:var(--primary);"> Panel Admin Jamaah</h3><button class="btn btn-primary btn-small mt-2" onclick="openTambahJamaahModal()"> + Tambah database</button><button class="btn btn-blue btn-small mt-2" onclick="openManageFieldsModal()"> Kelola Field Dinamis</button><button class="btn btn-teal btn-small mt-2" onclick="downloadTemplateExcel()" style="background:#1D6F42;">⬇️ Download Template Excel</button><button class="btn btn-teal btn-small mt-2" onclick="exportJamaahToExcel()"> Export ke Excel</button><button class="btn btn-orange btn-small mt-2" onclick="document.getElementById('importExcelFile').click()"> IMPORT EXCEL</button><input type="file" id="importExcelFile" accept=".xlsx,.xls" style="display:none" onchange="importJamaahFromExcel(this)"><button class="btn btn-danger btn-small mt-2" onclick="confirmDeleteAllJamaah()"> HAPUS SEMUA database</button></div>
-        <div class="section-title"><span>DAFTAR JAMAAH</span></div>
+        <div class="section-title"><span id="hdrDaftarJamaah">DAFTAR PESERTA DIDIK</span></div>
         <div class="search-box"><input type="text" id="searchJamaahInput" placeholder=" Cari nama jamaah..." onkeyup="filterJamaahList()"><select id="sortJamaahSelect" onchange="sortJamaahList()"><option value="urutan_asli">Urutan asli</option><option value="nama_asc">Nama A-Z</option><option value="nama_desc">Nama Z-A</option><option value="tgl_asc">Tanggal lama ke baru</option><option value="tgl_desc">Tanggal baru ke lama</option></select><button onclick="resetJamaahFilter()">Reset</button></div>
         <div class="sort-buttons"><span style="font-size:12px; color:var(--gray);">Jumlah per halaman:</span><select id="perPageJamaah" onchange="changePerPage()"><option value="10">10</option><option value="20">20</option><option value="50">50</option><option value="100">100</option><option value="all">Semua</option></select></div>
         <div id="jamaahListContainer"></div><div id="paginationContainer" class="pagination"></div>
-        <button class="btn btn-wa" onclick="shareAllJamaahToWA()"><i class="fab fa-whatsapp"></i> SHARE SEMUA JAMAAH KE WA</button>
+        <button class="btn btn-wa" onclick="shareAllJamaahToWA()"><i class="fab fa-whatsapp"></i> <span id="btnShareWA">SHARE SEMUA PESERTA KE WA</span></button>
         <div class="section-title" style="margin-top:20px;"><span>Backup & Restore database</span></div>
-        <div class="row"><button class="btn btn-blue btn-small" onclick="backupJamaahData()" style="flex:1"><i class="fas fa-download"></i> BACKUP JAMAAH</button><button class="btn btn-orange btn-small" onclick="document.getElementById('restoreJamaahFile').click()" style="flex:1"><i class="fas fa-upload"></i> RESTORE JAMAAH</button></div>
+        <div class="row"><button class="btn btn-blue btn-small" onclick="backupJamaahData()" style="flex:1"><i class="fas fa-download"></i> BACKUP PESERTA</button><button class="btn btn-orange btn-small" onclick="document.getElementById('restoreJamaahFile').click()" style="flex:1"><i class="fas fa-upload"></i> RESTORE PESERTA</button></div>
         <div class="row" style="margin-top:8px;"><button class="btn btn-small mt-2" onclick="downloadTemplateExcel()" style="flex:1;background:#1D6F42;color:white;">⬇️ Download Template Excel</button><button class="btn btn-small mt-2" onclick="document.getElementById('importExcelFile2').click()" style="flex:1;background:#F59E0B;color:white;">⬆️ Import Excel</button></div>
         <input type="file" id="importExcelFile2" accept=".xlsx,.xls" style="display:none" onchange="importJamaahFromExcel(this)">
         <input type="file" id="restoreJamaahFile" accept=".json" style="display:none" onchange="restoreJamaahData(this)">
@@ -2251,7 +2251,7 @@
             <p style="font-size: 11px; color: var(--gray); margin-top: 12px;">
                 💡 Tips: Field WhatsApp tidak bisa dihapus. Yang lain bisa ditambah/dihapus.
             </p>
-            <button class="btn btn-danger btn-small mt-2" onclick="confirmDeleteAllJamaahKita()">🗑️ HAPUS SEMUA JAMAAH ON PROSES</button>
+            <button class="btn btn-danger btn-small mt-2" onclick="confirmDeleteAllJamaahKita()">🗑️ HAPUS SEMUA PESERTA ON PROSES</button>
         </div>
         <div class="section-title"><span>📋 TAMBAH DATA</span></div>
         <div class="input-group">
@@ -2268,7 +2268,7 @@
         <button class="btn btn-accent" onclick="tambahJamaahKitaMulti()" style="margin-top:16px;">
             <i class="fas fa-plus-circle"></i> TAMBAHKAN KE ON PROSES
         </button>
-        <div class="section-title" style="margin-top:24px;"><span>📋 DAFTAR JAMAAH ON PROSES</span></div>
+        <div class="section-title" style="margin-top:24px;"><span id="hdrDaftarOnProses">📋 DAFTAR PESERTA AKTIF</span></div>
         <div class="search-box">
             <input type="text" id="searchJamaahKitaInput" placeholder="Cari nama jamaah..." onkeyup="filterJamaahKitaList()">
             <button onclick="resetJamaahKitaFilter()" style="width:auto; padding:0 16px; background:var(--gray);">Reset</button>
@@ -2368,7 +2368,7 @@
                 </div>
             </div>
         </div>
-        <div class="section-title"><span><i class="fas fa-users"></i> DAFTAR TAGIHAN JAMAAH</span></div>
+        <div class="section-title"><span><i class="fas fa-users"></i> <span id="hdrTagihanJamaah">DAFTAR TAGIHAN PESERTA</span></span></div>
         <div id="paymentJamaahListContainer"><div style="text-align:center; padding:20px;">Memuat data jamaah...</div></div>
         <button class="payment-fab" id="paymentFabOpen"><i class="fas fa-plus"></i></button>
     </div>
@@ -2839,7 +2839,7 @@
     <div class="nav-item-premium" data-page="home" onclick="showPage('home')"><i class="fas fa-home"></i><span>Home</span></div>
     <div class="nav-item-premium" data-page="estimasi" onclick="showPage('estimasi')"><i class="fas fa-chart-line"></i><span>Estimasi</span></div>
     <div class="nav-item-premium" data-page="kas" onclick="showPage('kas')"><i class="fas fa-wallet"></i><span>Kas</span></div>
-    <div class="nav-item-premium" data-page="jamaah" onclick="showPage('jamaah')"><i class="fas fa-users"></i><span>Jamaah</span></div>
+    <div class="nav-item-premium" data-page="jamaah" onclick="showPage('jamaah')"><i class="fas fa-users"></i><span id="navLabelJamaah">Peserta</span></div>
     <div class="nav-item-premium" data-page="setting" onclick="showPage('setting')"><i class="fas fa-sliders-h"></i><span>Setting</span></div>
 </div>
 
@@ -3484,11 +3484,11 @@ async function cetakDashboardHTML() {
         <div class="tgl">Tanggal Cetak: ${tanggal}</div>
         <div class="stats">
             <div class="stat-box"><div class="label">TOTAL KAS</div><div class="value">Rp ${formatRupiah(totalKas)}</div></div>
-            <div class="stat-box"><div class="label">TOTAL JAMAAH</div><div class="value">${totalJamaah}</div></div>
-            <div class="stat-box"><div class="label">JAMAAH LUNAS</div><div class="value">${totalLunas}</div></div>
+            <div class="stat-box"><div class="label">TOTAL PESERTA</div><div class="value">${totalJamaah}</div></div>
+            <div class="stat-box"><div class="label">PESERTA LUNAS</div><div class="value">${totalLunas}</div></div>
             <div class="stat-box"><div class="label">TOTAL PIUTANG</div><div class="value">Rp ${formatRupiah(totalPiutang)}</div></div>
         </div>
-        <h2>5 JAMAAH DENGAN TAGIHAN TERBESAR</h2>
+        <h2>5 PESERTA DENGAN TAGIHAN TERBESAR</h2>
         <table><thead><tr><th>No</th><th>Nama Jamaah</th><th>Total Paket</th><th>Sisa Tagihan</th></tr></thead><tbody>${topHtml}</tbody></table>
         ${qrHtml}
     </div>
@@ -5375,7 +5375,7 @@ function downloadTemplateExcel() {
 
     // Sheet petunjuk
     const petunjuk = [
-        ['PETUNJUK PENGISIAN TEMPLATE IMPORT JAMAAH'],
+        ['PETUNJUK PENGISIAN TEMPLATE IMPORT PESERTA DIDIK'],
         [''],
         ['1. Isi data jamaah mulai dari baris ke-3 (baris 2 adalah contoh, boleh dihapus)'],
         ['2. Kolom "Nama Lengkap" wajib diisi'],
@@ -7018,7 +7018,7 @@ async function generateInvoicePDFDoc(jamaahId) {
     doc.setFontSize(11);
     doc.setTextColor(0, 0, 0);
     doc.setFont('times', 'bold');
-    doc.text('JAMAAH:', 20, y);
+    doc.text('PESERTA:', 20, y);
     y += 6;
     doc.setFont('times', 'normal');
     doc.text(jamaah.nama_lengkap, 20, y);
@@ -7327,7 +7327,7 @@ async function cetakPembayaranHTML() {
         <div class="watermark-wrap">${watermarkHtml}</div>
         <div class="content">
             ${headerHtml}
-            <h2>LAPORAN PEMBAYARAN JAMAAH</h2>
+            <h2>LAPORAN PEMBAYARAN PESERTA</h2>
             <div class="tgl">Tanggal Cetak: ${tglCetak}</div>
             <table><thead><tr><th style="width:36px;">No</th><th>Tanggal</th><th>Jamaah</th><th>Keterangan</th><th>Metode</th><th style="text-align:right;">Nominal</th></tr></thead><tbody>${rowsHtml}</tbody></table>
             <div class="summary"><strong>TOTAL PEMASUKAN: <span style="color:#0D5C4A;">${formatRupiah(totalMasuk)}</span></strong></div>
@@ -10620,7 +10620,7 @@ async function generatePaymentPDFBlob(outputType) {
     await applyPDFConfig(doc, { landscape: true });
     let totalMasuk = paymentTransaksiList.reduce((s,t)=>s+t.nominal,0);
     doc.setFontSize(16); doc.setTextColor(26,93,74);
-    doc.text('LAPORAN PEMBAYARAN JAMAAH', 148.5, 65, { align: 'center' });
+    doc.text('LAPORAN PEMBAYARAN PESERTA', 148.5, 65, { align: 'center' });
     const tableData = paymentTransaksiList.map((t,i)=>[i+1, t.tanggal, t.nama_jamaah, t.keterangan, t.metode, formatRupiah(t.nominal)]);
     doc.autoTable({startY:80, head:[['No','Tanggal','Jamaah','Keterangan','Metode','Nominal']], body:tableData, theme:'striped', headStyles:{fillColor:[26,93,74]}, styles:{fontSize:8, lineWidth:0.1}});
     let finalY = doc.lastAutoTable.finalY + 10;
@@ -10989,7 +10989,7 @@ async function downloadPembayaranPDF() {
         await applyPDFConfig(doc, { landscape: true });
         let totalMasuk = paymentTransaksiList.reduce((s,t)=>s+t.nominal,0);
         doc.setFontSize(16); doc.setTextColor(26,93,74);
-        doc.text('LAPORAN PEMBAYARAN JAMAAH', 148.5, 65, { align: 'center' });
+        doc.text('LAPORAN PEMBAYARAN PESERTA', 148.5, 65, { align: 'center' });
         const tableData = paymentTransaksiList.map((t,i)=>[i+1, t.tanggal, t.nama_jamaah, t.keterangan, t.metode, formatRupiah(t.nominal)]);
         doc.autoTable({startY:80, head:[['No','Tanggal','Jamaah','Keterangan','Metode','Nominal']], body:tableData, theme:'striped', headStyles:{fillColor:[26,93,74]}, styles:{fontSize:8, lineWidth:0.1}});
         let finalY = doc.lastAutoTable.finalY + 10;
@@ -11040,7 +11040,7 @@ async function sharePembayaranPDF() {
         doc.setFont('times', 'bold');
         doc.setFontSize(14);
         doc.setTextColor(13, 92, 74);
-        doc.text('LAPORAN PEMBAYARAN JAMAAH', 105, y, { align: 'center' });
+        doc.text('LAPORAN PEMBAYARAN PESERTA', 105, y, { align: 'center' });
         y += 7;
         
         // Tanggal
@@ -12263,17 +12263,45 @@ let edukuTerms = JSON.parse(localStorage.getItem('eduku_terminology') || 'null')
 function getTerm(key) { return edukuTerms[key] || key; }
 
 function applyTermsToDOM() {
-    // Update display in config
+    const p = getTerm('pesertaDidik');    // Santri / Siswa / Peserta
+    const g = getTerm('pengajar');        // Ustadz / Guru / Pengajar
+    const pay = getTerm('pembayaranType'); // Syahriyah / SPP / Iuran
+
+    // Config display
     const dp = document.getElementById('dispPeserta');
     const dg = document.getElementById('dispPengajar');
-    if(dp) dp.textContent = getTerm('pesertaDidik');
-    if(dg) dg.textContent = getTerm('pengajar');
+    if(dp) dp.textContent = p;
+    if(dg) dg.textContent = g;
     
-    // Update menu labels dynamically
+    // HOME STATS
+    const sl1 = document.getElementById('statLabelJamaah');
+    const sl2 = document.getElementById('statLabelLunas');
+    if(sl1) sl1.textContent = p;
+    if(sl2) sl2.textContent = p + ' Lunas';
+    
+    // DASHBOARD STATS
+    const dl1 = document.getElementById('dashLabelTotal');
+    const dl2 = document.getElementById('dashLabelLunas');
+    if(dl1) dl1.textContent = 'TOTAL ' + p.toUpperCase();
+    if(dl2) dl2.textContent = p.toUpperCase() + ' LUNAS';
+    
+    // BOTTOM NAV
+    const nav = document.getElementById('navLabelJamaah');
+    if(nav) nav.textContent = p;
+    
+    // PAGE HEADERS
+    const hdr1 = document.getElementById('hdrDaftarJamaah');
+    const hdr2 = document.getElementById('hdrDaftarOnProses');
+    const hdr3 = document.getElementById('hdrTagihanJamaah');
+    if(hdr1) hdr1.textContent = 'DAFTAR ' + p.toUpperCase();
+    if(hdr2) hdr2.textContent = '📋 DAFTAR ' + p.toUpperCase() + ' AKTIF';
+    if(hdr3) hdr3.textContent = 'DAFTAR TAGIHAN ' + p.toUpperCase();
+    
+    // MENU PENGAJAR
     const mPengajar = document.getElementById('menuPengajarLabel');
-    if (mPengajar) mPengajar.textContent = getTerm('pengajar');
+    if(mPengajar) mPengajar.textContent = g;
     const hdrPengajar = document.getElementById('hdrPengajar');
-    if (hdrPengajar) hdrPengajar.textContent = 'Data ' + getTerm('pengajar');
+    if(hdrPengajar) hdrPengajar.textContent = 'Data ' + g;
     // Semua elemen dengan data-term attribute
     document.querySelectorAll('[data-term]').forEach(el => {
         el.textContent = getTerm(el.getAttribute('data-term'));
