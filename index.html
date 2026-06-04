@@ -2123,7 +2123,7 @@
 
 <!-- ESTIMASI PAGE -->
 <div id="page-estimasi" class="page">
-    <div class="header-premium header-premium-small"><div class="back-header"><i class="fas fa-arrow-left" onclick="showPage('home')"></i><h2>Cuan Plan Umroh</h2><div style="width:30px;"></div></div></div>
+    <div class="header-premium header-premium-small"><div class="back-header"><i class="fas fa-arrow-left" onclick="showPage('home')"></i><h2>Kalkulator Biaya Pendidikan</h2><div style="width:30px;"></div></div></div>
     <div class="card-premium">
         <div class="logo-box text-center"><img src="https://img.icons8.com/color/96/school.png" style="width:50px;"></div>
         <p class="text-center" style="color:var(--gray); font-size:0.8rem;" id="dashFooterNama">Safara</p>
@@ -2137,7 +2137,7 @@
         <div class="row"><div class="input-group"><label>Diskon/PIC</label><input type="text" id="cPIC" class="money-input" value="0"></div><div class="input-group"><label>Lain-lain</label><input type="text" id="cLain" class="money-input" value="0"></div></div>
         <div class="section-title"><span>Margin</span></div>
         <div class="input-group"><label>Profit (%)</label><input type="number" id="profitPct" value="5"></div>
-        <button class="btn btn-primary" onclick="hitungUmroh()"><i class="fas fa-calculator"></i> HITUNG ESTIMASI</button>
+        <button class="btn btn-primary" onclick="hitungUmroh()"><i class="fas fa-calculator"></i> HITUNG KALKULASI</button>
         <button class="btn btn-orange mt-2" onclick="resetEstimasiToDefault()"><i class="fas fa-undo-alt"></i> RESET KE DEFAULT</button>
     </div>
     <div id="hasilEstimasi" class="res-card" style="display:none;"></div>
@@ -2147,7 +2147,7 @@
 <div id="page-kas" class="page">
     <div class="header-premium header-premium-small"><div class="back-header"><i class="fas fa-arrow-left" onclick="showPage('home')"></i><h2>Uang Kas</h2><div style="width:30px;"></div></div></div>
     <div class="card-premium">
-        <div class="input-group"><label>Kegiatan / Nama Rombongan</label><input type="text" id="kegiatan" placeholder="Contoh: Umroh Syawal 2026" value="Umroh Syawal 2026"></div>
+        <div class="input-group"><label>Kegiatan / Nama Rombongan</label><input type="text" id="kegiatan" placeholder="Contoh: Semester Ganjil 2026" value="Semester Ganjil 2026"></div>
         <div class="section-title"><span>Input Transaksi</span></div>
         <div class="input-group" style="margin-bottom:12px;"><input type="text" id="ketReal" placeholder="Keterangan detail transaksi"></div>
         <div class="row"><div style="flex:2"><input id="nomReal" type="text" class="money-input" placeholder="Nominal Rp"></div><div style="flex:1"><select id="tipeReal"><option value="masuk">Masuk</option><option value="keluar">Keluar</option></select></div></div>
@@ -2328,10 +2328,10 @@
 
 <!-- ZAKAT PAGE -->
 <div id="page-zakat" class="page">
-    <div class="header-premium header-premium-small"><div class="back-header"><i class="fas fa-arrow-left" onclick="showPage('home')"></i><h2>Kalkulator Zakat</h2><div style="width:30px;"></div></div></div>
+    <div class="header-premium header-premium-small"><div class="back-header"><i class="fas fa-arrow-left" onclick="showPage('home')"></i><h2>Kalkulator Zakat & Infaq</h2><div style="width:30px;"></div></div></div>
     <div class="card-premium">
         <div class="logo-box text-center"><div style="font-size:40px;"></div></div>
-        <p class="text-center" style="color:var(--gray);" id="zakatNama">Safara</p>
+        <p class="text-center" style="color:var(--gray);" id="zakatNama">EduKu</p>
         <div class="row"><div class="input-group"><label>Jenis Zakat</label><select id="jenisZakat" onchange="toggleZakatInput()"><option value="mal">Zakat Mal (Harta/Uang)</option><option value="pertanian">Zakat Pertanian</option><option value="perdagangan">Zakat Perdagangan</option></select></div></div>
         <div id="zakatGlobalInput"><div class="input-group"><label>Harga Emas per Gram (Rp)</label><input type="text" id="hargaEmas" class="money-input" value="1.200.000"></div></div>
         <div class="section-title"><span>Sumber Harta</span></div>
@@ -2379,7 +2379,7 @@
     <div class="header-premium header-premium-small"><div class="back-header"><i class="fas fa-arrow-left" onclick="showPage('home')"></i><h2 id="masterJudulHeader">Multi Event</h2><i class="fas fa-cog" onclick="openMasterSetting()" style="color:white; font-size:18px; cursor:pointer;"></i></div></div>
     <div class="card-premium">
         <div id="masterAdminPanel" style="display:none; background:var(--gray-light); padding:15px; border-radius:20px; margin-bottom:15px;">
-            <div class="input-group"><label> Judul Halaman / Laporan</label><input type="text" id="masterJudul" placeholder="Contoh: BADAL HAJI 2026"></div>
+            <div class="input-group"><label> Judul Halaman / Laporan</label><input type="text" id="masterJudul" placeholder="Contoh: DATA SANTRI 2026"></div>
             <div class="row"><button class="btn btn-blue btn-small" onclick="openMasterFieldModal()" style="flex:1"> Kelola Field Dinamis</button><button class="btn btn-teal btn-small" onclick="openMasterItemModal()" style="flex:1"> Kelola Item</button></div>
             <div class="row mt-2"><button class="btn btn-purple btn-small" onclick="copyFromJamaah()" style="flex:1"> Copy dari database</button><button class="btn btn-orange btn-small" onclick="openModeManager()" style="flex:1"><i class="fas fa-sliders-h"></i>  Kelola Mode</button></div>
             <div class="row mt-2"><button class="btn btn-danger btn-small" onclick="confirmDeleteAllMasterData()" style="flex:1"><i class="fas fa-trash-alt"></i>  HAPUS SEMUA</button><button class="btn btn-orange btn-small" onclick="deleteSelectedMasterData()" style="flex:1"><i class="fas fa-trash-alt"></i>  HAPUS TERPILIH</button></div>
@@ -2551,7 +2551,7 @@
             <div class="fitur-card" onclick="showPage('pengingatwa')"><div class="fitur-icon">📲</div><div class="fitur-title">Pengingat WA</div><div class="fitur-desc">Kirim pengingat otomatis</div></div>
             <div class="fitur-card" onclick="showPage('etikettiket')"><div class="fitur-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="48" height="48"><rect x="4" y="14" width="56" height="36" rx="6" fill="#f5a623"/><rect x="4" y="14" width="56" height="10" rx="4" fill="#e08000"/><circle cx="20" cy="38" r="4" fill="white"/><rect x="28" y="30" width="20" height="3" rx="2" fill="white"/><rect x="28" y="36" width="14" height="3" rx="2" fill="white"/><rect x="28" y="42" width="17" height="3" rx="2" fill="white"/></svg></div><div class="fitur-title">E-Tiket & QR</div><div class="fitur-desc">Tiket digital dengan QR</div></div>
             <div class="fitur-card" onclick="showPage('scanqr')"><div class="fitur-icon" style="font-size:40px;">📷</div><div class="fitur-title">Scan QR</div><div class="fitur-desc">Absensi & cek data jamaah</div></div>
-            <div class="fitur-card" onclick="showPage('suratresmi')"><div class="fitur-icon" style="font-size:40px;">📄</div><div class="fitur-title">Surat Resmi</div><div class="fitur-desc">Buat surat otomatis dari data jamaah</div></div>
+            <div class="fitur-card" onclick="showPage('suratresmi')"><div class="fitur-icon" style="font-size:40px;">📄</div><div class="fitur-title">Surat Resmi</div><div class="fitur-desc">Buat surat otomatis dari data peserta didik</div></div>
             <div class="fitur-card" onclick="showPage('cetaklabel')"><div class="fitur-icon">🏷️</div><div class="fitur-title">Cetak Label</div><div class="fitur-desc">Name tag / stiker koper</div></div>
             <div class="fitur-card" onclick="showPage('cloudstorage')"><div class="fitur-icon">☁️</div><div class="fitur-title">Cloud Storage</div><div class="fitur-desc">Backup & Restore data</div></div>
             <div class="fitur-card" onclick="showPage('dashboard')"><div class="fitur-icon">📈</div><div class="fitur-title">Dashboard</div><div class="fitur-desc">Grafik statistik data</div></div>
@@ -2574,7 +2574,7 @@
 <!-- FOLDER VIRTUAL PAGE -->
 <div id="page-foldervirtual" class="page">
     <div class="header-premium header-premium-small"><div class="back-header"><i class="fas fa-arrow-left" onclick="showPage('fitur')"></i><h2> Folder Virtual</h2><div style="width:30px;"></div></div></div>
-    <div class="container"><div id="folderAdminPanel" class="setting-card" style="display:none"><h3> Kelola Folder</h3><div class="row"><div class="input-group"><label>Nama Folder Baru</label><input type="text" id="newFolderName" placeholder="Contoh: Umroh Syawal 2026"></div><button class="btn btn-primary btn-small" onclick="tambahFolder()" style="flex:0.5;">+ Buat</button></div></div><div id="folderListContainer"></div></div>
+    <div class="container"><div id="folderAdminPanel" class="setting-card" style="display:none"><h3> Kelola Folder</h3><div class="row"><div class="input-group"><label>Nama Folder Baru</label><input type="text" id="newFolderName" placeholder="Contoh: Kegiatan Pesantren 2026"></div><button class="btn btn-primary btn-small" onclick="tambahFolder()" style="flex:0.5;">+ Buat</button></div></div><div id="folderListContainer"></div></div>
 </div>
 
 <!-- PENGINGAT WA PAGE -->
@@ -2772,7 +2772,7 @@
     <div class="header-premium header-premium-small"><div class="back-header"><i class="fas fa-arrow-left" onclick="showPage('fitur')"></i><h2> Cetak Label</h2><div style="width:30px;"></div></div></div>
     <div class="container">
         <div class="card-premium">
-            <div class="input-group"><label>Nama Acara / Rombongan</label><input type="text" id="labelEvent" placeholder="Umroh Syawal 2026"></div>
+            <div class="input-group"><label>Nama Acara / Rombongan</label><input type="text" id="labelEvent" placeholder="Kegiatan Pendidikan 2026"></div>
             <div class="input-group">
                 <label>Pilih Jamaah</label>
                 <input type="text" id="searchLabelJamaah" placeholder="🔍 Cari nama jamaah..." oninput="filterLabelJamaah()" style="margin-bottom:8px;">
@@ -2837,7 +2837,7 @@
 <!-- BOTTOM NAVIGATION -->
 <div class="bottom-nav-premium">
     <div class="nav-item-premium" data-page="home" onclick="showPage('home')"><i class="fas fa-home"></i><span>Home</span></div>
-    <div class="nav-item-premium" data-page="estimasi" onclick="showPage('estimasi')"><i class="fas fa-chart-line"></i><span>Estimasi</span></div>
+    <div class="nav-item-premium" data-page="estimasi" onclick="showPage('estimasi')"><i class="fas fa-calculator"></i><span>Kalkulator</span></div>
     <div class="nav-item-premium" data-page="kas" onclick="showPage('kas')"><i class="fas fa-wallet"></i><span>Kas</span></div>
     <div class="nav-item-premium" data-page="jamaah" onclick="showPage('jamaah')"><i class="fas fa-users"></i><span id="navLabelJamaah">Peserta</span></div>
     <div class="nav-item-premium" data-page="setting" onclick="showPage('setting')"><i class="fas fa-sliders-h"></i><span>Setting</span></div>
@@ -2854,7 +2854,7 @@
 <div id="riwayatModal" class="modal"><div class="modal-content"><h3> Riwayat Pembayaran</h3><p id="riwayatNama" style="font-weight:bold;"></p><div id="riwayatListContainer" style="max-height:400px; overflow-y:auto;"></div><div class="row" style="margin-top:15px;"><button class="btn btn-danger" onclick="closeRiwayatModal()" style="flex:1">Tutup</button></div></div></div>
 <div id="masterFieldModal" class="modal"><div class="modal-content"><h3>Kelola Field Dinamis</h3><div class="dynamic-field"><label>Nama Field</label><input type="text" id="masterNewFieldName" placeholder="contoh: alamat, no_hp"></div><div class="dynamic-field"><label>Label Field</label><input type="text" id="masterNewFieldLabel" placeholder="Contoh: Alamat, No HP"></div><div class="dynamic-field"><label>Tipe</label><select id="masterNewFieldType"><option value="text">Text</option><option value="date">Tanggal</option><option value="tel">Telepon</option><option value="textarea">Text Area</option></select></div><button class="btn btn-primary" onclick="addMasterDynamicField()"> TAMBAH FIELD</button><div id="masterFieldsList" style="margin-top:15px;"></div><button class="btn btn-danger mt-2" onclick="closeMasterFieldModal()">TUTUP</button></div></div>
 <div id="masterItemModal" class="modal"><div class="modal-content"><h3>Kelola Daftar Item</h3><div class="row"><div class="input-group"><label>Nama Item</label><input type="text" id="masterNewItem" placeholder="Contoh: Kain Ihram"></div><button class="btn-small" onclick="addMasterItem()" style="background:var(--primary); color:white; padding:0 15px;">+ Tambah</button></div><div id="masterItemList" style="margin-top:15px;"></div><button class="btn btn-danger mt-2" onclick="closeMasterItemModal()">TUTUP</button></div></div>
-<div id="copyModal" class="modal"><div class="modal-content"><h3> Copy dari database</h3><div class="dynamic-field"><label>Pilih Kategori</label><select id="copyCategory"><option value="Haji"> Haji</option><option value="Toko"> Toko</option><option value="Sekolah"> Sekolah</option><option value="Umroh"> Umroh</option><option value="Donasi"> Donasi</option></select></div><p style="font-size:12px; color:#666; margin:10px 0;"> Data yang sudah ada tidak akan dihapus. Data baru akan ditambahkan.</p><div class="row"><button class="btn btn-danger" onclick="closeCopyModal()" style="flex:1">BATAL</button><button class="btn btn-primary" onclick="executeCopyFromJamaah()" style="flex:1">COPY SEKARANG</button></div></div></div>
+<div id="copyModal" class="modal"><div class="modal-content"><h3> Copy dari database</h3><div class="dynamic-field"><label>Pilih Kategori</label><select id="copyCategory"><option value="Pesantren"> Pesantren</option><option value="Toko"> Toko</option><option value="Sekolah"> Sekolah</option><option value="Madrasah"> Madrasah</option><option value="Donasi"> Donasi</option></select></div><p style="font-size:12px; color:#666; margin:10px 0;"> Data yang sudah ada tidak akan dihapus. Data baru akan ditambahkan.</p><div class="row"><button class="btn btn-danger" onclick="closeCopyModal()" style="flex:1">BATAL</button><button class="btn btn-primary" onclick="executeCopyFromJamaah()" style="flex:1">COPY SEKARANG</button></div></div></div>
 <div id="modeManagerModal" class="modal"><div class="modal-content"><h3><i class="fas fa-sliders-h"></i> Kelola Mode Switcher</h3><p style="font-size:12px; color:#666; margin-bottom:15px;">Centang mode yang ingin ditampilkan.</p><div id="modeManagerList" style="margin-bottom:20px;"></div><div class="row"><div class="input-group" style="flex:3"><input type="text" id="newModeName" placeholder="Nama mode baru (contoh: Wisata)"></div><button class="btn-small" onclick="addNewMode()" style="background:var(--primary); color:white; padding:0 15px;">+ TAMBAH</button></div><div class="row" style="margin-top:15px;"><button class="btn btn-danger" onclick="closeModeManager()" style="flex:1">BATAL</button><button class="btn btn-primary" onclick="saveModes()" style="flex:1"> SIMPAN PERUBAHAN</button></div></div></div>
 <div id="entryModal" class="modal"><div class="modal-content"><h3 id="entryModalTitle">Tambah Catatan</h3><div class="input-group"><label>Judul</label><input type="text" id="entryJudul" placeholder="Judul catatan..."></div><div class="input-group"><label>Isi</label><textarea id="entryIsi" rows="8" placeholder="Tulis catatan di sini..."></textarea></div><button class="btn btn-primary" onclick="saveCatatanEntry()"> SIMPAN</button><button class="btn btn-danger mt-2" onclick="closeEntryModal()">BATAL</button></div></div>
 <div id="detailModal" class="modal"><div class="modal-content"><h3 id="detailJudul"></h3><div id="detailIsi" style="margin:15px 0; white-space:pre-wrap;"></div><button class="btn btn-wa" onclick="shareDetailToWA()"> KIRIM KE WA</button><button class="btn btn-danger mt-2" onclick="closeDetailModal()">TUTUP</button></div></div>
@@ -3486,7 +3486,7 @@ async function cetakDashboardHTML() {
             <div class="stat-box"><div class="label">TOTAL KAS</div><div class="value">Rp ${formatRupiah(totalKas)}</div></div>
             <div class="stat-box"><div class="label">TOTAL PESERTA</div><div class="value">${totalJamaah}</div></div>
             <div class="stat-box"><div class="label">PESERTA LUNAS</div><div class="value">${totalLunas}</div></div>
-            <div class="stat-box"><div class="label">TOTAL PIUTANG</div><div class="value">Rp ${formatRupiah(totalPiutang)}</div></div>
+            <div class="stat-box"><div class="label">TUNGGAKAN SPP</div><div class="value">Rp ${formatRupiah(totalPiutang)}</div></div>
         </div>
         <h2>5 PESERTA DENGAN TAGIHAN TERBESAR</h2>
         <table><thead><tr><th>No</th><th>Nama Jamaah</th><th>Total Paket</th><th>Sisa Tagihan</th></tr></thead><tbody>${topHtml}</tbody></table>
@@ -4126,14 +4126,14 @@ Jenis Kelamin   : {jenis_kelamin}
 Alamat          : {alamat}
 No. Porsi       : {no_porsi}
 
-Adalah benar jamaah kami yang akan melaksanakan ibadah Haji/Umroh pada tahun ini. Oleh karena itu, kami merekomendasikan kepada instansi terkait untuk membantu proses pembuatan paspor yang bersangkutan.
+Adalah benar merupakan peserta didik aktif di lembaga kami. Surat ini dibuat untuk keperluan yang bersangkutan.
 
 {keperluan}
 
 Demikian surat rekomendasi ini kami buat dengan sebenarnya untuk dapat digunakan sebagaimana mestinya.`
     },
     keterangan_jamaah: {
-        judul: 'SURAT KETERANGAN JAMAAH HAJI/UMROH',
+        judul: 'SURAT KETERANGAN PESERTA DIDIK',
         isi: `Yang bertanda tangan di bawah ini menerangkan bahwa:
 
 Nama Lengkap    : {nama}
@@ -4141,14 +4141,11 @@ NIK             : {nik}
 Tempat/Tgl Lahir: {tempat_lahir}, {tgl_lahir}
 Jenis Kelamin   : {jenis_kelamin}
 Alamat          : {alamat}
-No. Porsi       : {no_porsi}
-No. Paspor      : {no_paspor}
-Rombongan       : {rombongan}
-Kamar           : {kamar}
-Hotel Makkah    : {hotel_makkah}
-Hotel Madinah   : {hotel_madinah}
+Nomor Induk     : {no_porsi}
+Kelas/Tingkat   : {rombongan}
+Alamat Email    : {kamar}
 
-Adalah benar terdaftar sebagai jamaah Haji/Umroh pada:
+Adalah benar terdaftar sebagai peserta didik aktif pada:
 
 {nama_instansi}
 
@@ -4171,7 +4168,7 @@ NIK         : {nik}
 Alamat      : {alamat}
 No. HP      : {whatsapp}
 
-Dengan ini mengajukan permohonan izin cuti untuk keperluan ibadah Haji/Umroh yang diselenggarakan oleh:
+Dengan ini mengajukan permohonan izin untuk keperluan kegiatan pendidikan yang diselenggarakan oleh:
 
 {nama_instansi}
 
@@ -4612,7 +4609,7 @@ function showBuatSesiModal() {
             <h3 style="color:var(--primary);margin-bottom:16px;">➕ Buat Sesi Absensi</h3>
             <div style="margin-bottom:12px;">
                 <label style="font-size:13px;">Nama Acara / Sesi</label>
-                <input type="text" id="inputNamaSesi" placeholder="Contoh: Manasik Haji 10 Mei 2026"
+                <input type="text" id="inputNamaSesi" placeholder="Contoh: Ujian Akhir Semester 10 Juni 2026"
                     style="width:100%;padding:12px;border-radius:8px;border:1px solid #ddd;margin-top:6px;font-size:14px;background:var(--input-bg);color:var(--text);">
             </div>
             <button onclick="buatSesiBaru()" style="width:100%;padding:12px;background:#0D5C4A;color:white;border:none;border-radius:10px;margin-bottom:8px;cursor:pointer;font-weight:bold;font-size:14px;">✅ Buat & Aktifkan</button>
@@ -7329,7 +7326,7 @@ async function cetakPembayaranHTML() {
             ${headerHtml}
             <h2>LAPORAN PEMBAYARAN PESERTA</h2>
             <div class="tgl">Tanggal Cetak: ${tglCetak}</div>
-            <table><thead><tr><th style="width:36px;">No</th><th>Tanggal</th><th>Jamaah</th><th>Keterangan</th><th>Metode</th><th style="text-align:right;">Nominal</th></tr></thead><tbody>${rowsHtml}</tbody></table>
+            <table><thead><tr><th style="width:36px;">No</th><th>Tanggal</th><th>Peserta</th><th>Keterangan</th><th>Metode</th><th style="text-align:right;">Nominal</th></tr></thead><tbody>${rowsHtml}</tbody></table>
             <div class="summary"><strong>TOTAL PEMASUKAN: <span style="color:#0D5C4A;">${formatRupiah(totalMasuk)}</span></strong></div>
             ${ttdHtml}
             ${qrHtml}
@@ -9961,8 +9958,8 @@ function loadModesFromStorage() {
         if(parsed.available) availableModes = parsed.available;
         if(parsed.active) activeModes = parsed.active;
     } else {
-        availableModes = ['Semua', 'Haji', 'Toko', 'Sekolah', 'Umroh', 'Donasi'];
-        activeModes = ['Semua', 'Haji', 'Toko', 'Sekolah', 'Umroh', 'Donasi'];
+        availableModes = ['Semua', 'Pesantren', 'Sekolah', 'Madrasah', 'Donasi', 'Lainnya'];
+        activeModes = ['Semua', 'Pesantren', 'Sekolah', 'Madrasah', 'Donasi', 'Lainnya'];
     }
 }
 
