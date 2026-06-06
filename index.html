@@ -11476,12 +11476,7 @@ function lihatDetailKelas(id) {
     for (var i = 0; i < kelasList.length; i++) { if (kelasList[i].id == id) { k = kelasList[i]; break; } }
     if (!k) return;
     var p = getTerm('pesertaDidik');
-    var peserta = [];
-    if (typeof jamaahList !== 'undefined') {
-        for (var j = 0; j < jamaahList.length; j++) {
-            if (jamaahList[j].kelasId == id || jamaahList[j].kelas_id == id) peserta.push(jamaahList[j]);
-        }
-    }
+    var peserta = getSantriByKelas(id);
     var titleEl = document.getElementById('detailKelasTitle');
     if (titleEl) titleEl.textContent = k.nama;
     var infoEl = document.getElementById('detailKelasInfo');
@@ -11508,6 +11503,13 @@ function lihatDetailKelas(id) {
             }
             pesertaEl.innerHTML = html;
         }
+    }
+    // Tambah tombol "Tambah Santri ke Kelas"
+    if (pesertaEl) {
+        var btnTambahSantri = '<div style="margin-top:14px;">'
+            + '<button onclick="bukaModalPilihSantri(' + id + ')" style="width:100%;padding:12px;background:var(--primary);color:white;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-size:14px;">+ Tambah Santri ke Kelas</button>'
+            + '</div>';
+        pesertaEl.innerHTML += btnTambahSantri;
     }
     var modal = document.getElementById('modalDetailKelas');
     if (modal) modal.style.display = 'flex';
@@ -11541,12 +11543,7 @@ function renderKelasList() {
     for (var i = 0; i < kelasList.length; i++) {
         var k = kelasList[i];
         var cc = clrs[i % clrs.length];
-        var peserta = [];
-        if (typeof jamaahList !== 'undefined') {
-            for (var j = 0; j < jamaahList.length; j++) {
-                if (jamaahList[j].kelasId == k.id || jamaahList[j].kelas_id == k.id) peserta.push(jamaahList[j]);
-            }
-        }
+        var peserta = getSantriByKelas(k.id);
         html += '<div style="background:white;border:2px solid #e2e8f0;border-radius:14px;padding:16px;margin-bottom:12px;border-left:5px solid ' + cc + ';">'
              + '<div style="display:flex;align-items:flex-start;gap:12px;">'
              + '<div style="width:46px;height:46px;background:' + cc + ';color:white;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">&#127963;</div>'
@@ -12014,6 +12011,341 @@ function renderRaportPeserta(){
     }
     ct.innerHTML=html;
 }
+
+
+// ===== KELAS-SANTRI MAPPING (localStorage, tidak ubah data Safara!) =====
+// Format: { kelasId: [jamaahId1, jamaahId2, ...] }
+function getKelasMapping() {
+    try { return JSON.parse(localStorage.getItem('eduku_kelas_mapping') || '{}'); } catch(e) { return {}; }
+}
+function saveKelasMapping(mapping) {
+    localStorage.setItem('eduku_kelas_mapping', JSON.stringify(mapping));
+}
+
+function getSantriByKelas(kelasId) {
+    if (typeof jamaahList === 'undefined') return [];
+    var mapping = getKelasMapping();
+    var ids = mapping[kelasId] || [];
+    var result = [];
+    for (var i = 0; i < jamaahList.length; i++) {
+        var jId = String(jamaahList[i].id);
+        for (var j = 0; j < ids.length; j++) {
+            if (String(ids[j]) === jId) { result.push(jamaahList[i]); break; }
+        }
+    }
+    return result;
+}
+
+function getKelasIdBySantri(jamaahId) {
+    var mapping = getKelasMapping();
+    var jId = String(jamaahId);
+    for (var kelasId in mapping) {
+        var ids = mapping[kelasId];
+        for (var i = 0; i < ids.length; i++) {
+            if (String(ids[i]) === jId) return kelasId;
+        }
+    }
+    return null;
+}
+
+function removeSantriFromAllKelas(jamaahId) {
+    var mapping = getKelasMapping();
+    var jId = String(jamaahId);
+    for (var kelasId in mapping) {
+        mapping[kelasId] = mapping[kelasId].filter(function(id) { return String(id) !== jId; });
+    }
+    saveKelasMapping(mapping);
+}
+
+// ===== MODAL PILIH SANTRI =====
+var _currentKelasId = null;
+var _pilihSantriSelected = {};
+
+function bukaModalPilihSantri(kelasId) {
+    _currentKelasId = kelasId;
+    _pilihSantriSelected = {};
+    
+    // Pre-select santri yang sudah di kelas ini
+    var mapping = getKelasMapping();
+    var existingIds = mapping[kelasId] || [];
+    for (var i = 0; i < existingIds.length; i++) {
+        _pilihSantriSelected[String(existingIds[i])] = true;
+    }
+    
+    // Update title
+    var k = null;
+    for (var j = 0; j < kelasList.length; j++) { if (kelasList[j].id == kelasId) { k = kelasList[j]; break; } }
+    var title = document.getElementById('pilihSantriKelasTitle');
+    var subtitle = document.getElementById('pilihSantriKelasSubtitle');
+    if (title) title.textContent = 'Tambah ' + getTerm('pesertaDidik') + ' ke Kelas';
+    if (subtitle) subtitle.textContent = k ? k.nama : '';
+    
+    // Reset search
+    var srch = document.getElementById('searchPilihSantri');
+    if (srch) srch.value = '';
+    var flt = document.getElementById('filterPilihSantri');
+    if (flt) flt.value = 'all';
+    
+    // Tutup modal detail dulu
+    var detailModal = document.getElementById('modalDetailKelas');
+    if (detailModal) detailModal.style.display = 'none';
+    
+    // Tampilkan modal
+    var modal = document.getElementById('modalPilihSantriKelas');
+    if (modal) modal.style.display = 'flex';
+    
+    renderPilihSantriList();
+}
+
+function closePilihSantriKelas() {
+    var modal = document.getElementById('modalPilihSantriKelas');
+    if (modal) modal.style.display = 'none';
+    // Refresh kelas list
+    renderKelasList();
+}
+
+function renderPilihSantriList() {
+    var ct = document.getElementById('pilihSantriList');
+    if (!ct) return;
+    
+    var q = '';
+    var srch = document.getElementById('searchPilihSantri');
+    if (srch) q = srch.value.toLowerCase();
+    
+    var filter = 'all';
+    var flt = document.getElementById('filterPilihSantri');
+    if (flt) filter = flt.value;
+    
+    if (typeof jamaahList === 'undefined' || !jamaahList.length) {
+        ct.innerHTML = '<div style="text-align:center;padding:30px;color:#94a3b8;">Belum ada data santri</div>';
+        return;
+    }
+    
+    var mapping = getKelasMapping();
+    var html = '';
+    var shown = 0;
+    
+    for (var i = 0; i < jamaahList.length; i++) {
+        var j = jamaahList[i];
+        var jId = String(j.id);
+        var nama = j.nama_lengkap || j.nama || '?';
+        var nis = j.no_porsi || '-';
+        
+        // Search filter
+        if (q && nama.toLowerCase().indexOf(q) < 0 && nis.toLowerCase().indexOf(q) < 0) continue;
+        
+        // Kelas filter
+        var kelasLain = getKelasIdBySantri(jId);
+        var sudahBerkelas = kelasLain !== null;
+        var diKelasIni = sudahBerkelas && String(kelasLain) === String(_currentKelasId);
+        
+        if (filter === 'belum' && sudahBerkelas && !diKelasIni) continue;
+        if (filter === 'sudah' && (!sudahBerkelas || diKelasIni)) continue;
+        
+        var isChecked = _pilihSantriSelected[jId] === true;
+        var kelasInfo = '';
+        if (sudahBerkelas && !diKelasIni) {
+            kelasInfo = ' <span style="font-size:10px;background:#f59e0b20;color:#f59e0b;padding:1px 5px;border-radius:4px;">Di kelas lain</span>';
+        } else if (diKelasIni) {
+            kelasInfo = ' <span style="font-size:10px;background:#10b98120;color:#10b981;padding:1px 5px;border-radius:4px;">Di kelas ini</span>';
+        }
+        
+        html += '<label style="display:flex;align-items:center;gap:10px;padding:10px;cursor:pointer;border-bottom:1px solid #f1f5f9;">'
+             + '<input type="checkbox" value="' + jId + '" ' + (isChecked ? 'checked' : '') 
+             + ' onchange="togglePilihSantri(this)" style="width:18px;height:18px;cursor:pointer;flex-shrink:0;">'
+             + '<div style="flex:1;min-width:0;">'
+             + '<div style="font-weight:600;font-size:14px;">' + nama + kelasInfo + '</div>'
+             + '<div style="font-size:12px;color:#64748b;">NIS: ' + nis + '</div>'
+             + '</div></label>';
+        shown++;
+    }
+    
+    if (!shown) {
+        html = '<div style="text-align:center;padding:30px;color:#94a3b8;">Tidak ada data</div>';
+    }
+    
+    ct.innerHTML = html;
+    updateCountPilihSantri();
+}
+
+function togglePilihSantri(cb) {
+    var jId = cb.value;
+    if (cb.checked) {
+        _pilihSantriSelected[jId] = true;
+    } else {
+        delete _pilihSantriSelected[jId];
+    }
+    updateCountPilihSantri();
+}
+
+function toggleSelectAllSantri(cb) {
+    var checkboxes = document.getElementById('pilihSantriList').querySelectorAll('input[type="checkbox"]');
+    for (var i = 0; i < checkboxes.length; i++) {
+        checkboxes[i].checked = cb.checked;
+        var jId = checkboxes[i].value;
+        if (cb.checked) {
+            _pilihSantriSelected[jId] = true;
+        } else {
+            delete _pilihSantriSelected[jId];
+        }
+    }
+    updateCountPilihSantri();
+}
+
+function updateCountPilihSantri() {
+    var count = Object.keys(_pilihSantriSelected).length;
+    var el = document.getElementById('countPilihSantri');
+    if (el) el.textContent = count + ' dipilih';
+}
+
+function simpanSantriKeKelas() {
+    if (!_currentKelasId) return;
+    
+    var mapping = getKelasMapping();
+    
+    // Hapus santri ini dari kelas lain jika sudah berkelas
+    var selectedIds = Object.keys(_pilihSantriSelected);
+    for (var i = 0; i < selectedIds.length; i++) {
+        var jId = selectedIds[i];
+        // Remove dari semua kelas
+        for (var kelasId in mapping) {
+            if (String(kelasId) !== String(_currentKelasId)) {
+                mapping[kelasId] = mapping[kelasId].filter(function(id) { return String(id) !== jId; });
+            }
+        }
+    }
+    
+    // Simpan ke kelas ini
+    mapping[String(_currentKelasId)] = selectedIds;
+    saveKelasMapping(mapping);
+    
+    var count = selectedIds.length;
+    closePilihSantriKelas();
+    showToast(count + ' ' + getTerm('pesertaDidik') + ' berhasil ditambahkan ke kelas!');
+    renderKelasList();
+}
+
+
+// ===== FIELD KELAS DI FORM SANTRI =====
+
+function ekInjectKelasDropdown(currentKelasId) {
+    var container = document.getElementById('jamaahFormContainer');
+    if (!container) return;
+    
+    // Hapus jika sudah ada
+    var existing = document.getElementById('ekKelasField');
+    if (existing) existing.parentNode.removeChild(existing);
+    
+    // Jika belum ada kelas, tidak perlu inject
+    if (!kelasList || !kelasList.length) return;
+    
+    // Build options
+    var opts = '<option value="">-- Pilih Kelas (Opsional) --</option>';
+    for (var i = 0; i < kelasList.length; i++) {
+        var k = kelasList[i];
+        var sel = (currentKelasId && String(k.id) === String(currentKelasId)) ? ' selected' : '';
+        opts += '<option value="' + k.id + '"' + sel + '>'
+             + k.nama
+             + (k.tahun ? ' (' + k.tahun + ')' : '')
+             + '</option>';
+    }
+    
+    // Buat field div
+    var div = document.createElement('div');
+    div.id = 'ekKelasField';
+    div.className = 'dynamic-field';
+    div.style.cssText = 'border-left:3px solid var(--primary);padding-left:10px;margin-bottom:10px;';
+    div.innerHTML = '<label style="color:var(--primary);font-weight:700;font-size:13px;">&#127963; Kelas / Tingkat <span style="font-weight:400;color:#64748b;">(opsional)</span></label>'
+        + '<select id="ekKelasDropdown" style="width:100%;padding:10px;border:1.5px solid var(--primary);border-radius:8px;font-size:14px;margin-top:4px;">'
+        + opts + '</select>';
+    
+    // Insert SETELAH field nama (firstChild = nama lengkap)
+    if (container.firstChild) {
+        container.insertBefore(div, container.firstChild.nextSibling);
+    } else {
+        container.appendChild(div);
+    }
+}
+
+function ekUpdateKelasForSantri(santriId, kelasId) {
+    var mapping = getKelasMapping();
+    var jId = String(santriId);
+    
+    // Hapus dari semua kelas dulu
+    for (var kId in mapping) {
+        var newArr = [];
+        for (var i = 0; i < mapping[kId].length; i++) {
+            if (String(mapping[kId][i]) !== jId) newArr.push(mapping[kId][i]);
+        }
+        mapping[kId] = newArr;
+    }
+    
+    // Tambah ke kelas yang dipilih
+    if (kelasId) {
+        var kelasIdStr = String(kelasId);
+        if (!mapping[kelasIdStr]) mapping[kelasIdStr] = [];
+        mapping[kelasIdStr].push(santriId);
+    }
+    
+    saveKelasMapping(mapping);
+}
+
+// Patch functions setelah Safara load
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+        
+        // Patch openTambahJamaahModal
+        if (typeof openTambahJamaahModal === 'function') {
+            var _ekOrigTambah = openTambahJamaahModal;
+            window.openTambahJamaahModal = function() {
+                _ekOrigTambah();
+                setTimeout(function() { ekInjectKelasDropdown(null); }, 50);
+            };
+        }
+        
+        // Patch editJamaah
+        if (typeof editJamaah === 'function') {
+            var _ekOrigEdit = editJamaah;
+            window.editJamaah = function(index) {
+                _ekOrigEdit(index);
+                var j = jamaahList[index];
+                if (j) {
+                    var kelasId = getKelasIdBySantri(j.id);
+                    setTimeout(function() { ekInjectKelasDropdown(kelasId); }, 50);
+                }
+            };
+        }
+        
+        // Patch saveJamaah - capture kelas sebelum save
+        if (typeof saveJamaah === 'function') {
+            var _ekOrigSave = saveJamaah;
+            window.saveJamaah = function() {
+                // Capture SEBELUM save (editingJamaahId akan di-reset)
+                var kelasDropdown = document.getElementById('ekKelasDropdown');
+                var selectedKelasId = kelasDropdown ? kelasDropdown.value : '';
+                var wasEditing = (typeof editingJamaahId !== 'undefined' && editingJamaahId !== null);
+                var editIdx = wasEditing ? editingJamaahId : null;
+                
+                // Jalankan save asli
+                _ekOrigSave();
+                
+                // Setelah save, dapatkan ID santri
+                var santriId = null;
+                if (wasEditing && editIdx !== null && jamaahList[editIdx]) {
+                    santriId = jamaahList[editIdx].id;
+                } else if (jamaahList.length > 0) {
+                    // Santri baru = item terakhir
+                    santriId = jamaahList[jamaahList.length - 1].id;
+                }
+                
+                if (santriId !== null && santriId !== undefined) {
+                    ekUpdateKelasForSantri(santriId, selectedKelasId);
+                }
+            };
+        }
+        
+    }, 1500); // Tunggu Safara load semua fungsi
+});
 
 // === INIT ===
 document.addEventListener('DOMContentLoaded', function() {
