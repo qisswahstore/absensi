@@ -11225,675 +11225,801 @@ async function printPDFDirect(pdfDoc, filename = 'document.pdf') {
 </style>
 
 <script>
-// ===== EDUKU EXTENSION JS (v2 - clean) =====
-const EDUKU_TMPLS={pesantren:{pesertaDidik:'Santri',pengajar:'Ustadz',pembayaranType:'Syahriyah',jenisLembaga:'Pondok Pesantren'},sekolah:{pesertaDidik:'Siswa',pengajar:'Guru',pembayaranType:'SPP',jenisLembaga:'Sekolah'},madrasah:{pesertaDidik:'Siswa',pengajar:'Ustadz/Guru',pembayaranType:'Iuran',jenisLembaga:'Madrasah'},custom:{pesertaDidik:'Peserta Didik',pengajar:'Pengajar',pembayaranType:'Iuran',jenisLembaga:'Lembaga'}};
-let ekTerms=JSON.parse(localStorage.getItem('eduku_terminology')||'null')||EDUKU_TMPLS.pesantren;
-function getTerm(k){return ekTerms[k]||k;}
-function applyTermsToDOM(){
-  try{
-    const p=getTerm('pesertaDidik'),g=getTerm('pengajar');
-    const u=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
-    u('statLabelJamaah',p);u('statLabelLunas',p+' Lunas');
-    u('dashLabelTotal','TOTAL '+p.toUpperCase());u('dashLabelLunas',p.toUpperCase()+' LUNAS');
-    u('navLabelJamaah',p);
-    u('hdrDaftarJamaah','DAFTAR '+p.toUpperCase());
-    u('hdrDaftarOnProses','DAFTAR '+p.toUpperCase()+' AKTIF');
-    u('hdrTagihanJamaah','DAFTAR TAGIHAN '+p.toUpperCase());
-    u('hdrPagePengajar','Data '+g);
-    u('dispPeserta',p);u('dispPengajar',g);
-    const m=document.getElementById('menuPengajarLabel');if(m)m.textContent=g;
-    const nl=localStorage.getItem('eduku_nama_lembaga');
-    if(nl){const h=document.getElementById('headerInstansi1');if(h&&(h.textContent==='EduKu'||!h.textContent||h.textContent==='Nama Lembaga Pendidikan'))h.textContent=nl;}
-  }catch(e){}
-}
-let wizTmpl=null;
-function mulaiEduKu(){
-  const done=localStorage.getItem('eduku_setup_done');
-  const s=document.getElementById('splashScreen');
-  if(s){s.style.opacity='0';setTimeout(()=>{s.style.display='none';},350);}
-  if(!done){setTimeout(()=>{const w=document.getElementById('setupWizard');if(w){w.style.display='flex';wizGo(1);}},200);}
-  else{localStorage.setItem('safara_mode','tanpa_login');setTimeout(applyTermsToDOM,100);}
-}
-function wizGo(s){document.querySelectorAll('.setup-step').forEach(e=>e.style.display='none');const el=document.getElementById('wizStep'+s);if(el)el.style.display='block';}
-function pickTmpl(id){
-  wizTmpl=id;
-  ['pesantren','sekolah','madrasah','custom'].forEach(t=>{const el=document.getElementById('tmpl_'+t);if(el){el.style.borderColor='#e2e8f0';el.style.background='white';}});
-  const el=document.getElementById('tmpl_'+id);
-  if(el){el.style.borderColor='var(--primary)';el.style.background='rgba(13,92,74,0.06)';}
-  const btn=document.getElementById('wizBtnNext2');if(btn){btn.disabled=false;btn.style.opacity='1';}
-}
-async function wizSelesai(){
-  const nama=document.getElementById('wizNama').value.trim();
-  if(!nama){showToast('Nama lembaga harus diisi!');return;}
-  if(wizTmpl&&EDUKU_TMPLS[wizTmpl]){ekTerms=Object.assign({},EDUKU_TMPLS[wizTmpl]);localStorage.setItem('eduku_terminology',JSON.stringify(ekTerms));}
-  localStorage.setItem('eduku_setup_done','1');localStorage.setItem('safara_mode','tanpa_login');localStorage.setItem('eduku_nama_lembaga',nama);
-  const h1=document.getElementById('headerInstansi1');if(h1)h1.textContent=nama;
-  try{const cfg=(typeof idbGet==='function')?(await idbGet(STORE_KONFIGURASI,'config_pro')||{}):{}; cfg.instansi1=cfg.instansi1||{};cfg.instansi1.nama=nama;cfg.instansi1.alamat=(document.getElementById('wizAlamat')||{}).value||'';cfg.instansi1.telp=(document.getElementById('wizTelp')||{}).value||'';if(typeof idbSet==='function')await idbSet(STORE_KONFIGURASI,'config_pro',cfg);}catch(e){}
-  document.getElementById('setupWizard').style.display='none';
-  if(typeof pilihTanpaLogin==='function')pilihTanpaLogin();
-  showToast('Selamat datang di EduKu!');applyTermsToDOM();
-}
-function checkEduKuSetup(){try{applyTermsToDOM();}catch(e){}}
-let termDraft={};
-function openTerminologiModal(){termDraft=Object.assign({},ekTerms);['prevPeserta','prevPengajar','prevPembayaran'].forEach((id,i)=>{const k=['pesertaDidik','pengajar','pembayaranType'][i];const el=document.getElementById(id);if(el)el.textContent=getTerm(k);});['termPesertaCustom','termPengajarCustom'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});document.getElementById('terminologiModal').style.display='flex';}
-function closeTerminologiModal(){document.getElementById('terminologiModal').style.display='none';}
-function setTerm(k,v,btn){termDraft[k]=v;const m={pesertaDidik:'prevPeserta',pengajar:'prevPengajar',pembayaranType:'prevPembayaran'};if(m[k]){const el=document.getElementById(m[k]);if(el)el.textContent=v;}if(btn){btn.closest('div').querySelectorAll('.term-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}}
-function simpanTerminologi(){const cp=(document.getElementById('termPesertaCustom')||{}).value||'';const cg=(document.getElementById('termPengajarCustom')||{}).value||'';if(cp)termDraft.pesertaDidik=cp;if(cg)termDraft.pengajar=cg;ekTerms=Object.assign({},termDraft);localStorage.setItem('eduku_terminology',JSON.stringify(ekTerms));closeTerminologiModal();applyTermsToDOM();showToast('Terminologi disimpan!');}
+/* EDUKU EXTENSION - ES5 Compatible */
 
-// PENGAJAR
-let pengajarList=JSON.parse(localStorage.getItem('eduku_pengajar')||'[]');
-function savePengajar(){localStorage.setItem('eduku_pengajar',JSON.stringify(pengajarList));}
-function openFormPengajar(id=null){
-  ['fPengajarNama','fPengajarNIP','fPengajarBidang','fPengajarWA','fPengajarCatatan'].forEach(f=>{const el=document.getElementById(f);if(el)el.value='';});
-  document.getElementById('pengajarEditId').value=id||'';
-  const g=getTerm('pengajar');
-  document.getElementById('formPengajarTitle').textContent=id?('Edit '+g):('Tambah '+g);
-  if(id){const p=pengajarList.find(x=>x.id==id);if(p){const el=n=>document.getElementById('fPengajar'+n);el('Nama').value=p.nama||'';el('NIP').value=p.nip||'';el('Bidang').value=p.bidang||'';el('WA').value=p.wa||'';el('Catatan').value=p.catatan||'';}}
-  document.getElementById('modalPengajar').style.display='flex';
-}
-function closeFormPengajar(){document.getElementById('modalPengajar').style.display='none';}
-function simpanPengajar(){
-  const nama=document.getElementById('fPengajarNama').value.trim();
-  if(!nama){showToast('Nama harus diisi!');return;}
-  const id=document.getElementById('pengajarEditId').value;
-  const g=n=>document.getElementById('fPengajar'+n).value.trim();
-  const data={id:id||Date.now(),nama,nip:g('NIP'),bidang:g('Bidang'),wa:g('WA'),catatan:g('Catatan')};
-  if(id){const i=pengajarList.findIndex(x=>x.id==id);if(i>=0)pengajarList[i]=data;}else pengajarList.push(data);
-  savePengajar();closeFormPengajar();renderPengajarList();showToast('Data '+getTerm('pengajar')+' disimpan!');
-}
-function hapusPengajar(id){if(!confirm('Hapus?'))return;pengajarList=pengajarList.filter(x=>x.id!=id);savePengajar();renderPengajarList();showToast('Dihapus!');}
-function renderPengajarList(){
-  const g=getTerm('pengajar');const h=document.getElementById('hdrPagePengajar');if(h)h.textContent='Data '+g;
-  const q=(document.getElementById('searchPengajar')||{value:''}).value.toLowerCase();
-  const ct=document.getElementById('pengajarList');if(!ct)return;
-  const fl=pengajarList.filter(p=>!q||(p.nama||'').toLowerCase().includes(q)||(p.bidang||'').toLowerCase().includes(q));
-  if(!fl.length){ct.innerHTML='<div style="text-align:center;padding:40px;color:#94a3b8;"><div style="font-size:48px;margin-bottom:12px;">&#128104;</div><div style="font-weight:600;">Belum ada data '+g+'</div><div style="font-size:13px;margin-top:6px;">Klik + Tambah</div></div>';return;}
-  ct.innerHTML=fl.map(p=>'<div style="background:#f8fafc;border-radius:12px;padding:14px;margin-bottom:10px;display:flex;gap:12px;align-items:flex-start;border-left:4px solid var(--primary);"><div style="width:44px;height:44px;background:var(--primary);color:white;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">&#128104;</div><div style="flex:1;min-width:0;"><div style="font-weight:700;font-size:15px;margin-bottom:2px;">'+p.nama+'</div>'+(p.nip?'<div style="font-size:12px;color:#64748b;">🆔 '+p.nip+'</div>':'')+(p.bidang?'<div style="font-size:12px;color:#64748b;">📚 '+p.bidang+'</div>':'')+(p.wa?'<div style="font-size:12px;color:#64748b;">📱 '+p.wa+'</div>':'')+'</div><div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;"><button onclick="openFormPengajar('+p.id+')" style="background:var(--primary);color:white;border:none;border-radius:8px;padding:7px 11px;font-size:12px;cursor:pointer;">&#9999;</button><button onclick="hapusPengajar('+p.id+')" style="background:#ef4444;color:white;border:none;border-radius:8px;padding:7px 11px;font-size:12px;cursor:pointer;">&#128465;</button></div></div>').join('');
+// === TERMINOLOGY ===
+var EDUKU_TMPLS = {
+    pesantren: {pesertaDidik:'Santri', pengajar:'Ustadz', pembayaranType:'Syahriyah'},
+    sekolah:   {pesertaDidik:'Siswa',  pengajar:'Guru',   pembayaranType:'SPP'},
+    madrasah:  {pesertaDidik:'Siswa',  pengajar:'Ustadz/Guru', pembayaranType:'Iuran'},
+    custom:    {pesertaDidik:'Peserta Didik', pengajar:'Pengajar', pembayaranType:'Iuran'}
+};
+
+var ekTerms = (function(){
+    var s = localStorage.getItem('eduku_terminology');
+    try { return s ? JSON.parse(s) : EDUKU_TMPLS.pesantren; } catch(e) { return EDUKU_TMPLS.pesantren; }
+})();
+
+function getTerm(k) { return ekTerms[k] || k; }
+
+function applyTermsToDOM() {
+    try {
+        var p = getTerm('pesertaDidik');
+        var g = getTerm('pengajar');
+        var ids = ['statLabelJamaah','statLabelLunas','dashLabelTotal','dashLabelLunas',
+                   'navLabelJamaah','hdrDaftarJamaah','hdrDaftarOnProses','hdrTagihanJamaah','hdrPagePengajar'];
+        var vals = [p, p+' Lunas', 'TOTAL '+p.toUpperCase(), p.toUpperCase()+' LUNAS',
+                    p, 'DAFTAR '+p.toUpperCase(), 'DAFTAR '+p.toUpperCase()+' AKTIF',
+                    'DAFTAR TAGIHAN '+p.toUpperCase(), 'Data '+g];
+        for (var i = 0; i < ids.length; i++) {
+            var el = document.getElementById(ids[i]);
+            if (el) el.textContent = vals[i];
+        }
+        var mn = document.getElementById('menuPengajarLabel');
+        if (mn) mn.textContent = g;
+        var nl = localStorage.getItem('eduku_nama_lembaga');
+        if (nl) {
+            var h = document.getElementById('headerInstansi1');
+            if (h && (h.textContent === 'EduKu' || h.textContent === 'Nama Lembaga Pendidikan')) h.textContent = nl;
+        }
+    } catch(e) {}
 }
 
-// JADWAL
-let jadwalEk=JSON.parse(localStorage.getItem('eduku_jadwal')||'[]');
-let jdHariFilter='';
-const JH_ORDER=['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Ahad'];
-const JH_CLR={Senin:'#3b82f6',Selasa:'#10b981',Rabu:'#f59e0b',Kamis:'#8b5cf6',Jumat:'#0D5C4A',Sabtu:'#ec4899',Ahad:'#ef4444'};
-function saveJadwal(){localStorage.setItem('eduku_jadwal',JSON.stringify(jadwalEk));}
-function openFormJadwal(id=null){
-  ['fJadwalMapel','fJadwalPengajar','fJadwalKelas','fJadwalRuangan','fJadwalMulai','fJadwalSelesai'].forEach(f=>{const el=document.getElementById(f);if(el)el.value='';});
-  document.getElementById('jadwalEditId').value=id||'';
-  document.getElementById('formJadwalTitle').textContent=id?'Edit Jadwal':'Tambah Jadwal';
-  if(id){const j=jadwalEk.find(x=>x.id==id);if(j){document.getElementById('fJadwalHari').value=j.hari||'Senin';['Mulai','Selesai','Mapel','Pengajar','Kelas','Ruangan'].forEach(k=>{const el=document.getElementById('fJadwal'+k);if(el)el.value=j[k.toLowerCase()]||'';});}}
-  document.getElementById('modalJadwal').style.display='flex';
-}
-function closeFormJadwal(){document.getElementById('modalJadwal').style.display='none';}
-function simpanJadwal(){
-  const mapel=document.getElementById('fJadwalMapel').value.trim();
-  const mulai=document.getElementById('fJadwalMulai').value;
-  if(!mapel||!mulai){showToast('Pelajaran dan jam mulai harus diisi!');return;}
-  const id=document.getElementById('jadwalEditId').value;
-  const g=n=>(document.getElementById('fJadwal'+n)||{value:''}).value.trim();
-  const data={id:id||Date.now(),hari:document.getElementById('fJadwalHari').value,mulai,selesai:g('Selesai'),mapel,pengajar:g('Pengajar'),kelas:g('Kelas'),ruangan:g('Ruangan')};
-  if(id){const i=jadwalEk.findIndex(x=>x.id==id);if(i>=0)jadwalEk[i]=data;}else jadwalEk.push(data);
-  saveJadwal();closeFormJadwal();renderJadwalList();showToast('Jadwal disimpan!');
-}
-function hapusJadwal(id){if(!confirm('Hapus?'))return;jadwalEk=jadwalEk.filter(x=>x.id!=id);saveJadwal();renderJadwalList();showToast('Jadwal dihapus!');}
-function filterJadwalHari(h){jdHariFilter=h;document.querySelectorAll('.jd-day-btn').forEach(b=>b.classList.remove('active'));const el=document.getElementById('jdHari'+(h||'All'));if(el)el.classList.add('active');renderJadwalList();}
-function renderJadwalList(){
-  const ct=document.getElementById('jadwalList');if(!ct)return;
-  let fl=jdHariFilter?jadwalEk.filter(j=>j.hari===jdHariFilter):jadwalEk.slice();
-  fl.sort((a,b)=>{const ha=JH_ORDER.indexOf(a.hari),hb=JH_ORDER.indexOf(b.hari);return ha!==hb?ha-hb:(a.mulai||'').localeCompare(b.mulai||'');});
-  if(!fl.length){ct.innerHTML='<div style="text-align:center;padding:40px;color:#94a3b8;"><div style="font-size:48px;margin-bottom:12px;">&#128197;</div><div style="font-weight:600;">Belum ada jadwal</div><div style="font-size:13px;margin-top:6px;">Klik + Tambah</div></div>';return;}
-  const card=j=>{const cc=JH_CLR[j.hari]||'#64748b';return '<div style="background:#f8fafc;border-radius:12px;padding:14px;margin-bottom:8px;display:flex;gap:12px;align-items:flex-start;border-left:4px solid '+cc+';"><div style="min-width:50px;text-align:center;"><div style="font-weight:700;font-size:14px;color:'+cc+';">'+(j.mulai||'--:--')+'</div>'+(j.selesai?'<div style="font-size:11px;color:#94a3b8;">'+j.selesai+'</div>':'')+'</div><div style="flex:1;min-width:0;"><div style="font-weight:700;font-size:15px;">'+j.mapel+'</div>'+(j.pengajar?'<div style="font-size:12px;color:#64748b;">👨‍🏫 '+j.pengajar+'</div>':'')+(j.kelas?'<div style="font-size:12px;color:#64748b;">🏛️ '+j.kelas+'</div>':'')+(j.ruangan?'<div style="font-size:12px;color:#64748b;">📍 '+j.ruangan+'</div>':'')+'</div><div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;"><button onclick="openFormJadwal('+j.id+')" style="background:var(--primary);color:white;border:none;border-radius:8px;padding:7px 11px;font-size:12px;cursor:pointer;">&#9999;</button><button onclick="hapusJadwal('+j.id+')" style="background:#ef4444;color:white;border:none;border-radius:8px;padding:7px 11px;font-size:12px;cursor:pointer;">&#128465;</button></div></div>';};
-  if(!jdHariFilter){let h='';JH_ORDER.forEach(hari=>{const items=fl.filter(j=>j.hari===hari);if(!items.length)return;h+='<div style="margin-bottom:16px;"><div style="font-weight:700;font-size:13px;color:'+JH_CLR[hari]+';margin-bottom:8px;padding:5px 12px;background:'+JH_CLR[hari]+'20;border-radius:8px;display:inline-block;">📅 '+hari+'</div>'+items.map(card).join('')+'</div>';});ct.innerHTML=h;}
-  else ct.innerHTML=fl.map(card).join('');
+// === SPLASH / WIZARD ===
+var wizTmpl = null;
+
+function mulaiEduKu() {
+    var done = localStorage.getItem('eduku_setup_done');
+    var splash = document.getElementById('splashScreen');
+    if (splash) {
+        splash.style.opacity = '0';
+        setTimeout(function(){ splash.style.display = 'none'; }, 350);
+    }
+    if (!done) {
+        setTimeout(function(){
+            var w = document.getElementById('setupWizard');
+            if (w) { w.style.display = 'flex'; wizGo(1); }
+        }, 200);
+    } else {
+        localStorage.setItem('safara_mode', 'tanpa_login');
+        setTimeout(applyTermsToDOM, 100);
+    }
 }
 
-// NILAI
-let nilaiEk=JSON.parse(localStorage.getItem('eduku_nilai')||'[]');
-function saveNilai(){localStorage.setItem('eduku_nilai',JSON.stringify(nilaiEk));}
-function openFormNilai(id=null){
-  const sel=document.getElementById('fNilaiPeserta');
-  if(sel){const p=getTerm('pesertaDidik');sel.innerHTML='<option value="">Pilih '+p+'...</option>'+(typeof jamaahList!=='undefined'?jamaahList.map(j=>'<option value="'+j.id+'">'+(j.nama_lengkap||j.nama||'?')+'</option>').join(''):'');}
-  ['fNilaiMapel','fNilaiAngka','fNilaiKeterangan'].forEach(f=>{const el=document.getElementById(f);if(el)el.value='';});
-  document.getElementById('nilaiEditId').value=id||'';
-  const td=document.getElementById('fNilaiTanggal');if(td)td.value=new Date().toISOString().split('T')[0];
-  if(id){const n=nilaiEk.find(x=>x.id==id);if(n){document.getElementById('fNilaiPeserta').value=n.jamaahId||'';document.getElementById('fNilaiMapel').value=n.mapel||'';document.getElementById('fNilaiJenis').value=n.jenis||'UH';document.getElementById('fNilaiAngka').value=n.nilai||'';if(td)td.value=n.tanggal||'';document.getElementById('fNilaiKeterangan').value=n.keterangan||'';}}
-  document.getElementById('modalNilai').style.display='flex';
-}
-function closeFormNilai(){document.getElementById('modalNilai').style.display='none';}
-function simpanNilai(){
-  const jId=document.getElementById('fNilaiPeserta').value;
-  const val=document.getElementById('fNilaiAngka').value;
-  if(!jId||!val){showToast('Peserta dan nilai harus diisi!');return;}
-  const id=document.getElementById('nilaiEditId').value;
-  const data={id:id||Date.now(),jamaahId:jId,mapel:document.getElementById('fNilaiMapel').value.trim(),jenis:document.getElementById('fNilaiJenis').value,nilai:parseFloat(val),tanggal:document.getElementById('fNilaiTanggal').value,keterangan:document.getElementById('fNilaiKeterangan').value.trim()};
-  if(id){const i=nilaiEk.findIndex(x=>x.id==id);if(i>=0)nilaiEk[i]=data;}else nilaiEk.push(data);
-  saveNilai();closeFormNilai();renderNilaiList();showToast('Nilai disimpan!');
-}
-function hapusNilai(id){if(!confirm('Hapus?'))return;nilaiEk=nilaiEk.filter(x=>x.id!=id);saveNilai();renderNilaiList();showToast('Dihapus!');}
-function renderNilaiList(){
-  const p=getTerm('pesertaDidik');
-  const fp=document.getElementById('filterNilaiPeserta');
-  if(fp&&fp.options.length<=1&&typeof jamaahList!=='undefined')fp.innerHTML='<option value="">Semua '+p+'</option>'+jamaahList.map(j=>'<option value="'+j.id+'">'+(j.nama_lengkap||j.nama||'?')+'</option>').join('');
-  const fPv=(document.getElementById('filterNilaiPeserta')||{value:''}).value;
-  const fJv=(document.getElementById('filterNilaiJenis')||{value:''}).value;
-  const ct=document.getElementById('nilaiList');if(!ct)return;
-  let fl=nilaiEk;
-  if(fPv)fl=fl.filter(n=>n.jamaahId==fPv);
-  if(fJv)fl=fl.filter(n=>n.jenis==fJv);
-  fl=fl.sort((a,b)=>new Date(b.tanggal||0)-new Date(a.tanggal||0));
-  if(!fl.length){ct.innerHTML='<div style="text-align:center;padding:40px;color:#94a3b8;"><div style="font-size:48px;margin-bottom:12px;">&#128202;</div><div style="font-weight:600;">Belum ada nilai</div><div style="font-size:13px;margin-top:6px;">Klik + Input</div></div>';return;}
-  const clr=n=>n>=90?'#10b981':n>=75?'#3b82f6':n>=60?'#f59e0b':'#ef4444';
-  const grd=n=>n>=90?'A':n>=80?'B':n>=70?'C':n>=60?'D':'E';
-  ct.innerHTML=fl.map(n=>{const j=typeof jamaahList!=='undefined'?jamaahList.find(x=>x.id==n.jamaahId):null;const nm=j?(j.nama_lengkap||j.nama||'?'):'?';return '<div style="background:#f8fafc;border-radius:12px;padding:14px;margin-bottom:8px;display:flex;gap:12px;align-items:center;"><div style="width:52px;height:52px;background:'+clr(n.nilai)+';color:white;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;"><div style="font-size:16px;font-weight:800;">'+n.nilai+'</div><div style="font-size:11px;font-weight:600;">'+grd(n.nilai)+'</div></div><div style="flex:1;min-width:0;"><div style="font-weight:700;font-size:14px;">'+nm+'</div><div style="font-size:12px;color:#64748b;">'+(n.mapel||'-')+' · '+n.jenis+'</div><div style="font-size:12px;color:#94a3b8;">'+(n.tanggal||'-')+'</div></div><div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;"><button onclick="openFormNilai('+n.id+')" style="background:var(--primary);color:white;border:none;border-radius:8px;padding:7px 11px;font-size:12px;cursor:pointer;">&#9999;</button><button onclick="hapusNilai('+n.id+')" style="background:#ef4444;color:white;border:none;border-radius:8px;padding:7px 11px;font-size:12px;cursor:pointer;">&#128465;</button></div></div>';}).join('');
+function wizGo(s) {
+    var steps = document.querySelectorAll('.setup-step');
+    for (var i = 0; i < steps.length; i++) steps[i].style.display = 'none';
+    var el = document.getElementById('wizStep' + s);
+    if (el) el.style.display = 'block';
 }
 
+function pickTmpl(id) {
+    wizTmpl = id;
+    var ids = ['pesantren','sekolah','madrasah','custom'];
+    for (var i = 0; i < ids.length; i++) {
+        var el = document.getElementById('tmpl_' + ids[i]);
+        if (el) { el.style.borderColor = '#e2e8f0'; el.style.background = 'white'; }
+    }
+    var sel = document.getElementById('tmpl_' + id);
+    if (sel) { sel.style.borderColor = 'var(--primary)'; sel.style.background = 'rgba(13,92,74,0.06)'; }
+    var btn = document.getElementById('wizBtnNext2');
+    if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
+}
 
-// ===== KELAS / TINGKAT =====
-let kelasList = JSON.parse(localStorage.getItem('eduku_kelas') || '[]');
+function wizSelesai() {
+    var namaEl = document.getElementById('wizNama');
+    var nama = namaEl ? namaEl.value.trim() : '';
+    if (!nama) { showToast('Nama lembaga harus diisi!'); return; }
+    if (wizTmpl && EDUKU_TMPLS[wizTmpl]) {
+        ekTerms = JSON.parse(JSON.stringify(EDUKU_TMPLS[wizTmpl]));
+        localStorage.setItem('eduku_terminology', JSON.stringify(ekTerms));
+    }
+    localStorage.setItem('eduku_setup_done', '1');
+    localStorage.setItem('safara_mode', 'tanpa_login');
+    localStorage.setItem('eduku_nama_lembaga', nama);
+    var h1 = document.getElementById('headerInstansi1');
+    if (h1) h1.textContent = nama;
+    try {
+        var alamatEl = document.getElementById('wizAlamat');
+        var telpEl = document.getElementById('wizTelp');
+        if (typeof idbSet === 'function' && typeof STORE_KONFIGURASI !== 'undefined') {
+            idbGet(STORE_KONFIGURASI, 'config_pro').then(function(cfg) {
+                if (!cfg) cfg = {};
+                if (!cfg.instansi1) cfg.instansi1 = {};
+                cfg.instansi1.nama = nama;
+                cfg.instansi1.alamat = alamatEl ? alamatEl.value.trim() : '';
+                cfg.instansi1.telp = telpEl ? telpEl.value.trim() : '';
+                idbSet(STORE_KONFIGURASI, 'config_pro', cfg);
+            }).catch(function(){});
+        }
+    } catch(e) {}
+    var wiz = document.getElementById('setupWizard');
+    if (wiz) wiz.style.display = 'none';
+    if (typeof pilihTanpaLogin === 'function') pilihTanpaLogin();
+    showToast('Selamat datang di EduKu!');
+    applyTermsToDOM();
+}
+
+function checkEduKuSetup() {
+    try { applyTermsToDOM(); } catch(e) {}
+}
+
+// === TERMINOLOGI MODAL ===
+var termDraft = {};
+function openTerminologiModal() {
+    termDraft = JSON.parse(JSON.stringify(ekTerms));
+    var ids = ['prevPeserta','prevPengajar','prevPembayaran'];
+    var keys = ['pesertaDidik','pengajar','pembayaranType'];
+    for (var i = 0; i < ids.length; i++) {
+        var el = document.getElementById(ids[i]);
+        if (el) el.textContent = getTerm(keys[i]);
+    }
+    var cp = document.getElementById('termPesertaCustom');
+    var cg = document.getElementById('termPengajarCustom');
+    if (cp) cp.value = '';
+    if (cg) cg.value = '';
+    var modal = document.getElementById('terminologiModal');
+    if (modal) modal.style.display = 'flex';
+}
+function closeTerminologiModal() {
+    var modal = document.getElementById('terminologiModal');
+    if (modal) modal.style.display = 'none';
+}
+function setTerm(k, v, btn) {
+    termDraft[k] = v;
+    var map = {pesertaDidik:'prevPeserta', pengajar:'prevPengajar', pembayaranType:'prevPembayaran'};
+    if (map[k]) { var el = document.getElementById(map[k]); if(el) el.textContent = v; }
+    if (btn) {
+        var btns = btn.parentNode.querySelectorAll('.term-btn');
+        for (var i = 0; i < btns.length; i++) btns[i].classList.remove('active');
+        btn.classList.add('active');
+    }
+}
+function simpanTerminologi() {
+    var cp = document.getElementById('termPesertaCustom');
+    var cg = document.getElementById('termPengajarCustom');
+    if (cp && cp.value.trim()) termDraft.pesertaDidik = cp.value.trim();
+    if (cg && cg.value.trim()) termDraft.pengajar = cg.value.trim();
+    ekTerms = JSON.parse(JSON.stringify(termDraft));
+    localStorage.setItem('eduku_terminology', JSON.stringify(ekTerms));
+    closeTerminologiModal();
+    applyTermsToDOM();
+    showToast('Terminologi disimpan!');
+}
+
+// === KELAS ===
+var kelasList = (function(){
+    try { return JSON.parse(localStorage.getItem('eduku_kelas') || '[]'); } catch(e) { return []; }
+})();
+
 function saveKelas() { localStorage.setItem('eduku_kelas', JSON.stringify(kelasList)); }
 
-function openFormKelas(id = null) {
-    ['fKelasNama','fKelasWali','fKelasRuangan','fKelasTahun','fKelasKeterangan']
-        .forEach(f => { const el = document.getElementById(f); if(el) el.value = ''; });
-    document.getElementById('kelasEditId').value = id || '';
-    const termP = getTerm('kelasTingkat') || 'Kelas';
-    document.getElementById('formKelasTitle').textContent = id ? ('Edit ' + termP) : ('Tambah ' + termP);
-    if (id) {
-        const k = kelasList.find(x => x.id == id);
-        if (k) {
-            document.getElementById('fKelasNama').value = k.nama || '';
-            document.getElementById('fKelasWali').value = k.wali || '';
-            document.getElementById('fKelasRuangan').value = k.ruangan || '';
-            document.getElementById('fKelasTahun').value = k.tahun || '';
-            document.getElementById('fKelasKeterangan').value = k.keterangan || '';
-        }
+function getKelasNama(id) {
+    for (var i = 0; i < kelasList.length; i++) {
+        if (kelasList[i].id == id) return kelasList[i].nama;
     }
-    document.getElementById('modalKelas').style.display = 'flex';
+    return '-';
 }
 
-function closeFormKelas() { document.getElementById('modalKelas').style.display = 'none'; }
+function openFormKelas(id) {
+    var fields = ['fKelasNama','fKelasWali','fKelasRuangan','fKelasTahun','fKelasKeterangan'];
+    for (var i = 0; i < fields.length; i++) {
+        var el = document.getElementById(fields[i]); if (el) el.value = '';
+    }
+    var editId = document.getElementById('kelasEditId');
+    if (editId) editId.value = id || '';
+    var title = document.getElementById('formKelasTitle');
+    if (title) title.textContent = id ? 'Edit Kelas' : 'Tambah Kelas';
+    if (id) {
+        for (var j = 0; j < kelasList.length; j++) {
+            if (kelasList[j].id == id) {
+                var k = kelasList[j];
+                var n = document.getElementById('fKelasNama'); if(n) n.value = k.nama||'';
+                var w = document.getElementById('fKelasWali'); if(w) w.value = k.wali||'';
+                var r = document.getElementById('fKelasRuangan'); if(r) r.value = k.ruangan||'';
+                var t = document.getElementById('fKelasTahun'); if(t) t.value = k.tahun||'';
+                var kt = document.getElementById('fKelasKeterangan'); if(kt) kt.value = k.keterangan||'';
+                break;
+            }
+        }
+    }
+    var modal = document.getElementById('modalKelas');
+    if (modal) modal.style.display = 'flex';
+}
+
+function closeFormKelas() {
+    var modal = document.getElementById('modalKelas');
+    if (modal) modal.style.display = 'none';
+}
 
 function simpanKelas() {
-    const nama = document.getElementById('fKelasNama').value.trim();
+    var namaEl = document.getElementById('fKelasNama');
+    var nama = namaEl ? namaEl.value.trim() : '';
     if (!nama) { showToast('Nama kelas harus diisi!'); return; }
-    const id = document.getElementById('kelasEditId').value;
-    const data = {
+    var editId = document.getElementById('kelasEditId');
+    var id = editId ? editId.value : '';
+    var data = {
         id: id || Date.now(),
-        nama,
-        wali: document.getElementById('fKelasWali').value.trim(),
-        ruangan: document.getElementById('fKelasRuangan').value.trim(),
-        tahun: document.getElementById('fKelasTahun').value.trim(),
-        keterangan: document.getElementById('fKelasKeterangan').value.trim(),
-        createdAt: id ? ((kelasList.find(x=>x.id==id)||{}).createdAt || new Date().toISOString()) : new Date().toISOString()
+        nama: nama,
+        wali: (document.getElementById('fKelasWali')||{value:''}).value.trim(),
+        ruangan: (document.getElementById('fKelasRuangan')||{value:''}).value.trim(),
+        tahun: (document.getElementById('fKelasTahun')||{value:''}).value.trim(),
+        keterangan: (document.getElementById('fKelasKeterangan')||{value:''}).value.trim()
     };
     if (id) {
-        const idx = kelasList.findIndex(x => x.id == id);
-        if (idx >= 0) kelasList[idx] = data;
+        for (var i = 0; i < kelasList.length; i++) {
+            if (kelasList[i].id == id) { kelasList[i] = data; break; }
+        }
     } else {
         kelasList.push(data);
     }
     saveKelas();
     closeFormKelas();
     renderKelasList();
-    showToast('✅ Kelas berhasil disimpan!');
+    showToast('Kelas berhasil disimpan!');
 }
 
 function hapusKelas(id) {
-    const k = kelasList.find(x => x.id == id);
-    if (!k) return;
-    // Cek apakah ada peserta di kelas ini
-    const pesertaInKelas = getPesertaByKelas(id);
-    if (pesertaInKelas.length > 0) {
-        if (!confirm('Kelas ' + k.nama + ' masih ada ' + pesertaInKelas.length + ' peserta.
-Hapus tetap lanjutkan? Peserta tidak akan ikut terhapus.')) return;
-    } else {
-        if (!confirm('Hapus kelas ' + k.nama + '?')) return;
+    if (!confirm('Hapus kelas ini?')) return;
+    var newList = [];
+    for (var i = 0; i < kelasList.length; i++) {
+        if (kelasList[i].id != id) newList.push(kelasList[i]);
     }
-    kelasList = kelasList.filter(x => x.id != id);
+    kelasList = newList;
     saveKelas();
     renderKelasList();
-    showToast('✅ Kelas dihapus!');
-}
-
-function getPesertaByKelas(kelasId) {
-    if (typeof jamaahList === 'undefined') return [];
-    return jamaahList.filter(j => {
-        // Cek dari field kelas_id atau nama kelas yang tersimpan
-        return j.kelas_id == kelasId || j.kelasId == kelasId;
-    });
+    showToast('Kelas dihapus!');
 }
 
 function lihatDetailKelas(id) {
-    const k = kelasList.find(x => x.id == id);
+    var k = null;
+    for (var i = 0; i < kelasList.length; i++) { if (kelasList[i].id == id) { k = kelasList[i]; break; } }
     if (!k) return;
-    
-    const peserta = getPesertaByKelas(id);
-    
-    document.getElementById('detailKelasTitle').textContent = '\uD83C\uDFDB ' + k.nama;
-    
-    let infoHtml = '';
-    if (k.wali) infoHtml += '<div>&#x1F468;&#x200D;&#x1F3EB; <strong>Wali Kelas:</strong> ' + k.wali + '</div>';
-    if (k.ruangan) infoHtml += '<div>📍 <strong>Ruangan:</strong> ' + k.ruangan + '</div>';
-    if (k.tahun) infoHtml += '<div>📅 <strong>Tahun Ajaran:</strong> ' + k.tahun + '</div>';
-    if (k.keterangan) infoHtml += '<div>📝 <strong>Keterangan:</strong> ' + k.keterangan + '</div>';
-    infoHtml += '<div style="margin-top:8px;font-weight:600;color:var(--primary);">👥 Total Peserta: ' + peserta.length + '</div>';
-    document.getElementById('detailKelasInfo').innerHTML = infoHtml || '<div style="color:#94a3b8;">Tidak ada info tambahan</div>';
-    
-    const p = getTerm('pesertaDidik');
-    if (!peserta.length) {
-        document.getElementById('detailPesertaKelas').innerHTML = 
-            '<div style="text-align:center;padding:30px;color:#94a3b8;">Belum ada ' + p + ' di kelas ini</div>';
-    } else {
-        document.getElementById('detailPesertaKelas').innerHTML = 
-            '<div style="font-weight:600;margin-bottom:10px;">Daftar ' + p + ':</div>' +
-            peserta.map((j, i) => 
-                '<div style="display:flex;align-items:center;gap:10px;padding:10px;background:#f8fafc;border-radius:8px;margin-bottom:6px;">' +
-                '<div style="width:28px;height:28px;background:var(--primary);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;">' + (i+1) + '</div>' +
-                '<div style="flex:1;min-width:0;"><div style="font-weight:600;font-size:14px;">' + (j.nama_lengkap || j.nama || '?') + '</div>' +
-                (j.no_porsi ? '<div style="font-size:12px;color:#64748b;">NIS: ' + j.no_porsi + '</div>' : '') +
-                '</div></div>'
-            ).join('');
+    var p = getTerm('pesertaDidik');
+    var peserta = [];
+    if (typeof jamaahList !== 'undefined') {
+        for (var j = 0; j < jamaahList.length; j++) {
+            if (jamaahList[j].kelasId == id || jamaahList[j].kelas_id == id) peserta.push(jamaahList[j]);
+        }
     }
-    
-    document.getElementById('modalDetailKelas').style.display = 'flex';
+    var titleEl = document.getElementById('detailKelasTitle');
+    if (titleEl) titleEl.textContent = k.nama;
+    var infoEl = document.getElementById('detailKelasInfo');
+    if (infoEl) {
+        var info = '';
+        if (k.wali) info += '<div><b>Wali Kelas:</b> ' + k.wali + '</div>';
+        if (k.ruangan) info += '<div><b>Ruangan:</b> ' + k.ruangan + '</div>';
+        if (k.tahun) info += '<div><b>Tahun Ajaran:</b> ' + k.tahun + '</div>';
+        info += '<div style="color:var(--primary);font-weight:700;margin-top:8px;">Total ' + p + ': ' + peserta.length + '</div>';
+        infoEl.innerHTML = info;
+    }
+    var pesertaEl = document.getElementById('detailPesertaKelas');
+    if (pesertaEl) {
+        if (!peserta.length) {
+            pesertaEl.innerHTML = '<div style="text-align:center;padding:20px;color:#94a3b8;">Belum ada ' + p + ' di kelas ini</div>';
+        } else {
+            var html = '<div style="font-weight:600;margin-bottom:8px;">Daftar ' + p + ':</div>';
+            for (var k2 = 0; k2 < peserta.length; k2++) {
+                var j2 = peserta[k2];
+                html += '<div style="padding:8px;background:#f8fafc;border-radius:8px;margin-bottom:6px;">'
+                     + '<b>' + (k2+1) + '. ' + (j2.nama_lengkap||j2.nama||'?') + '</b>'
+                     + (j2.no_porsi ? ' <span style="color:#64748b;font-size:12px;">NIS: ' + j2.no_porsi + '</span>' : '')
+                     + '</div>';
+            }
+            pesertaEl.innerHTML = html;
+        }
+    }
+    var modal = document.getElementById('modalDetailKelas');
+    if (modal) modal.style.display = 'flex';
 }
 
 function renderKelasList() {
-    const p = getTerm('pesertaDidik');
-    const hdr = document.getElementById('hdrPageKelas');
+    var p = getTerm('pesertaDidik');
+    var hdr = document.getElementById('hdrPageKelas');
     if (hdr) hdr.textContent = 'Data Kelas / Tingkat';
-    
-    const statsRow = document.getElementById('kelasStatsRow');
-    const container = document.getElementById('kelasList');
+    var stats = document.getElementById('kelasStatsRow');
+    var container = document.getElementById('kelasList');
     if (!container) return;
-    
-    // Stats row
-    if (statsRow) {
-        const totalKelas = kelasList.length;
-        const totalPeserta = typeof jamaahList !== 'undefined' ? jamaahList.length : 0;
-        statsRow.innerHTML = 
-            '<div style="background:var(--primary);color:white;padding:14px;border-radius:12px;text-align:center;">' +
-            '<div style="font-size:24px;font-weight:800;">' + totalKelas + '</div>' +
-            '<div style="font-size:12px;opacity:0.9;">Total Kelas</div></div>' +
-            '<div style="background:#f0fdf4;padding:14px;border-radius:12px;text-align:center;border:2px solid #10b981;">' +
-            '<div style="font-size:24px;font-weight:800;color:#10b981;">' + totalPeserta + '</div>' +
-            '<div style="font-size:12px;color:#64748b;">Total ' + p + '</div></div>';
+    var jTotal = typeof jamaahList !== 'undefined' ? jamaahList.length : 0;
+    if (stats) {
+        stats.innerHTML = '<div style="background:var(--primary);color:white;padding:14px;border-radius:12px;text-align:center;">'
+            + '<div style="font-size:24px;font-weight:800;">' + kelasList.length + '</div>'
+            + '<div style="font-size:12px;opacity:0.9;">Total Kelas</div></div>'
+            + '<div style="background:#f0fdf4;padding:14px;border-radius:12px;text-align:center;border:2px solid #10b981;">'
+            + '<div style="font-size:24px;font-weight:800;color:#10b981;">' + jTotal + '</div>'
+            + '<div style="font-size:12px;color:#64748b;">Total ' + p + '</div></div>';
     }
-    
     if (!kelasList.length) {
-        container.innerHTML = '<div style="text-align:center;padding:40px;color:#94a3b8;">' +
-            '<div style="font-size:48px;margin-bottom:12px;">&#127963;</div>' +
-            '<div style="font-weight:600;font-size:15px;">Belum ada kelas</div>' +
-            '<div style="font-size:13px;margin-top:6px;">Klik + Tambah untuk membuat kelas</div></div>';
+        container.innerHTML = '<div style="text-align:center;padding:40px;color:#94a3b8;">'
+            + '<div style="font-size:48px;margin-bottom:12px;">&#127963;</div>'
+            + '<div style="font-weight:600;">Belum ada kelas</div>'
+            + '<div style="font-size:13px;margin-top:6px;">Klik + Tambah</div></div>';
         return;
     }
-    
-    const COLORS = ['#3b82f6','#10b981','#f59e0b','#8b5cf6','#ec4899','#0D5C4A','#ef4444'];
-    
-    container.innerHTML = kelasList.map((k, i) => {
-        const peserta = getPesertaByKelas(k.id);
-        const cc = COLORS[i % COLORS.length];
-        return '<div style="background:white;border:2px solid #e2e8f0;border-radius:14px;padding:16px;margin-bottom:12px;border-left:5px solid ' + cc + ';">' +
-            '<div style="display:flex;align-items:flex-start;gap:12px;">' +
-            '<div style="width:48px;height:48px;background:' + cc + ';color:white;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">&#127963;</div>' +
-            '<div style="flex:1;min-width:0;">' +
-            '<div style="font-weight:700;font-size:16px;margin-bottom:4px;">' + k.nama + '</div>' +
-            (k.wali ? '<div style="font-size:12px;color:#64748b;">👨‍🏫 ' + k.wali + '</div>' : '') +
-            (k.ruangan ? '<div style="font-size:12px;color:#64748b;">📍 ' + k.ruangan + '</div>' : '') +
-            (k.tahun ? '<div style="font-size:12px;color:#64748b;">📅 ' + k.tahun + '</div>' : '') +
-            '<div style="display:inline-block;background:' + cc + '20;color:' + cc + ';padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600;margin-top:6px;">' +
-            peserta.length + ' ' + p + '</div>' +
-            '</div>' +
-            '<div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">' +
-            '<button onclick="lihatDetailKelas(' + k.id + ')" style="background:var(--primary);color:white;border:none;border-radius:8px;padding:7px 10px;font-size:12px;cursor:pointer;" title="Detail">👥</button>' +
-            '<button onclick="openFormKelas(' + k.id + ')" style="background:#f59e0b;color:white;border:none;border-radius:8px;padding:7px 10px;font-size:12px;cursor:pointer;" title="Edit">&#9999;</button>' +
-            '<button onclick="hapusKelas(' + k.id + ')" style="background:#ef4444;color:white;border:none;border-radius:8px;padding:7px 10px;font-size:12px;cursor:pointer;" title="Hapus">&#128465;</button>' +
-            '</div></div></div>';
-    }).join('');
-}
-
-// Helper: get kelas nama by id
-function getKelasNama(id) {
-    const k = kelasList.find(x => x.id == id);
-    return k ? k.nama : '-';
-}
-
-// Update form peserta: inject dropdown kelas
-function injectKelasDropdownToPesertaForm() {
-    // Cari container form jamaah dan inject field kelas
-    const formContainer = document.getElementById('jamaahFormContainer');
-    if (!formContainer) return;
-    
-    // Cek apakah sudah ada
-    if (document.getElementById('ekKelasField')) return;
-    
-    // Buat field kelas
-    const kelasField = document.createElement('div');
-    kelasField.id = 'ekKelasField';
-    kelasField.style.cssText = 'margin-bottom:12px;padding:12px;background:#f0fdf4;border-radius:10px;border:2px solid #10b981;';
-    
-    const options = '<option value="">-- Pilih Kelas (Opsional) --</option>' +
-        kelasList.map(k => '<option value="' + k.id + '">' + k.nama + (k.tahun ? ' (' + k.tahun + ')' : '') + '</option>').join('');
-    
-    kelasField.innerHTML = '<label style="display:block;font-weight:700;font-size:13px;margin-bottom:6px;color:var(--primary);">🏛️ Kelas / Tingkat</label>' +
-        '<select id="ekKelasSelect" style="width:100%;padding:10px;border:2px solid #10b981;border-radius:8px;font-size:14px;">' + options + '</select>';
-    
-    // Insert di awal form
-    if (formContainer.firstChild) {
-        formContainer.insertBefore(kelasField, formContainer.firstChild);
-    } else {
-        formContainer.appendChild(kelasField);
-    }
-}
-
-// Hook ke saveJamaah untuk simpan kelasId
-const _origSaveJamaah = typeof saveJamaah !== 'undefined' ? saveJamaah : null;
-function saveJamaahWithKelas() {
-    // Ambil kelasId yang dipilih
-    const kelasSelect = document.getElementById('ekKelasSelect');
-    if (kelasSelect && kelasSelect.value) {
-        window._pendingKelasId = kelasSelect.value;
-    }
-    if (typeof saveJamaah === 'function') {
-        saveJamaah();
-    }
-}
-
-// Observer untuk inject dropdown kelas saat form jamaah dibuka
-const _kelasObserver = new MutationObserver(() => {
-    const formContainer = document.getElementById('jamaahFormContainer');
-    if (formContainer && formContainer.children.length > 0) {
-        injectKelasDropdownToPesertaForm();
-        
-        // Restore kelasId jika edit
-        const editId = (document.getElementById('jamaahEditId')||{}).value;
-        if (editId && typeof jamaahList !== 'undefined') {
-            const j = jamaahList.find(x => x.id == editId);
-            if (j && j.kelasId) {
-                const sel = document.getElementById('ekKelasSelect');
-                if (sel) sel.value = j.kelasId;
+    var clrs = ['#3b82f6','#10b981','#f59e0b','#8b5cf6','#ec4899','#0D5C4A','#ef4444'];
+    var html = '';
+    for (var i = 0; i < kelasList.length; i++) {
+        var k = kelasList[i];
+        var cc = clrs[i % clrs.length];
+        var peserta = [];
+        if (typeof jamaahList !== 'undefined') {
+            for (var j = 0; j < jamaahList.length; j++) {
+                if (jamaahList[j].kelasId == k.id || jamaahList[j].kelas_id == k.id) peserta.push(jamaahList[j]);
             }
         }
+        html += '<div style="background:white;border:2px solid #e2e8f0;border-radius:14px;padding:16px;margin-bottom:12px;border-left:5px solid ' + cc + ';">'
+             + '<div style="display:flex;align-items:flex-start;gap:12px;">'
+             + '<div style="width:46px;height:46px;background:' + cc + ';color:white;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">&#127963;</div>'
+             + '<div style="flex:1;min-width:0;">'
+             + '<div style="font-weight:700;font-size:16px;margin-bottom:4px;">' + k.nama + '</div>'
+             + (k.wali ? '<div style="font-size:12px;color:#64748b;">Wali: ' + k.wali + '</div>' : '')
+             + (k.ruangan ? '<div style="font-size:12px;color:#64748b;">Ruangan: ' + k.ruangan + '</div>' : '')
+             + (k.tahun ? '<div style="font-size:12px;color:#64748b;">TA: ' + k.tahun + '</div>' : '')
+             + '<div style="display:inline-block;background:' + cc + '20;color:' + cc + ';padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600;margin-top:6px;">'
+             + peserta.length + ' ' + p + '</div>'
+             + '</div>'
+             + '<div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">'
+             + '<button onclick="lihatDetailKelas(' + k.id + ')" style="background:var(--primary);color:white;border:none;border-radius:8px;padding:7px 10px;font-size:12px;cursor:pointer;">&#128101;</button>'
+             + '<button onclick="openFormKelas(' + k.id + ')" style="background:#f59e0b;color:white;border:none;border-radius:8px;padding:7px 10px;font-size:12px;cursor:pointer;">&#9998;</button>'
+             + '<button onclick="hapusKelas(' + k.id + ')" style="background:#ef4444;color:white;border:none;border-radius:8px;padding:7px 10px;font-size:12px;cursor:pointer;">&#128465;</button>'
+             + '</div></div></div>';
     }
-});
+    container.innerHTML = html;
+}
 
-// Start observing setelah DOM ready
-document.addEventListener('DOMContentLoaded', function() {
-    const formContainer = document.getElementById('jamaahFormContainer');
-    if (formContainer) {
-        _kelasObserver.observe(formContainer, { childList: true, subtree: true });
-    }
-    
-    // Patch saveJamaah untuk include kelasId
-    const origBtn = document.querySelector('button[onclick="saveJamaah()"]');
-    if (origBtn) {
-        origBtn.onclick = function() {
-            const kelasSelect = document.getElementById('ekKelasSelect');
-            if (kelasSelect) {
-                // Inject kelas sebagai data sebelum save
-                window._ekPendingKelasId = kelasSelect.value;
-            }
-            saveJamaah();
-        };
-    }
-});
+// === PENGAJAR ===
+var pengajarList = (function(){
+    try { return JSON.parse(localStorage.getItem('eduku_pengajar') || '[]'); } catch(e) { return []; }
+})();
 
-// Patch after jamaah save - tambahkan kelasId ke data
-const _origRenderJamaah = window.renderJamaahList;
+function savePengajar() { localStorage.setItem('eduku_pengajar', JSON.stringify(pengajarList)); }
 
-
-
-// ===== MATA PELAJARAN =====
-let mapelList = JSON.parse(localStorage.getItem('eduku_mapel') || '[]');
-function saveMapel() { localStorage.setItem('eduku_mapel', JSON.stringify(mapelList)); }
-
-function openFormMapel(id = null) {
-    ['fMapelNama','fMapelKode','fMapelPengajar','fMapelKKM','fMapelKet']
-        .forEach(f => { const el = document.getElementById(f); if(el) el.value = ''; });
-    document.getElementById('mapelEditId').value = id || '';
-    document.getElementById('formMapelTitle').textContent = id ? 'Edit Mata Pelajaran' : 'Tambah Mata Pelajaran';
+function openFormPengajar(id) {
+    var flds = ['fPengajarNama','fPengajarNIP','fPengajarBidang','fPengajarWA','fPengajarCatatan'];
+    for (var i = 0; i < flds.length; i++) { var el = document.getElementById(flds[i]); if(el) el.value=''; }
+    var editId = document.getElementById('pengajarEditId');
+    if (editId) editId.value = id || '';
+    var title = document.getElementById('formPengajarTitle');
+    var g = getTerm('pengajar');
+    if (title) title.textContent = id ? ('Edit ' + g) : ('Tambah ' + g);
     if (id) {
-        const m = mapelList.find(x => x.id == id);
-        if (m) {
-            document.getElementById('fMapelNama').value = m.nama || '';
-            document.getElementById('fMapelKode').value = m.kode || '';
-            document.getElementById('fMapelPengajar').value = m.pengajar || '';
-            document.getElementById('fMapelKKM').value = m.kkm || '';
-            document.getElementById('fMapelKet').value = m.keterangan || '';
+        for (var j = 0; j < pengajarList.length; j++) {
+            if (pengajarList[j].id == id) {
+                var pr = pengajarList[j];
+                var fn = document.getElementById('fPengajarNama'); if(fn) fn.value = pr.nama||'';
+                var fi = document.getElementById('fPengajarNIP'); if(fi) fi.value = pr.nip||'';
+                var fb = document.getElementById('fPengajarBidang'); if(fb) fb.value = pr.bidang||'';
+                var fw = document.getElementById('fPengajarWA'); if(fw) fw.value = pr.wa||'';
+                var fc = document.getElementById('fPengajarCatatan'); if(fc) fc.value = pr.catatan||'';
+                break;
+            }
         }
     }
-    document.getElementById('modalMapel').style.display = 'flex';
+    var modal = document.getElementById('modalPengajar');
+    if (modal) modal.style.display = 'flex';
 }
-function closeFormMapel() { document.getElementById('modalMapel').style.display = 'none'; }
-function simpanMapel() {
-    const nama = document.getElementById('fMapelNama').value.trim();
-    if (!nama) { showToast('Nama mata pelajaran harus diisi!'); return; }
-    const id = document.getElementById('mapelEditId').value;
-    const data = { id: id || Date.now(), nama,
-        kode: document.getElementById('fMapelKode').value.trim(),
-        pengajar: document.getElementById('fMapelPengajar').value.trim(),
-        kkm: parseInt(document.getElementById('fMapelKKM').value) || 75,
-        keterangan: document.getElementById('fMapelKet').value.trim() };
-    if (id) { const i = mapelList.findIndex(x => x.id == id); if(i>=0) mapelList[i] = data; }
-    else mapelList.push(data);
-    saveMapel(); closeFormMapel(); renderMapelList();
-    showToast('✅ Mata pelajaran disimpan!');
+function closeFormPengajar() { var m = document.getElementById('modalPengajar'); if(m) m.style.display='none'; }
+function simpanPengajar() {
+    var namaEl = document.getElementById('fPengajarNama');
+    var nama = namaEl ? namaEl.value.trim() : '';
+    if (!nama) { showToast('Nama harus diisi!'); return; }
+    var editId = document.getElementById('pengajarEditId');
+    var id = editId ? editId.value : '';
+    var data = {
+        id: id || Date.now(), nama: nama,
+        nip: (document.getElementById('fPengajarNIP')||{value:''}).value.trim(),
+        bidang: (document.getElementById('fPengajarBidang')||{value:''}).value.trim(),
+        wa: (document.getElementById('fPengajarWA')||{value:''}).value.trim(),
+        catatan: (document.getElementById('fPengajarCatatan')||{value:''}).value.trim()
+    };
+    if (id) {
+        for (var i = 0; i < pengajarList.length; i++) {
+            if (pengajarList[i].id == id) { pengajarList[i] = data; break; }
+        }
+    } else { pengajarList.push(data); }
+    savePengajar(); closeFormPengajar(); renderPengajarList();
+    showToast('Data ' + getTerm('pengajar') + ' disimpan!');
 }
-function hapusMapel(id) {
-    if (!confirm('Hapus mata pelajaran ini?')) return;
-    mapelList = mapelList.filter(x => x.id != id);
-    saveMapel(); renderMapelList(); showToast('Dihapus!');
+function hapusPengajar(id) {
+    if (!confirm('Hapus?')) return;
+    var nl = [];
+    for (var i = 0; i < pengajarList.length; i++) { if (pengajarList[i].id != id) nl.push(pengajarList[i]); }
+    pengajarList = nl; savePengajar(); renderPengajarList(); showToast('Dihapus!');
 }
-function renderMapelList() {
-    const q = ((document.getElementById('searchMapel')||{value:''}).value || '').toLowerCase();
-    const ct = document.getElementById('mapelList'); if (!ct) return;
-    const fl = mapelList.filter(m => !q || (m.nama||'').toLowerCase().includes(q) || (m.kode||'').toLowerCase().includes(q));
+function renderPengajarList() {
+    var g = getTerm('pengajar');
+    var hdr = document.getElementById('hdrPagePengajar'); if(hdr) hdr.textContent = 'Data ' + g;
+    var q = '';
+    var srch = document.getElementById('searchPengajar'); if(srch) q = srch.value.toLowerCase();
+    var ct = document.getElementById('pengajarList'); if(!ct) return;
+    var fl = [];
+    for (var i = 0; i < pengajarList.length; i++) {
+        var pr = pengajarList[i];
+        if (!q || (pr.nama||'').toLowerCase().indexOf(q)>=0 || (pr.bidang||'').toLowerCase().indexOf(q)>=0) fl.push(pr);
+    }
     if (!fl.length) {
-        ct.innerHTML = '<div style="text-align:center;padding:40px;color:#94a3b8;"><div style="font-size:48px;margin-bottom:12px;">&#128218;</div><div style="font-weight:600;">Belum ada mata pelajaran</div><div style="font-size:13px;margin-top:6px;">Klik + Tambah</div></div>';
+        ct.innerHTML = '<div style="text-align:center;padding:40px;color:#94a3b8;">'
+            + '<div style="font-size:48px;margin-bottom:12px;">&#128104;</div>'
+            + '<div style="font-weight:600;">Belum ada data ' + g + '</div>'
+            + '<div style="font-size:13px;margin-top:6px;">Klik + Tambah</div></div>';
         return;
     }
-    const CLRS = ['#3b82f6','#10b981','#f59e0b','#8b5cf6','#ec4899','#0D5C4A'];
-    ct.innerHTML = fl.map((m, i) => {
-        const cc = CLRS[i % CLRS.length];
-        // Hitung rata2 nilai
-        const nilaiMapel = typeof nilaiEk !== 'undefined' ? nilaiEk.filter(n => n.mapel === m.nama) : [];
-        const avg = nilaiMapel.length ? Math.round(nilaiMapel.reduce((s,n) => s + n.nilai, 0) / nilaiMapel.length) : null;
-        return '<div style="background:white;border:2px solid #e2e8f0;border-radius:12px;padding:14px;margin-bottom:10px;display:flex;gap:12px;align-items:flex-start;border-left:5px solid ' + cc + ';">' +
-            '<div style="width:44px;height:44px;background:' + cc + ';color:white;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">&#128218;</div>' +
-            '<div style="flex:1;min-width:0;">' +
-            '<div style="font-weight:700;font-size:15px;">' + m.nama + (m.kode ? ' <span style="font-size:11px;background:' + cc + '20;color:' + cc + ';padding:2px 6px;border-radius:6px;">' + m.kode + '</span>' : '') + '</div>' +
-            (m.pengajar ? '<div style="font-size:12px;color:#64748b;">👨‍🏫 ' + m.pengajar + '</div>' : '') +
-            '<div style="font-size:12px;color:#64748b;">KKM: ' + (m.kkm || 75) + (avg !== null ? ' · Rata-rata: <strong style="color:' + (avg >= m.kkm ? '#10b981' : '#ef4444') + '">' + avg + '</strong>' : '') + '</div>' +
-            (nilaiMapel.length ? '<div style="font-size:12px;color:#94a3b8;">' + nilaiMapel.length + ' data nilai</div>' : '') +
-            '</div>' +
-            '<div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">' +
-            '<button onclick="openFormMapel(' + m.id + ')" style="background:var(--primary);color:white;border:none;border-radius:8px;padding:7px 10px;font-size:12px;cursor:pointer;">&#9999;</button>' +
-            '<button onclick="hapusMapel(' + m.id + ')" style="background:#ef4444;color:white;border:none;border-radius:8px;padding:7px 10px;font-size:12px;cursor:pointer;">&#128465;</button>' +
-            '</div></div>';
-    }).join('');
-}
-function getMapelOptions(selectedNama) {
-    return '<option value="">-- Pilih Mapel --</option>' +
-        mapelList.map(m => '<option value="' + m.nama + '"' + (m.nama === selectedNama ? ' selected' : '') + '>' + m.nama + (m.kode ? ' (' + m.kode + ')' : '') + '</option>').join('') +
-        '<option value="__custom__">✏️ Ketik sendiri...</option>';
-}
-
-// ===== RAPORT =====
-function initRaport() {
-    const p = getTerm('pesertaDidik');
-    // Populate kelas filter
-    const kf = document.getElementById('raportKelasFilter');
-    if (kf) {
-        kf.innerHTML = '<option value="">Semua Kelas</option>' +
-            kelasList.map(k => '<option value="' + k.id + '">' + k.nama + '</option>').join('');
-    }
-    // Populate peserta filter
-    const pf = document.getElementById('raportPesertaFilter');
-    if (pf) {
-        const jList = typeof jamaahList !== 'undefined' ? jamaahList : [];
-        pf.innerHTML = '<option value="">-- Pilih ' + p + ' --</option>' +
-            jList.map(j => '<option value="' + j.id + '">' + (j.nama_lengkap || j.nama || '?') + '</option>').join('');
-    }
-    renderRaport();
-}
-
-function renderRaport() {
-    const kelasId = (document.getElementById('raportKelasFilter')||{value:''}).value || '';
-    const pf = document.getElementById('raportPesertaFilter');
-    const p = getTerm('pesertaDidik');
-    if (!pf) return;
-    // Filter peserta by kelas
-    let jList = typeof jamaahList !== 'undefined' ? jamaahList : [];
-    if (kelasId) jList = jList.filter(j => j.kelasId == kelasId || j.kelas_id == kelasId);
-    pf.innerHTML = '<option value="">-- Pilih ' + p + ' --</option>' +
-        jList.map(j => '<option value="' + j.id + '">' + (j.nama_lengkap || j.nama || '?') + '</option>').join('');
-    // Clear raport content
-    const ct = document.getElementById('raportContent');
-    if (ct) ct.innerHTML = '<div style="text-align:center;padding:40px;color:#94a3b8;"><div style="font-size:48px;margin-bottom:12px;">&#128203;</div><div style="font-weight:600;">Pilih ' + p + ' untuk melihat raport</div></div>';
-}
-
-function renderRaportPeserta() {
-    const pesertaId = (document.getElementById('raportPesertaFilter')||{value:''}).value || '';
-    const jenisFilter = (document.getElementById('raportJenisFilter')||{value:''}).value || '';
-    const ct = document.getElementById('raportContent');
-    const p = getTerm('pesertaDidik');
-    if (!ct) return;
-    if (!pesertaId) {
-        ct.innerHTML = '<div style="text-align:center;padding:40px;color:#94a3b8;"><div style="font-size:48px;margin-bottom:12px;">&#128203;</div><div style="font-weight:600;">Pilih ' + p + ' untuk melihat raport</div></div>';
-        return;
-    }
-    const jList = typeof jamaahList !== 'undefined' ? jamaahList : [];
-    const peserta = jList.find(j => j.id == pesertaId);
-    if (!peserta) return;
-    const namaPeserta = peserta.nama_lengkap || peserta.nama || '?';
-    const nisPeserta = peserta.no_porsi || '-';
-    // Get nilai peserta
-    const nilaiData = typeof nilaiEk !== 'undefined' ? nilaiEk.filter(n => n.jamaahId == pesertaId) : [];
-    const filtered = jenisFilter ? nilaiData.filter(n => n.jenis === jenisFilter) : nilaiData;
-    // Group by mapel
-    const byMapel = {};
-    filtered.forEach(n => {
-        const mapelKey = n.mapel || 'Umum';
-        if (!byMapel[mapelKey]) byMapel[mapelKey] = [];
-        byMapel[mapelKey].push(n);
-    });
-    // Calculate stats
-    const totalNilai = filtered.length;
-    const avgNilai = totalNilai ? Math.round(filtered.reduce((s,n) => s + n.nilai, 0) / totalNilai) : 0;
-    const nilaiTertinggi = totalNilai ? filtered.reduce(function(a,n){return a>n.nilai?a:n.nilai;}, filtered[0].nilai) : 0;
-    const nilaiTerendah = totalNilai ? filtered.reduce(function(a,n){return a<n.nilai?a:n.nilai;}, filtered[0].nilai) : 0;
-    const clr = n => n >= 90 ? '#10b981' : n >= 75 ? '#3b82f6' : n >= 60 ? '#f59e0b' : '#ef4444';
-    const grd = n => n >= 90 ? 'A' : n >= 80 ? 'B' : n >= 70 ? 'C' : n >= 60 ? 'D' : 'E';
-    let html = '';
-    // Header raport
-    html += '<div style="background:linear-gradient(135deg,var(--primary),#0a4a3a);color:white;padding:20px;border-radius:14px;margin-bottom:16px;">' +
-        '<div style="font-weight:700;font-size:18px;margin-bottom:4px;">' + namaPeserta + '</div>' +
-        '<div style="font-size:13px;opacity:0.85;">NIS: ' + nisPeserta + '</div>' +
-        (peserta.kelasId || peserta.kelas_id ? '<div style="font-size:13px;opacity:0.85;">Kelas: ' + getKelasNama(peserta.kelasId || peserta.kelas_id) + '</div>' : '') +
-        '</div>';
-    // Summary stats
-    if (totalNilai > 0) {
-        html += '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px;">' +
-            '<div style="background:#f8fafc;padding:12px;border-radius:10px;text-align:center;"><div style="font-size:22px;font-weight:800;color:' + clr(avgNilai) + ';">' + avgNilai + '</div><div style="font-size:11px;color:#64748b;">Rata-rata</div></div>' +
-            '<div style="background:#f8fafc;padding:12px;border-radius:10px;text-align:center;"><div style="font-size:22px;font-weight:800;color:var(--primary);">' + grd(avgNilai) + '</div><div style="font-size:11px;color:#64748b;">Grade</div></div>' +
-            '<div style="background:#f8fafc;padding:12px;border-radius:10px;text-align:center;"><div style="font-size:22px;font-weight:800;color:#10b981;">' + nilaiTertinggi + '</div><div style="font-size:11px;color:#64748b;">Tertinggi</div></div>' +
-            '<div style="background:#f8fafc;padding:12px;border-radius:10px;text-align:center;"><div style="font-size:22px;font-weight:800;color:#ef4444;">' + nilaiTerendah + '</div><div style="font-size:11px;color:#64748b;">Terendah</div></div>' +
-            '</div>';
-        // Nilai per mapel
-        html += '<div style="font-weight:700;margin-bottom:10px;">📊 Detail Nilai per Mapel:</div>';
-        Object.entries(byMapel).forEach(([mapelNama, values]) => {
-            const mapelAvg = Math.round(values.reduce((s,n) => s + n.nilai, 0) / values.length);
-            const mapelData = mapelList.find(m => m.nama === mapelNama);
-            const kkm = (mapelData||{}).kkm || 75;
-            const lulus = mapelAvg >= kkm;
-            html += '<div style="background:white;border:2px solid ' + (lulus ? '#10b981' : '#ef4444') + ';border-radius:12px;padding:14px;margin-bottom:8px;">' +
-                '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">' +
-                '<div style="font-weight:700;">' + mapelNama + '</div>' +
-                '<div style="display:flex;align-items:center;gap:8px;">' +
-                '<span style="background:' + clr(mapelAvg) + ';color:white;padding:4px 10px;border-radius:8px;font-weight:800;font-size:15px;">' + mapelAvg + '</span>' +
-                '<span style="font-size:12px;color:' + (lulus ? '#10b981' : '#ef4444') + ';font-weight:600;">' + (lulus ? '✅ Lulus' : '❌ Remedial') + '</span>' +
-                '</div></div>' +
-                '<div style="display:flex;flex-wrap:wrap;gap:6px;">' +
-                values.map(n => '<span style="background:#f1f5f9;padding:4px 8px;border-radius:6px;font-size:12px;">' + n.jenis + ': <strong style="color:' + clr(n.nilai) + '">' + n.nilai + '</strong></span>').join('') +
-                '</div>' +
-                (mapelData ? '<div style="font-size:11px;color:#94a3b8;margin-top:4px;">KKM: ' + kkm + '</div>' : '') +
-                '</div>';
-        });
-        // Tombol cetak
-        html += '<button onclick="cetakRaport(' + pesertaId + ')" style="width:100%;padding:14px;background:var(--primary);color:white;border:none;border-radius:12px;font-weight:700;font-size:15px;cursor:pointer;margin-top:8px;">🖨️ Cetak Raport</button>';
-    } else {
-        html += '<div style="text-align:center;padding:40px;color:#94a3b8;"><div style="font-size:48px;">📭</div><div style="font-weight:600;margin-top:10px;">Belum ada nilai untuk ' + namaPeserta + '</div></div>';
+    var html = '';
+    for (var j = 0; j < fl.length; j++) {
+        var pr2 = fl[j];
+        html += '<div style="background:#f8fafc;border-radius:12px;padding:14px;margin-bottom:10px;display:flex;gap:12px;align-items:flex-start;border-left:4px solid var(--primary);">'
+             + '<div style="width:44px;height:44px;background:var(--primary);color:white;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">&#128104;</div>'
+             + '<div style="flex:1;min-width:0;">'
+             + '<div style="font-weight:700;font-size:15px;margin-bottom:2px;">' + pr2.nama + '</div>'
+             + (pr2.nip ? '<div style="font-size:12px;color:#64748b;">NIP: ' + pr2.nip + '</div>' : '')
+             + (pr2.bidang ? '<div style="font-size:12px;color:#64748b;">Bidang: ' + pr2.bidang + '</div>' : '')
+             + (pr2.wa ? '<div style="font-size:12px;color:#64748b;">WA: ' + pr2.wa + '</div>' : '')
+             + '</div>'
+             + '<div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">'
+             + '<button onclick="openFormPengajar(' + pr2.id + ')" style="background:var(--primary);color:white;border:none;border-radius:8px;padding:7px 10px;font-size:12px;cursor:pointer;">&#9998;</button>'
+             + '<button onclick="hapusPengajar(' + pr2.id + ')" style="background:#ef4444;color:white;border:none;border-radius:8px;padding:7px 10px;font-size:12px;cursor:pointer;">&#128465;</button>'
+             + '</div></div>';
     }
     ct.innerHTML = html;
 }
 
-function cetakRaport(pesertaId) {
-    const jList = typeof jamaahList !== 'undefined' ? jamaahList : [];
-    const peserta = jList.find(j => j.id == pesertaId);
-    if (!peserta) return;
-    const namaPeserta = peserta.nama_lengkap || peserta.nama || '?';
-    const nilaiData = typeof nilaiEk !== 'undefined' ? nilaiEk.filter(n => n.jamaahId == pesertaId) : [];
-    const byMapel = {};
-    nilaiData.forEach(n => {
-        const k = n.mapel || 'Umum';
-        if (!byMapel[k]) byMapel[k] = [];
-        byMapel[k].push(n);
+// === JADWAL ===
+var jadwalList = (function(){
+    try { return JSON.parse(localStorage.getItem('eduku_jadwal') || '[]'); } catch(e) { return []; }
+})();
+var jdHariFilter = '';
+var JH_ORDER = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Ahad'];
+var JH_CLR = {Senin:'#3b82f6',Selasa:'#10b981',Rabu:'#f59e0b',Kamis:'#8b5cf6',Jumat:'#0D5C4A',Sabtu:'#ec4899',Ahad:'#ef4444'};
+
+function saveJadwal() { localStorage.setItem('eduku_jadwal', JSON.stringify(jadwalList)); }
+function openFormJadwal(id) {
+    var flds = ['fJadwalMapel','fJadwalPengajar','fJadwalKelas','fJadwalRuangan','fJadwalMulai','fJadwalSelesai'];
+    for (var i = 0; i < flds.length; i++) { var el = document.getElementById(flds[i]); if(el) el.value=''; }
+    var editId = document.getElementById('jadwalEditId'); if(editId) editId.value = id||'';
+    var title = document.getElementById('formJadwalTitle'); if(title) title.textContent = id?'Edit Jadwal':'Tambah Jadwal';
+    if (id) {
+        for (var j = 0; j < jadwalList.length; j++) {
+            if (jadwalList[j].id == id) {
+                var jd = jadwalList[j];
+                var fh = document.getElementById('fJadwalHari'); if(fh) fh.value = jd.hari||'Senin';
+                var fm = document.getElementById('fJadwalMulai'); if(fm) fm.value = jd.mulai||'';
+                var fs = document.getElementById('fJadwalSelesai'); if(fs) fs.value = jd.selesai||'';
+                var fmp = document.getElementById('fJadwalMapel'); if(fmp) fmp.value = jd.mapel||'';
+                var fp = document.getElementById('fJadwalPengajar'); if(fp) fp.value = jd.pengajar||'';
+                var fk = document.getElementById('fJadwalKelas'); if(fk) fk.value = jd.kelas||'';
+                var fr = document.getElementById('fJadwalRuangan'); if(fr) fr.value = jd.ruangan||'';
+                break;
+            }
+        }
+    }
+    var modal = document.getElementById('modalJadwal'); if(modal) modal.style.display='flex';
+}
+function closeFormJadwal() { var m=document.getElementById('modalJadwal'); if(m) m.style.display='none'; }
+function simpanJadwal() {
+    var mapelEl = document.getElementById('fJadwalMapel');
+    var mulaiEl = document.getElementById('fJadwalMulai');
+    var mapel = mapelEl ? mapelEl.value.trim() : '';
+    var mulai = mulaiEl ? mulaiEl.value : '';
+    if (!mapel||!mulai) { showToast('Pelajaran dan jam harus diisi!'); return; }
+    var editId = document.getElementById('jadwalEditId'); var id = editId ? editId.value : '';
+    var data = { id:id||Date.now(),
+        hari: (document.getElementById('fJadwalHari')||{value:'Senin'}).value,
+        mulai: mulai,
+        selesai: (document.getElementById('fJadwalSelesai')||{value:''}).value,
+        mapel: mapel,
+        pengajar: (document.getElementById('fJadwalPengajar')||{value:''}).value.trim(),
+        kelas: (document.getElementById('fJadwalKelas')||{value:''}).value.trim(),
+        ruangan: (document.getElementById('fJadwalRuangan')||{value:''}).value.trim()
+    };
+    if (id) {
+        for (var i=0;i<jadwalList.length;i++) { if(jadwalList[i].id==id) { jadwalList[i]=data; break; } }
+    } else jadwalList.push(data);
+    saveJadwal(); closeFormJadwal(); renderJadwalList(); showToast('Jadwal disimpan!');
+}
+function hapusJadwal(id) {
+    if (!confirm('Hapus?')) return;
+    var nl=[];
+    for (var i=0;i<jadwalList.length;i++) { if(jadwalList[i].id!=id) nl.push(jadwalList[i]); }
+    jadwalList=nl; saveJadwal(); renderJadwalList(); showToast('Jadwal dihapus!');
+}
+function filterJadwalHari(h) {
+    jdHariFilter = h;
+    var btns = document.querySelectorAll('.jd-day-btn');
+    for (var i=0;i<btns.length;i++) btns[i].classList.remove('active');
+    var el = document.getElementById('jdHari'+(h||'All')); if(el) el.classList.add('active');
+    renderJadwalList();
+}
+function renderJadwalList() {
+    var ct = document.getElementById('jadwalList'); if(!ct) return;
+    var fl = [];
+    for (var i=0;i<jadwalList.length;i++) {
+        if (!jdHariFilter || jadwalList[i].hari===jdHariFilter) fl.push(jadwalList[i]);
+    }
+    fl.sort(function(a,b) {
+        var ha=JH_ORDER.indexOf(a.hari), hb=JH_ORDER.indexOf(b.hari);
+        if (ha!==hb) return ha-hb;
+        return (a.mulai||'').localeCompare(b.mulai||'');
     });
-    const avgAll = nilaiData.length ? Math.round(nilaiData.reduce((s,n) => s+n.nilai,0)/nilaiData.length) : 0;
-    const grd = n => n>=90?'A':n>=80?'B':n>=70?'C':n>=60?'D':'E';
-    const clr = n => n>=90?'#10b981':n>=75?'#3b82f6':n>=60?'#f59e0b':'#ef4444';
-    const namaLembaga = localStorage.getItem('eduku_nama_lembaga') || 'EduKu';
-    const html = `<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"><title>Raport - ${namaPeserta}</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Segoe UI',Arial,sans-serif;padding:20px;color:#333;}
-.header{text-align:center;padding:20px;border-bottom:3px solid #0D5C4A;margin-bottom:20px;}
-.header h1{font-size:22px;color:#0D5C4A;}
-.header h2{font-size:16px;color:#666;margin-top:4px;}
-.info-box{background:#f8fafc;padding:16px;border-radius:8px;margin-bottom:20px;}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px;}
-.stat{background:#f8fafc;padding:12px;border-radius:8px;text-align:center;}
-.stat .val{font-size:20px;font-weight:800;}
-.stat .lbl{font-size:11px;color:#666;}
-table{width:100%;border-collapse:collapse;margin-bottom:20px;}
-th{background:#0D5C4A;color:white;padding:10px;text-align:left;font-size:13px;}
-td{padding:10px;border-bottom:1px solid #e2e8f0;font-size:13px;}
-tr:nth-child(even){background:#f8fafc;}
-.lulus{color:#10b981;font-weight:700;}
-.remedial{color:#ef4444;font-weight:700;}
-.footer{text-align:right;margin-top:20px;font-size:12px;color:#666;}
-@media print{button{display:none!important;}}
-</style></head><body>
-<div class="header"><h1>${namaLembaga}</h1><h2>RAPORT PESERTA DIDIK</h2></div>
-<div class="info-box">
-<strong>Nama:</strong> ${namaPeserta}<br>
-<strong>NIS:</strong> ${peserta.no_porsi || '-'}<br>
-${(peserta.kelasId||peserta.kelas_id) ? '<strong>Kelas:</strong> ' + getKelasNama(peserta.kelasId||peserta.kelas_id) + '<br>' : ''}
-</div>
-<div class="stats">
-<div class="stat"><div class="val" style="color:${clr(avgAll)}">${avgAll}</div><div class="lbl">Rata-rata</div></div>
-<div class="stat"><div class="val">${grd(avgAll)}</div><div class="lbl">Grade</div></div>
-<div class="stat"><div class="val">${nilaiData.length ? nilaiData.reduce(function(a,n){return a>n.nilai?a:n.nilai;},nilaiData[0].nilai) : 0}</div><div class="lbl">Tertinggi</div></div>
-<div class="stat"><div class="val">${nilaiData.length ? nilaiData.reduce(function(a,n){return a<n.nilai?a:n.nilai;},nilaiData[0].nilai) : 0}</div><div class="lbl">Terendah</div></div>
-</div>
-<table>
-<tr><th>No</th><th>Mata Pelajaran</th><th>Nilai</th><th>Grade</th><th>KKM</th><th>Status</th></tr>
-${Object.entries(byMapel).map(([mapelNama, vals], i) => {
-    const avg = Math.round(vals.reduce((s,n)=>s+n.nilai,0)/vals.length);
-    const mapelData = mapelList.find(m=>m.nama===mapelNama);
-    const kkm = (mapelData||{}).kkm || 75;
-    return '<tr><td>'+(i+1)+'</td><td>'+mapelNama+'</td><td><strong style="color:'+clr(avg)+'">'+avg+'</strong></td><td>'+grd(avg)+'</td><td>'+kkm+'</td><td class="'+(avg>=kkm?'lulus':'remedial')+'">'+(avg>=kkm?'Lulus':'Remedial')+'</td></tr>';
-}).join('')}
-</table>
-<div class="footer">Dicetak: ${new Date().toLocaleDateString('id-ID', {day:'2-digit',month:'long',year:'numeric'})}</div>
-<div style="text-align:center;margin-top:20px;"><button onclick="window.print()" style="padding:12px 32px;background:#0D5C4A;color:white;border:none;border-radius:8px;font-size:15px;cursor:pointer;">🖨️ CETAK</button></div>
-</body></html>`;
-    const w = window.open('', '_blank');
-    if (!w) { showToast('Izinkan popup!'); return; }
-    w.document.write(html); w.document.close();
-    showToast('✅ Raport siap dicetak!');
+    if (!fl.length) {
+        ct.innerHTML='<div style="text-align:center;padding:40px;color:#94a3b8;"><div style="font-size:48px;margin-bottom:12px;">&#128197;</div><div style="font-weight:600;">Belum ada jadwal</div></div>';
+        return;
+    }
+    var html = '';
+    for (var j=0;j<fl.length;j++) {
+        var jd = fl[j];
+        var cc = JH_CLR[jd.hari]||'#64748b';
+        html += '<div style="background:#f8fafc;border-radius:12px;padding:14px;margin-bottom:8px;display:flex;gap:12px;border-left:4px solid '+cc+';">'
+             + '<div style="min-width:50px;text-align:center;"><div style="font-weight:700;color:'+cc+';">'+(jd.mulai||'--:--')+'</div>'
+             + (jd.selesai?'<div style="font-size:11px;color:#94a3b8;">'+jd.selesai+'</div>':'')+'</div>'
+             + '<div style="flex:1;min-width:0;"><div style="font-weight:700;">'+jd.mapel+'</div>'
+             + (jd.pengajar?'<div style="font-size:12px;color:#64748b;">Pengajar: '+jd.pengajar+'</div>':'')
+             + (jd.kelas?'<div style="font-size:12px;color:#64748b;">Kelas: '+jd.kelas+'</div>':'')
+             + (jd.ruangan?'<div style="font-size:12px;color:#64748b;">Ruangan: '+jd.ruangan+'</div>':'')+'</div>'
+             + '<div style="display:flex;flex-direction:column;gap:6px;">'
+             + '<button onclick="openFormJadwal('+jd.id+')" style="background:var(--primary);color:white;border:none;border-radius:8px;padding:7px 10px;font-size:12px;cursor:pointer;">&#9998;</button>'
+             + '<button onclick="hapusJadwal('+jd.id+')" style="background:#ef4444;color:white;border:none;border-radius:8px;padding:7px 10px;font-size:12px;cursor:pointer;">&#128465;</button>'
+             + '</div></div>';
+    }
+    ct.innerHTML = html;
 }
 
-document.addEventListener('DOMContentLoaded',function(){setTimeout(()=>{try{applyTermsToDOM();}catch(e){}},800);});
+// === NILAI ===
+var nilaiList = (function(){
+    try { return JSON.parse(localStorage.getItem('eduku_nilai') || '[]'); } catch(e) { return []; }
+})();
+function saveNilai() { localStorage.setItem('eduku_nilai', JSON.stringify(nilaiList)); }
+function openFormNilai(id) {
+    var sel = document.getElementById('fNilaiPeserta');
+    if (sel) {
+        var p = getTerm('pesertaDidik');
+        var opts = '<option value="">Pilih '+p+'...</option>';
+        if (typeof jamaahList !== 'undefined') {
+            for (var i=0;i<jamaahList.length;i++) {
+                opts += '<option value="'+jamaahList[i].id+'">'+(jamaahList[i].nama_lengkap||jamaahList[i].nama||'?')+'</option>';
+            }
+        }
+        sel.innerHTML = opts;
+    }
+    var flds = ['fNilaiMapel','fNilaiAngka','fNilaiKeterangan'];
+    for (var j=0;j<flds.length;j++) { var el=document.getElementById(flds[j]); if(el) el.value=''; }
+    var editId = document.getElementById('nilaiEditId'); if(editId) editId.value=id||'';
+    var td = document.getElementById('fNilaiTanggal');
+    if (td) td.value = new Date().toISOString().substr(0,10);
+    if (id) {
+        for (var k=0;k<nilaiList.length;k++) {
+            if (nilaiList[k].id==id) {
+                var n = nilaiList[k];
+                if(sel) sel.value=n.jamaahId||'';
+                var fm = document.getElementById('fNilaiMapel'); if(fm) fm.value=n.mapel||'';
+                var fj = document.getElementById('fNilaiJenis'); if(fj) fj.value=n.jenis||'UH';
+                var fa = document.getElementById('fNilaiAngka'); if(fa) fa.value=n.nilai||'';
+                if(td) td.value=n.tanggal||'';
+                var fk = document.getElementById('fNilaiKeterangan'); if(fk) fk.value=n.keterangan||'';
+                break;
+            }
+        }
+    }
+    var modal = document.getElementById('modalNilai'); if(modal) modal.style.display='flex';
+}
+function closeFormNilai() { var m=document.getElementById('modalNilai'); if(m) m.style.display='none'; }
+function simpanNilai() {
+    var jId = (document.getElementById('fNilaiPeserta')||{value:''}).value;
+    var val = (document.getElementById('fNilaiAngka')||{value:''}).value;
+    if (!jId||!val) { showToast('Peserta dan nilai harus diisi!'); return; }
+    var editId = document.getElementById('nilaiEditId'); var id = editId?editId.value:'';
+    var data = { id:id||Date.now(), jamaahId:jId,
+        mapel:(document.getElementById('fNilaiMapel')||{value:''}).value.trim(),
+        jenis:(document.getElementById('fNilaiJenis')||{value:'UH'}).value,
+        nilai:parseFloat(val),
+        tanggal:(document.getElementById('fNilaiTanggal')||{value:''}).value,
+        keterangan:(document.getElementById('fNilaiKeterangan')||{value:''}).value.trim()
+    };
+    if (id) { for(var i=0;i<nilaiList.length;i++) { if(nilaiList[i].id==id) { nilaiList[i]=data; break; } } }
+    else nilaiList.push(data);
+    saveNilai(); closeFormNilai(); renderNilaiList(); showToast('Nilai disimpan!');
+}
+function hapusNilai(id) {
+    if (!confirm('Hapus?')) return;
+    var nl=[];
+    for(var i=0;i<nilaiList.length;i++) { if(nilaiList[i].id!=id) nl.push(nilaiList[i]); }
+    nilaiList=nl; saveNilai(); renderNilaiList(); showToast('Nilai dihapus!');
+}
+function renderNilaiList() {
+    var p = getTerm('pesertaDidik');
+    var fp = document.getElementById('filterNilaiPeserta');
+    if (fp && fp.options.length<=1 && typeof jamaahList!=='undefined') {
+        var opts = '<option value="">Semua '+p+'</option>';
+        for(var i=0;i<jamaahList.length;i++) opts += '<option value="'+jamaahList[i].id+'">'+(jamaahList[i].nama_lengkap||jamaahList[i].nama||'?')+'</option>';
+        fp.innerHTML = opts;
+    }
+    var fPv = fp?fp.value:'';
+    var fJv = (document.getElementById('filterNilaiJenis')||{value:''}).value;
+    var ct = document.getElementById('nilaiList'); if(!ct) return;
+    var fl = [];
+    for(var j=0;j<nilaiList.length;j++) {
+        var n = nilaiList[j];
+        if (fPv && n.jamaahId!=fPv) continue;
+        if (fJv && n.jenis!==fJv) continue;
+        fl.push(n);
+    }
+    fl.sort(function(a,b) { return new Date(b.tanggal||0)-new Date(a.tanggal||0); });
+    if (!fl.length) {
+        ct.innerHTML='<div style="text-align:center;padding:40px;color:#94a3b8;"><div style="font-size:48px;">&#128202;</div><div style="font-weight:600;margin-top:10px;">Belum ada nilai</div></div>';
+        return;
+    }
+    var clrFn = function(v) { return v>=90?'#10b981':v>=75?'#3b82f6':v>=60?'#f59e0b':'#ef4444'; };
+    var grdFn = function(v) { return v>=90?'A':v>=80?'B':v>=70?'C':v>=60?'D':'E'; };
+    var html = '';
+    for(var k=0;k<fl.length;k++) {
+        var n2 = fl[k];
+        var jm = null;
+        if (typeof jamaahList!=='undefined') { for(var m=0;m<jamaahList.length;m++) { if(jamaahList[m].id==n2.jamaahId) { jm=jamaahList[m]; break; } } }
+        var nm = jm?(jm.nama_lengkap||jm.nama||'?'):'?';
+        html += '<div style="background:#f8fafc;border-radius:12px;padding:14px;margin-bottom:8px;display:flex;gap:12px;align-items:center;">'
+             + '<div style="width:52px;height:52px;background:'+clrFn(n2.nilai)+';color:white;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;">'
+             + '<div style="font-size:16px;font-weight:800;">'+n2.nilai+'</div>'
+             + '<div style="font-size:11px;font-weight:600;">'+grdFn(n2.nilai)+'</div></div>'
+             + '<div style="flex:1;min-width:0;"><div style="font-weight:700;">'+nm+'</div>'
+             + '<div style="font-size:12px;color:#64748b;">'+(n2.mapel||'-')+' - '+n2.jenis+'</div>'
+             + '<div style="font-size:12px;color:#94a3b8;">'+(n2.tanggal||'-')+'</div></div>'
+             + '<div style="display:flex;flex-direction:column;gap:6px;">'
+             + '<button onclick="openFormNilai('+n2.id+')" style="background:var(--primary);color:white;border:none;border-radius:8px;padding:7px 10px;font-size:12px;cursor:pointer;">&#9998;</button>'
+             + '<button onclick="hapusNilai('+n2.id+')" style="background:#ef4444;color:white;border:none;border-radius:8px;padding:7px 10px;font-size:12px;cursor:pointer;">&#128465;</button>'
+             + '</div></div>';
+    }
+    ct.innerHTML = html;
+}
+
+// === MATA PELAJARAN ===
+var mapelList = (function(){
+    try { return JSON.parse(localStorage.getItem('eduku_mapel') || '[]'); } catch(e) { return []; }
+})();
+function saveMapel() { localStorage.setItem('eduku_mapel', JSON.stringify(mapelList)); }
+function openFormMapel(id) {
+    var flds=['fMapelNama','fMapelKode','fMapelPengajar','fMapelKKM','fMapelKet'];
+    for(var i=0;i<flds.length;i++){var el=document.getElementById(flds[i]);if(el)el.value='';}
+    var editId=document.getElementById('mapelEditId');if(editId)editId.value=id||'';
+    var title=document.getElementById('formMapelTitle');if(title)title.textContent=id?'Edit Mapel':'Tambah Mapel';
+    if(id){for(var j=0;j<mapelList.length;j++){if(mapelList[j].id==id){var m=mapelList[j];
+        var fn=document.getElementById('fMapelNama');if(fn)fn.value=m.nama||'';
+        var fk=document.getElementById('fMapelKode');if(fk)fk.value=m.kode||'';
+        var fp=document.getElementById('fMapelPengajar');if(fp)fp.value=m.pengajar||'';
+        var fkm=document.getElementById('fMapelKKM');if(fkm)fkm.value=m.kkm||'';
+        var fkt=document.getElementById('fMapelKet');if(fkt)fkt.value=m.keterangan||'';
+        break;}}}
+    var modal=document.getElementById('modalMapel');if(modal)modal.style.display='flex';
+}
+function closeFormMapel(){var m=document.getElementById('modalMapel');if(m)m.style.display='none';}
+function simpanMapel(){
+    var namaEl=document.getElementById('fMapelNama');var nama=namaEl?namaEl.value.trim():'';
+    if(!nama){showToast('Nama mapel harus diisi!');return;}
+    var editId=document.getElementById('mapelEditId');var id=editId?editId.value:'';
+    var data={id:id||Date.now(),nama:nama,
+        kode:(document.getElementById('fMapelKode')||{value:''}).value.trim(),
+        pengajar:(document.getElementById('fMapelPengajar')||{value:''}).value.trim(),
+        kkm:parseInt((document.getElementById('fMapelKKM')||{value:'75'}).value)||75,
+        keterangan:(document.getElementById('fMapelKet')||{value:''}).value.trim()};
+    if(id){for(var i=0;i<mapelList.length;i++){if(mapelList[i].id==id){mapelList[i]=data;break;}}}else mapelList.push(data);
+    saveMapel();closeFormMapel();renderMapelList();showToast('Mapel disimpan!');
+}
+function hapusMapel(id){
+    if(!confirm('Hapus?'))return;
+    var nl=[];for(var i=0;i<mapelList.length;i++){if(mapelList[i].id!=id)nl.push(mapelList[i]);}
+    mapelList=nl;saveMapel();renderMapelList();showToast('Dihapus!');
+}
+function renderMapelList(){
+    var q='';var srch=document.getElementById('searchMapel');if(srch)q=srch.value.toLowerCase();
+    var ct=document.getElementById('mapelList');if(!ct)return;
+    var fl=[];for(var i=0;i<mapelList.length;i++){var m=mapelList[i];if(!q||(m.nama||'').toLowerCase().indexOf(q)>=0)fl.push(m);}
+    if(!fl.length){ct.innerHTML='<div style="text-align:center;padding:40px;color:#94a3b8;"><div style="font-size:48px;">&#128218;</div><div style="font-weight:600;margin-top:10px;">Belum ada mata pelajaran</div></div>';return;}
+    var clrs=['#3b82f6','#10b981','#f59e0b','#8b5cf6','#ec4899'];
+    var html='';
+    for(var j=0;j<fl.length;j++){
+        var m2=fl[j];var cc=clrs[j%clrs.length];
+        html+='<div style="background:white;border:2px solid #e2e8f0;border-radius:12px;padding:14px;margin-bottom:10px;border-left:5px solid '+cc+';">'
+            +'<div style="display:flex;align-items:flex-start;gap:12px;">'
+            +'<div style="width:44px;height:44px;background:'+cc+';color:white;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">&#128218;</div>'
+            +'<div style="flex:1;">'
+            +'<div style="font-weight:700;font-size:15px;">'+m2.nama+(m2.kode?' <span style="font-size:11px;background:'+cc+'20;color:'+cc+';padding:2px 6px;border-radius:4px;">'+m2.kode+'</span>':'')+'</div>'
+            +(m2.pengajar?'<div style="font-size:12px;color:#64748b;">Pengajar: '+m2.pengajar+'</div>':'')
+            +'<div style="font-size:12px;color:#64748b;">KKM: '+(m2.kkm||75)+'</div>'
+            +'</div>'
+            +'<div style="display:flex;flex-direction:column;gap:6px;">'
+            +'<button onclick="openFormMapel('+m2.id+')" style="background:var(--primary);color:white;border:none;border-radius:8px;padding:7px 10px;font-size:12px;cursor:pointer;">&#9998;</button>'
+            +'<button onclick="hapusMapel('+m2.id+')" style="background:#ef4444;color:white;border:none;border-radius:8px;padding:7px 10px;font-size:12px;cursor:pointer;">&#128465;</button>'
+            +'</div></div></div>';
+    }
+    ct.innerHTML=html;
+}
+
+// === RAPORT ===
+function initRaport(){
+    var p=getTerm('pesertaDidik');
+    var kf=document.getElementById('raportKelasFilter');
+    if(kf){var opts='<option value="">Semua Kelas</option>';for(var i=0;i<kelasList.length;i++)opts+='<option value="'+kelasList[i].id+'">'+kelasList[i].nama+'</option>';kf.innerHTML=opts;}
+    renderRaport();
+}
+function renderRaport(){
+    var p=getTerm('pesertaDidik');
+    var kelasId=(document.getElementById('raportKelasFilter')||{value:''}).value;
+    var pf=document.getElementById('raportPesertaFilter');
+    if(pf){
+        var jList=typeof jamaahList!=='undefined'?jamaahList:[];
+        var fl=[];for(var i=0;i<jList.length;i++){if(!kelasId||jList[i].kelasId==kelasId||jList[i].kelas_id==kelasId)fl.push(jList[i]);}
+        var opts='<option value="">-- Pilih '+p+' --</option>';
+        for(var j=0;j<fl.length;j++)opts+='<option value="'+fl[j].id+'">'+(fl[j].nama_lengkap||fl[j].nama||'?')+'</option>';
+        pf.innerHTML=opts;
+    }
+    var ct=document.getElementById('raportContent');
+    if(ct)ct.innerHTML='<div style="text-align:center;padding:40px;color:#94a3b8;"><div style="font-size:48px;">&#128203;</div><div style="font-weight:600;margin-top:10px;">Pilih '+p+' untuk melihat raport</div></div>';
+}
+function renderRaportPeserta(){
+    var pesertaId=(document.getElementById('raportPesertaFilter')||{value:''}).value;
+    var jenisFilter=(document.getElementById('raportJenisFilter')||{value:''}).value;
+    var ct=document.getElementById('raportContent');
+    var p=getTerm('pesertaDidik');
+    if(!ct)return;
+    if(!pesertaId){renderRaport();return;}
+    var jList=typeof jamaahList!=='undefined'?jamaahList:[];
+    var peserta=null;for(var i=0;i<jList.length;i++){if(jList[i].id==pesertaId){peserta=jList[i];break;}}
+    if(!peserta)return;
+    var namaPeserta=peserta.nama_lengkap||peserta.nama||'?';
+    var fl=[];
+    for(var j=0;j<nilaiList.length;j++){
+        var n=nilaiList[j];
+        if(n.jamaahId!=pesertaId)continue;
+        if(jenisFilter&&n.jenis!==jenisFilter)continue;
+        fl.push(n);
+    }
+    var byMapel={};
+    for(var k=0;k<fl.length;k++){var mk=fl[k].mapel||'Umum';if(!byMapel[mk])byMapel[mk]=[];byMapel[mk].push(fl[k]);}
+    var totalNilai=fl.length;
+    var sumNilai=0;for(var m=0;m<fl.length;m++)sumNilai+=fl[m].nilai;
+    var avgNilai=totalNilai?Math.round(sumNilai/totalNilai):0;
+    var maxNilai=0,minNilai=100;
+    for(var n2=0;n2<fl.length;n2++){if(fl[n2].nilai>maxNilai)maxNilai=fl[n2].nilai;if(fl[n2].nilai<minNilai)minNilai=fl[n2].nilai;}
+    var clrFn=function(v){return v>=90?'#10b981':v>=75?'#3b82f6':v>=60?'#f59e0b':'#ef4444';};
+    var grdFn=function(v){return v>=90?'A':v>=80?'B':v>=70?'C':v>=60?'D':'E';};
+    var html='<div style="background:linear-gradient(135deg,var(--primary),#0a4a3a);color:white;padding:18px;border-radius:12px;margin-bottom:14px;">'
+        +'<div style="font-weight:700;font-size:17px;">'+namaPeserta+'</div>'
+        +'<div style="font-size:13px;opacity:0.85;">NIS: '+(peserta.no_porsi||'-')+'</div>'
+        +(peserta.kelasId?'<div style="font-size:13px;opacity:0.85;">Kelas: '+getKelasNama(peserta.kelasId)+'</div>':'')
+        +'</div>';
+    if(totalNilai>0){
+        html+='<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px;">'
+            +'<div style="background:#f8fafc;padding:12px;border-radius:10px;text-align:center;"><div style="font-size:22px;font-weight:800;color:'+clrFn(avgNilai)+'">'+avgNilai+'</div><div style="font-size:11px;color:#64748b;">Rata-rata</div></div>'
+            +'<div style="background:#f8fafc;padding:12px;border-radius:10px;text-align:center;"><div style="font-size:22px;font-weight:800;">'+grdFn(avgNilai)+'</div><div style="font-size:11px;color:#64748b;">Grade</div></div>'
+            +'<div style="background:#f8fafc;padding:12px;border-radius:10px;text-align:center;"><div style="font-size:22px;font-weight:800;color:#10b981;">'+maxNilai+'</div><div style="font-size:11px;color:#64748b;">Tertinggi</div></div>'
+            +'<div style="background:#f8fafc;padding:12px;border-radius:10px;text-align:center;"><div style="font-size:22px;font-weight:800;color:#ef4444;">'+minNilai+'</div><div style="font-size:11px;color:#64748b;">Terendah</div></div>'
+            +'</div>';
+        html+='<div style="font-weight:700;margin-bottom:10px;">Detail per Mata Pelajaran:</div>';
+        for(var mapelNama in byMapel){
+            var vals=byMapel[mapelNama];
+            var mapelSum=0;for(var v=0;v<vals.length;v++)mapelSum+=vals[v].nilai;
+            var mapelAvg=Math.round(mapelSum/vals.length);
+            var mapelData=null;for(var mx=0;mx<mapelList.length;mx++){if(mapelList[mx].nama===mapelNama){mapelData=mapelList[mx];break;}}
+            var kkm=mapelData?mapelData.kkm:75;
+            var lulus=mapelAvg>=kkm;
+            html+='<div style="background:white;border:2px solid '+(lulus?'#10b981':'#ef4444')+';border-radius:12px;padding:14px;margin-bottom:8px;">'
+                +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">'
+                +'<div style="font-weight:700;">'+mapelNama+'</div>'
+                +'<div style="display:flex;align-items:center;gap:8px;">'
+                +'<span style="background:'+clrFn(mapelAvg)+';color:white;padding:4px 10px;border-radius:8px;font-weight:800;">'+mapelAvg+'</span>'
+                +'<span style="font-size:12px;color:'+(lulus?'#10b981':'#ef4444')+';font-weight:600;">'+(lulus?'Lulus':'Remedial')+'</span>'
+                +'</div></div>'
+                +'<div style="font-size:11px;color:#94a3b8;">KKM: '+kkm+'</div></div>';
+        }
+    } else {
+        html+='<div style="text-align:center;padding:30px;color:#94a3b8;">Belum ada nilai untuk '+namaPeserta+'</div>';
+    }
+    ct.innerHTML=html;
+}
+
+// === INIT ===
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() { try { applyTermsToDOM(); } catch(e) {} }, 800);
+});
 </script>
+
+</body>
 </html>
