@@ -10979,7 +10979,7 @@ async function printPDFDirect(pdfDoc, filename = 'document.pdf') {
 
 
 <!-- PAGE KELAS -->
-<div id="page-kelas" class="page" style="display:none;">
+<div id="page-kelas" class="page">
   <div class="header-premium header-premium-small">
     <div class="back-header">
       <i class="fas fa-arrow-left" onclick="showPage('home')"></i>
@@ -11052,7 +11052,7 @@ async function printPDFDirect(pdfDoc, filename = 'document.pdf') {
 
 
 <!-- PAGE MATA PELAJARAN -->
-<div id="page-mapel" class="page" style="display:none;">
+<div id="page-mapel" class="page">
   <div class="header-premium header-premium-small">
     <div class="back-header">
       <i class="fas fa-arrow-left" onclick="showPage('home')"></i>
@@ -11096,7 +11096,7 @@ async function printPDFDirect(pdfDoc, filename = 'document.pdf') {
 </div>
 
 <!-- PAGE RAPORT -->
-<div id="page-raport" class="page" style="display:none;">
+<div id="page-raport" class="page">
   <div class="header-premium header-premium-small">
     <div class="back-header">
       <i class="fas fa-arrow-left" onclick="showPage('home')"></i>
@@ -11134,7 +11134,7 @@ async function printPDFDirect(pdfDoc, filename = 'document.pdf') {
   </div>
 </div>
 
-<div id="page-pengajar" class="page" style="display:none;">
+<div id="page-pengajar" class="page">
   <div class="header-premium header-premium-small"><div class="back-header"><i class="fas fa-arrow-left" onclick="showPage('home')"></i><h2 id="hdrPagePengajar">Data Pengajar</h2><button onclick="openFormPengajar()" style="background:var(--primary);color:white;border:none;border-radius:8px;padding:6px 14px;font-size:13px;cursor:pointer;font-weight:600;">+ Tambah</button></div></div>
   <div class="page-content"><div class="card-premium"><input type="text" id="searchPengajar" oninput="renderPengajarList()" placeholder="Cari pengajar..." style="width:100%;padding:10px 14px;border:2px solid #e2e8f0;border-radius:10px;font-size:14px;box-sizing:border-box;margin-bottom:14px;outline:none;"><div id="pengajarList"></div></div></div>
 </div>
@@ -11153,7 +11153,7 @@ async function printPDFDirect(pdfDoc, filename = 'document.pdf') {
   </div></div>
 </div>
 
-<div id="page-jadwal" class="page" style="display:none;">
+<div id="page-jadwal" class="page">
   <div class="header-premium header-premium-small"><div class="back-header"><i class="fas fa-arrow-left" onclick="showPage('home')"></i><h2>Jadwal Pelajaran</h2><button onclick="openFormJadwal()" style="background:var(--primary);color:white;border:none;border-radius:8px;padding:6px 14px;font-size:13px;cursor:pointer;font-weight:600;">+ Tambah</button></div></div>
   <div class="page-content"><div class="card-premium">
     <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:10px;margin-bottom:14px;-webkit-overflow-scrolling:touch;">
@@ -11188,7 +11188,7 @@ async function printPDFDirect(pdfDoc, filename = 'document.pdf') {
   </div></div>
 </div>
 
-<div id="page-nilai" class="page" style="display:none;">
+<div id="page-nilai" class="page">
   <div class="header-premium header-premium-small"><div class="back-header"><i class="fas fa-arrow-left" onclick="showPage('home')"></i><h2>Nilai Peserta</h2><button onclick="openFormNilai()" style="background:var(--primary);color:white;border:none;border-radius:8px;padding:6px 14px;font-size:13px;cursor:pointer;font-weight:600;">+ Input</button></div></div>
   <div class="page-content"><div class="card-premium">
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
