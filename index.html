@@ -12080,7 +12080,7 @@ function bukaModalPilihSantri(kelasId) {
     if (title) title.textContent = 'Tambah ' + getTerm('pesertaDidik') + ' ke Kelas';
     if (subtitle) subtitle.textContent = k ? k.nama : '';
     
-    // Reset search
+    // Reset search & filter
     var srch = document.getElementById('searchPilihSantri');
     if (srch) srch.value = '';
     var flt = document.getElementById('filterPilihSantri');
@@ -12090,11 +12090,38 @@ function bukaModalPilihSantri(kelasId) {
     var detailModal = document.getElementById('modalDetailKelas');
     if (detailModal) detailModal.style.display = 'none';
     
-    // Tampilkan modal
+    // Tampilkan modal dengan loading
     var modal = document.getElementById('modalPilihSantriKelas');
     if (modal) modal.style.display = 'flex';
     
-    renderPilihSantriList();
+    var ct = document.getElementById('pilihSantriList');
+    if (ct) ct.innerHTML = '<div style="text-align:center;padding:40px;color:#64748b;">'
+        + '<div style="font-size:32px;margin-bottom:10px;">&#8987;</div>'
+        + '<div>Memuat data santri...</div></div>';
+    
+    // Load jamaahList dari IndexedDB jika belum ada atau kosong
+    if (typeof jamaahList !== 'undefined' && jamaahList && jamaahList.length > 0) {
+        // Data sudah ada, langsung render
+        renderPilihSantriList();
+    } else if (typeof loadJamaahData === 'function') {
+        // Data belum ada, load dulu
+        try {
+            var result = loadJamaahData();
+            if (result && typeof result.then === 'function') {
+                result.then(function() {
+                    renderPilihSantriList();
+                }).catch(function(e) {
+                    renderPilihSantriList(); // Coba tetap render
+                });
+            } else {
+                setTimeout(function() { renderPilihSantriList(); }, 500);
+            }
+        } catch(e) {
+            setTimeout(function() { renderPilihSantriList(); }, 500);
+        }
+    } else {
+        renderPilihSantriList();
+    }
 }
 
 function closePilihSantriKelas() {
