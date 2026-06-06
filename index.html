@@ -11013,7 +11013,11 @@ async function printPDFDirect(pdfDoc, filename = 'document.pdf') {
         </div>
         <div>
           <label style="display:block;font-weight:600;font-size:13px;margin-bottom:4px;">Wali Kelas / Ustadz</label>
-          <input type="text" id="fKelasWali" placeholder="Nama wali kelas (opsional)" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;">
+          <select id="fKelasWaliSelect" onchange="ekHandleWaliKelasChange()" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;margin-bottom:6px;">
+            <option value="">-- Pilih dari database (opsional) --</option>
+            <option value="__manual__">&#9998; Ketik manual...</option>
+          </select>
+          <input type="text" id="fKelasWali" placeholder="Ketik nama wali kelas..." style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;display:none;">
         </div>
         <div>
           <label style="display:block;font-weight:600;font-size:13px;margin-bottom:4px;">Ruangan / Lokasi</label>
@@ -11425,6 +11429,16 @@ function openFormKelas(id) {
     }
     var modal = document.getElementById('modalKelas');
     if (modal) modal.style.display = 'flex';
+    
+    // Populate wali kelas dropdown
+    setTimeout(function() {
+        ekPopulateWaliKelasDropdown(id ? (function() {
+            for (var x = 0; x < kelasList.length; x++) {
+                if (kelasList[x].id == id) return kelasList[x].wali || '';
+            }
+            return '';
+        })() : '');
+    }, 50);
 }
 
 function closeFormKelas() {
@@ -11441,7 +11455,7 @@ function simpanKelas() {
     var data = {
         id: id || Date.now(),
         nama: nama,
-        wali: (document.getElementById('fKelasWali')||{value:''}).value.trim(),
+        wali: ekGetWaliKelasValue(),
         ruangan: (document.getElementById('fKelasRuangan')||{value:''}).value.trim(),
         tahun: (document.getElementById('fKelasTahun')||{value:''}).value.trim(),
         keterangan: (document.getElementById('fKelasKeterangan')||{value:''}).value.trim()
@@ -12252,6 +12266,75 @@ function simpanSantriKeKelas() {
     renderKelasList();
 }
 
+
+
+// ===== WALI KELAS - DROPDOWN + MANUAL =====
+
+function ekPopulateWaliKelasDropdown(currentWali) {
+    var sel = document.getElementById('fKelasWaliSelect');
+    var input = document.getElementById('fKelasWali');
+    if (!sel) return;
+    
+    // Build options dari pengajarList
+    var opts = '<option value="">-- Pilih dari database (opsional) --</option>';
+    for (var i = 0; i < pengajarList.length; i++) {
+        var p = pengajarList[i];
+        var label = p.nama + (p.bidang ? ' (' + p.bidang + ')' : '');
+        opts += '<option value="' + p.nama + '">' + label + '</option>';
+    }
+    opts += '<option value="__manual__">&#9998; Ketik manual...</option>';
+    sel.innerHTML = opts;
+    
+    // Pre-fill jika ada currentWali
+    if (currentWali) {
+        // Cek apakah wali ada di database pengajar
+        var found = false;
+        for (var j = 0; j < pengajarList.length; j++) {
+            if (pengajarList[j].nama === currentWali) {
+                sel.value = currentWali;
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            // Tidak ada di database → mode manual
+            sel.value = '__manual__';
+            if (input) {
+                input.style.display = 'block';
+                input.value = currentWali;
+            }
+        }
+    }
+}
+
+function ekHandleWaliKelasChange() {
+    var sel = document.getElementById('fKelasWaliSelect');
+    var input = document.getElementById('fKelasWali');
+    if (!sel || !input) return;
+    
+    if (sel.value === '__manual__') {
+        // Tampilkan input manual
+        input.style.display = 'block';
+        input.value = '';
+        input.focus();
+    } else {
+        // Sembunyikan input manual
+        input.style.display = 'none';
+        input.value = '';
+    }
+}
+
+function ekGetWaliKelasValue() {
+    var sel = document.getElementById('fKelasWaliSelect');
+    var input = document.getElementById('fKelasWali');
+    if (!sel) return '';
+    
+    if (sel.value === '__manual__') {
+        return input ? input.value.trim() : '';
+    } else {
+        return sel.value;
+    }
+}
 
 // ===== FIELD KELAS DI FORM SANTRI =====
 
