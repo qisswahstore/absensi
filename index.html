@@ -1898,8 +1898,8 @@
 <div style="height:100%; width:100%; background:var(--accent); border-radius:2px;"></div></div>
 </div>
 <div id="splashChoice" style="display:block; width:100%; max-width:320px;">
-<button onclick="loginAdmin()" style="width:100%; padding:16px; background:white; color:var(--primary); border:none; border-radius:16px; font-size:16px; font-weight:700; cursor:pointer; margin-bottom:12px; box-shadow:0 4px 20px rgba(0,0,0,0.15);">🔐 Login Admin</button>
-<button onclick="loginGuru()" style="width:100%; padding:16px; background:rgba(255,255,255,0.15); color:white; border:2px solid rgba(255,255,255,0.4); border-radius:16px; font-size:16px; font-weight:700; cursor:pointer;">👨‍🏫 Login Guru</button>
+<button onclick="try{loginAdmin();}catch(e){alert('Error: '+e.message);}" style="width:100%; padding:16px; background:white; color:var(--primary); border:none; border-radius:16px; font-size:16px; font-weight:700; cursor:pointer; margin-bottom:12px; box-shadow:0 4px 20px rgba(0,0,0,0.15);">🔐 Login Admin</button>
+<button onclick="try{loginGuru();}catch(e){alert('Error: '+e.message);}" style="width:100%; padding:16px; background:rgba(255,255,255,0.15); color:white; border:2px solid rgba(255,255,255,0.4); border-radius:16px; font-size:16px; font-weight:700; cursor:pointer;">👨‍🏫 Login Guru</button>
 </div>
 </div>
 
@@ -14558,7 +14558,7 @@ function initGuruMode() {
                   +'<div style="min-width:50px;text-align:center;"><div style="font-weight:700;color:var(--primary);font-size:13px;">'+(jd2.mulai||'--:--')+'</div></div>'
                   +'<div style="flex:1;"><div style="font-weight:600;font-size:14px;">'+jd2.mapel+'</div>'
                   +(jd2.kelas?'<div style="font-size:12px;color:#64748b;">'+jd2.kelas+'</div>':'')+'</div>'
-                  +'<button onclick="bukaFormAbsensiPelajaran('+JSON.stringify(jd2)+')" style="background:var(--primary);color:white;border:none;border-radius:8px;padding:8px 12px;font-size:12px;cursor:pointer;font-weight:600;">Absen</button>'
+                  +'<button onclick="bukaAbsensiDariJadwalId('+jd2.id+')" style="background:var(--primary);color:white;border:none;border-radius:8px;padding:8px 12px;font-size:12px;cursor:pointer;font-weight:600;">Absen</button>'
                   +'</div>';
             }
             jadwalEl.innerHTML=h;
@@ -14602,6 +14602,12 @@ function logoutGuru() {
 var _absStatusMap={};
 function getAbsensiPelajaranData() { try{return JSON.parse(localStorage.getItem('eduku_absensi_pelajaran')||'[]');}catch(e){return [];} }
 function saveAbsensiPelajaran(data) { localStorage.setItem('eduku_absensi_pelajaran',JSON.stringify(data)); }
+
+function bukaAbsensiDariJadwalId(jadwalId) {
+    var jd=null;
+    for(var i=0;i<jadwalList.length;i++){if(String(jadwalList[i].id)===String(jadwalId)){jd=jadwalList[i];break;}}
+    bukaFormAbsensiPelajaran(jd);
+}
 
 function bukaFormAbsensiPelajaran(jadwal) {
     var today=new Date();
@@ -14649,18 +14655,18 @@ function loadSantriUntukAbsensi() {
     var santri=getSantriByKelas(kelasId);
     if(!santri.length){ct.innerHTML='<div style="text-align:center;padding:16px;color:#94a3b8;">Belum ada santri di kelas ini</div>';return;}
     var h='<div style="display:flex;gap:8px;margin-bottom:10px;">'
-      +'<button onclick="setAllAbsStatus('hadir')" style="flex:1;padding:8px;background:#10b981;color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;">Semua Hadir</button>'
-      +'<button onclick="setAllAbsStatus('alpha')" style="flex:1;padding:8px;background:#ef4444;color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;">Semua Alpha</button>'
+      +'<button onclick="setAllAbsStatus(\'hadir\')" style="flex:1;padding:8px;background:#10b981;color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;">Semua Hadir</button>'
+      +'<button onclick="setAllAbsStatus(\'alpha\')" style="flex:1;padding:8px;background:#ef4444;color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;">Semua Alpha</button>'
       +'</div>';
     for(var i=0;i<santri.length;i++){
         var s=santri[i];var sId=String(s.id);
         h+='<div style="display:flex;align-items:center;gap:8px;padding:9px;border-bottom:1px solid #f1f5f9;" id="absRow_'+sId+'">'
           +'<div style="flex:1;font-size:13px;font-weight:600;">'+(i+1)+'. '+(s.nama_lengkap||s.nama||'?')+'</div>'
           +'<div style="display:flex;gap:4px;">'
-          +'<button data-sid="+sId+" data-sts="hadir" onclick="ekAbsClick(this)" class="abx-btn abx-hadir" style="padding:6px 10px;border:2px solid #10b981;border-radius:7px;background:#10b981;color:white;font-size:11px;font-weight:700;cursor:pointer;">H</button>'
-          +'<button data-sid="+sId+" data-sts="sakit" onclick="ekAbsClick(this)" class="abx-btn abx-sakit" style="padding:6px 10px;border:2px solid #f59e0b;border-radius:7px;background:white;color:#f59e0b;font-size:11px;font-weight:700;cursor:pointer;">S</button>'
-          +'<button data-sid="+sId+" data-sts="izin" onclick="ekAbsClick(this)" class="abx-btn abx-izin" style="padding:6px 10px;border:2px solid #3b82f6;border-radius:7px;background:white;color:#3b82f6;font-size:11px;font-weight:700;cursor:pointer;">I</button>'
-          +'<button data-sid="+sId+" data-sts="alpha" onclick="ekAbsClick(this)" class="abx-btn abx-alpha" style="padding:6px 10px;border:2px solid #ef4444;border-radius:7px;background:white;color:#ef4444;font-size:11px;font-weight:700;cursor:pointer;">A</button>'
+          +'<button data-sid="'+sId+'" data-sts="hadir" onclick="ekAbsClick(this)" class="abx-btn abx-hadir" style="padding:6px 10px;border:2px solid #10b981;border-radius:7px;background:#10b981;color:white;font-size:11px;font-weight:700;cursor:pointer;">H</button>'
+          +'<button data-sid="'+sId+'" data-sts="sakit" onclick="ekAbsClick(this)" class="abx-btn abx-sakit" style="padding:6px 10px;border:2px solid #f59e0b;border-radius:7px;background:white;color:#f59e0b;font-size:11px;font-weight:700;cursor:pointer;">S</button>'
+          +'<button data-sid="'+sId+'" data-sts="izin" onclick="ekAbsClick(this)" class="abx-btn abx-izin" style="padding:6px 10px;border:2px solid #3b82f6;border-radius:7px;background:white;color:#3b82f6;font-size:11px;font-weight:700;cursor:pointer;">I</button>'
+          +'<button data-sid="'+sId+'" data-sts="alpha" onclick="ekAbsClick(this)" class="abx-btn abx-alpha" style="padding:6px 10px;border:2px solid #ef4444;border-radius:7px;background:white;color:#ef4444;font-size:11px;font-weight:700;cursor:pointer;">A</button>'
           +'</div></div>';
     }
     ct.innerHTML=h;
@@ -14760,18 +14766,18 @@ function loadSantriAbsensiHarian(){
     if(!santri.length){ct.innerHTML='<div style="text-align:center;padding:16px;color:#94a3b8;">Belum ada santri di kelas ini</div>';return;}
     var clrs={hadir:'#10b981',sakit:'#f59e0b',izin:'#3b82f6',alpha:'#ef4444'};
     var h='<div style="display:flex;gap:8px;margin-bottom:10px;">'
-      +'<button onclick="setAllHarianSts('hadir')" style="flex:1;padding:8px;background:#10b981;color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;">Semua Hadir</button>'
-      +'<button onclick="setAllHarianSts('alpha')" style="flex:1;padding:8px;background:#ef4444;color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;">Semua Alpha</button>'
+      +'<button onclick="setAllHarianSts(\'hadir\')" style="flex:1;padding:8px;background:#10b981;color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;">Semua Hadir</button>'
+      +'<button onclick="setAllHarianSts(\'alpha\')" style="flex:1;padding:8px;background:#ef4444;color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;">Semua Alpha</button>'
       +'</div>';
     for(var k=0;k<santri.length;k++){
         var s=santri[k];var sId=String(s.id);var cur=_absHarianMap[sId]||'hadir';
         h+='<div style="display:flex;align-items:center;gap:8px;padding:9px;border-bottom:1px solid #f1f5f9;" id="absHRow_'+sId+'">'
           +'<div style="flex:1;font-size:13px;font-weight:600;">'+(k+1)+'. '+(s.nama_lengkap||s.nama||'?')+'</div>'
           +'<div style="display:flex;gap:4px;">'
-          +'<button data-sid="+sId+" data-sts="hadir" onclick="ekHarianClick(this)" class="abh-btn abh-hadir" style="padding:6px 10px;border:2px solid #10b981;border-radius:7px;background:'+(cur==='hadir'?'#10b981':'white')+';color:'+(cur==='hadir'?'white':'#10b981')+';font-size:11px;font-weight:700;cursor:pointer;">H</button>'
-          +'<button data-sid="+sId+" data-sts="sakit" onclick="ekHarianClick(this)" class="abh-btn abh-sakit" style="padding:6px 10px;border:2px solid #f59e0b;border-radius:7px;background:'+(cur==='sakit'?'#f59e0b':'white')+';color:'+(cur==='sakit'?'white':'#f59e0b')+';font-size:11px;font-weight:700;cursor:pointer;">S</button>'
-          +'<button data-sid="+sId+" data-sts="izin" onclick="ekHarianClick(this)" class="abh-btn abh-izin" style="padding:6px 10px;border:2px solid #3b82f6;border-radius:7px;background:'+(cur==='izin'?'#3b82f6':'white')+';color:'+(cur==='izin'?'white':'#3b82f6')+';font-size:11px;font-weight:700;cursor:pointer;">I</button>'
-          +'<button data-sid="+sId+" data-sts="alpha" onclick="ekHarianClick(this)" class="abh-btn abh-alpha" style="padding:6px 10px;border:2px solid #ef4444;border-radius:7px;background:'+(cur==='alpha'?'#ef4444':'white')+';color:'+(cur==='alpha'?'white':'#ef4444')+';font-size:11px;font-weight:700;cursor:pointer;">A</button>'
+          +'<button data-sid="'+sId+'" data-sts="hadir" onclick="ekHarianClick(this)" class="abh-btn abh-hadir" style="padding:6px 10px;border:2px solid #10b981;border-radius:7px;background:'+(cur==='hadir'?'#10b981':'white')+';color:'+(cur==='hadir'?'white':'#10b981')+';font-size:11px;font-weight:700;cursor:pointer;">H</button>'
+          +'<button data-sid="'+sId+'" data-sts="sakit" onclick="ekHarianClick(this)" class="abh-btn abh-sakit" style="padding:6px 10px;border:2px solid #f59e0b;border-radius:7px;background:'+(cur==='sakit'?'#f59e0b':'white')+';color:'+(cur==='sakit'?'white':'#f59e0b')+';font-size:11px;font-weight:700;cursor:pointer;">S</button>'
+          +'<button data-sid="'+sId+'" data-sts="izin" onclick="ekHarianClick(this)" class="abh-btn abh-izin" style="padding:6px 10px;border:2px solid #3b82f6;border-radius:7px;background:'+(cur==='izin'?'#3b82f6':'white')+';color:'+(cur==='izin'?'white':'#3b82f6')+';font-size:11px;font-weight:700;cursor:pointer;">I</button>'
+          +'<button data-sid="'+sId+'" data-sts="alpha" onclick="ekHarianClick(this)" class="abh-btn abh-alpha" style="padding:6px 10px;border:2px solid #ef4444;border-radius:7px;background:'+(cur==='alpha'?'#ef4444':'white')+';color:'+(cur==='alpha'?'white':'#ef4444')+';font-size:11px;font-weight:700;cursor:pointer;">A</button>'
           +'</div></div>';
     }
     ct.innerHTML=h;
