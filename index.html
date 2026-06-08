@@ -12867,6 +12867,54 @@ async function printPDFDirect(pdfDoc, filename = 'document.pdf') {
   </div>
 </div>
 
+
+<!-- ===== MODAL REKAP ABSENSI KELAS ===== -->
+<div id="modalRekapAbsensi" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:10002;overflow-y:auto;">
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:white;border-radius:20px;max-width:400px;width:100%;padding:24px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <h3 style="margin:0;color:var(--primary);">&#128203; Cetak Rekap Absensi</h3>
+        <button onclick="document.getElementById('modalRekapAbsensi').style.display='none'" style="background:none;border:none;font-size:22px;cursor:pointer;">&#10005;</button>
+      </div>
+      <div id="modalRekapKelasInfo" style="background:#f0fdf4;padding:12px;border-radius:10px;margin-bottom:16px;font-weight:600;color:var(--primary);"></div>
+      <div style="display:grid;gap:12px;margin-bottom:16px;">
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Jenis Absensi</label>
+          <select id="rekapJenis" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;">
+            <option value="harian">Absensi Harian (Pagi/Malam)</option>
+            <option value="pelajaran">Absensi Pelajaran</option>
+            <option value="gabungan">Keduanya (Gabungan)</option>
+          </select>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div>
+            <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Dari Tanggal</label>
+            <input type="date" id="rekapDari" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:13px;box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Sampai Tanggal</label>
+            <input type="date" id="rekapSampai" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:13px;box-sizing:border-box;">
+          </div>
+        </div>
+        <!-- Shortcut periode -->
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">Shortcut Periode</label>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button onclick="setPeriode(7)" style="padding:6px 12px;border:1px solid #e2e8f0;border-radius:8px;background:#f8fafc;font-size:12px;cursor:pointer;">7 Hari</button>
+            <button onclick="setPeriode(30)" style="padding:6px 12px;border:1px solid #e2e8f0;border-radius:8px;background:#f8fafc;font-size:12px;cursor:pointer;">1 Bulan</button>
+            <button onclick="setPeriodeBulan()" style="padding:6px 12px;border:1px solid #e2e8f0;border-radius:8px;background:#f8fafc;font-size:12px;cursor:pointer;">Bulan Ini</button>
+            <button onclick="setPeriode(180)" style="padding:6px 12px;border:1px solid #e2e8f0;border-radius:8px;background:#f8fafc;font-size:12px;cursor:pointer;">6 Bulan</button>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button onclick="document.getElementById('modalRekapAbsensi').style.display='none'" style="flex:1;padding:12px;background:#f1f5f9;color:#333;border:none;border-radius:10px;font-weight:600;cursor:pointer;">Batal</button>
+        <button onclick="prosesRekapAbsensi()" style="flex:2;padding:12px;background:#10b981;color:white;border:none;border-radius:10px;font-weight:700;cursor:pointer;">&#128438; Cetak Rekap</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ===== MODAL ABSENSI HARIAN ===== -->
 <div id="modalAbsensiHarian" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:10001;overflow-y:auto;">
   <div style="min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:16px;">
@@ -13510,7 +13558,8 @@ function lihatDetailKelas(id) {
     if (pesertaEl) {
         var btnTambahSantri = '<div style="margin-top:14px;display:grid;gap:8px;">'
             + '<button onclick="bukaModalPilihSantri(' + id + ')" style="width:100%;padding:12px;background:var(--primary);color:white;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-size:14px;">+ Tambah Santri ke Kelas</button>'
-            + '<button onclick="cetakDaftarSantri(' + id + ')" style="width:100%;padding:12px;background:#3b82f6;color:white;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-size:14px;">&#128438; Cetak Daftar Santri</button>'
+            + '<button onclick="cetakDaftarSantri(' + id + ')" style="width:100%;padding:12px;background:#3b82f6;color:white;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-size:14px;">&#128438; Cetak Daftar Kosong</button>'
+            + '<button onclick="bukaRekapAbsensi(' + id + ')" style="width:100%;padding:12px;background:#10b981;color:white;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-size:14px;">&#128203; Cetak Rekap Absensi</button>'
             + '</div>';
         pesertaEl.innerHTML += btnTambahSantri;
     }
