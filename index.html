@@ -12698,13 +12698,115 @@ async function printPDFDirect(pdfDoc, filename = 'document.pdf') {
       <button onclick="logoutGuru()" style="background:rgba(255,255,255,0.2);color:white;border:none;border-radius:8px;padding:8px 14px;font-size:12px;cursor:pointer;font-weight:600;">Keluar &#x2192;</button>
     </div>
     <div style="background:white;border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
-      <div style="font-weight:700;font-size:15px;margin-bottom:12px;color:var(--primary);">&#128197; Jadwal Hari Ini</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div style="font-weight:700;font-size:15px;color:var(--primary);">&#128197; Jadwal Hari Ini</div>
+        <button onclick="bukaJadwalLengkap()" style="background:#f1f5f9;color:var(--primary);border:none;border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;font-weight:600;">Lihat Semua &#8594;</button>
+      </div>
       <div id="guruJadwalHariIni"></div>
     </div>
     <div style="background:white;border-radius:14px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
       <div style="font-weight:700;font-size:15px;margin-bottom:12px;color:var(--primary);">&#128202; Absensi Saya Hari Ini</div>
       <div id="guruAbsensiList"></div>
       <button onclick="bukaFormAbsensiPelajaran(null)" style="width:100%;padding:12px;background:var(--primary);color:white;border:none;border-radius:10px;font-weight:700;cursor:pointer;margin-top:12px;font-size:14px;">+ Input Absensi Pelajaran</button>
+    </div>
+
+    <!-- Input Nilai -->
+    <div style="background:white;border-radius:14px;padding:16px;margin-top:14px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+      <div style="font-weight:700;font-size:15px;margin-bottom:12px;color:var(--primary);">&#128202; Input Nilai Santri</div>
+      <div id="guruNilaiList" style="margin-bottom:10px;"></div>
+      <button onclick="bukaFormNilaiGuru()" style="width:100%;padding:12px;background:#3b82f6;color:white;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-size:14px;">+ Input Nilai</button>
+    </div>
+
+    <!-- Rekap Absensi Kelas (hanya jika wali kelas) -->
+    <div id="guruRekapSection" style="display:none;background:white;border-radius:14px;padding:16px;margin-top:14px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+      <div style="font-weight:700;font-size:15px;margin-bottom:12px;color:var(--primary);">&#128203; Rekap Absensi Kelas</div>
+      <!-- Filter bulan -->
+      <div style="display:flex;gap:8px;margin-bottom:12px;">
+        <select id="guruRekapBulan" onchange="renderGuruRekap()" style="flex:1;padding:9px;border:2px solid #e2e8f0;border-radius:8px;font-size:13px;"></select>
+        <select id="guruRekapJenis" onchange="renderGuruRekap()" style="flex:1;padding:9px;border:2px solid #e2e8f0;border-radius:8px;font-size:13px;">
+          <option value="harian">Absensi Harian</option>
+          <option value="pelajaran">Per Pelajaran</option>
+        </select>
+      </div>
+      <div id="guruRekapContent"></div>
+    </div>
+
+    <!-- Daftar Santri Kelas (hanya jika wali kelas) -->
+    <div id="guruKelasSection" style="display:none;background:white;border-radius:14px;padding:16px;margin-top:14px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div style="font-weight:700;font-size:15px;color:var(--primary);">&#127963; Santri Kelas Saya</div>
+        <div id="guruKelasNama" style="font-size:12px;color:#64748b;background:#f1f5f9;padding:4px 10px;border-radius:8px;"></div>
+      </div>
+      <input type="text" id="guruSearchSantri" oninput="renderGuruSantriList()" placeholder="Cari nama santri..." style="width:100%;padding:9px 12px;border:2px solid #e2e8f0;border-radius:8px;font-size:13px;box-sizing:border-box;margin-bottom:10px;outline:none;">
+      <div id="guruSantriList"></div>
+    </div>
+
+  </div>
+</div>
+
+
+
+<!-- ===== MODAL JADWAL LENGKAP GURU ===== -->
+<div id="modalJadwalGuru" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:10001;overflow-y:auto;">
+  <div style="min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:16px;">
+    <div style="background:white;border-radius:20px;max-width:500px;width:100%;padding:20px;margin-top:8px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <div>
+          <h3 style="margin:0;color:var(--primary);">&#128197; Jadwal Mengajar</h3>
+          <div id="guruJadwalNama" style="font-size:12px;color:#64748b;margin-top:2px;"></div>
+        </div>
+        <button onclick="document.getElementById('modalJadwalGuru').style.display='none'" style="background:none;border:none;font-size:22px;cursor:pointer;">&#10005;</button>
+      </div>
+      <!-- Filter hari -->
+      <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:12px;-webkit-overflow-scrolling:touch;">
+        <button onclick="filterGuruJadwal('')" id="gjHariAll" class="gj-btn" style="flex-shrink:0;padding:7px 12px;border:2px solid var(--primary);border-radius:20px;background:var(--primary);color:white;font-size:12px;font-weight:600;cursor:pointer;">Semua</button>
+        <button onclick="filterGuruJadwal('Senin')" id="gjSenin" class="gj-btn" style="flex-shrink:0;padding:7px 12px;border:2px solid #e2e8f0;border-radius:20px;background:white;color:#333;font-size:12px;font-weight:600;cursor:pointer;">Senin</button>
+        <button onclick="filterGuruJadwal('Selasa')" id="gjSelasa" class="gj-btn" style="flex-shrink:0;padding:7px 12px;border:2px solid #e2e8f0;border-radius:20px;background:white;color:#333;font-size:12px;font-weight:600;cursor:pointer;">Selasa</button>
+        <button onclick="filterGuruJadwal('Rabu')" id="gjRabu" class="gj-btn" style="flex-shrink:0;padding:7px 12px;border:2px solid #e2e8f0;border-radius:20px;background:white;color:#333;font-size:12px;font-weight:600;cursor:pointer;">Rabu</button>
+        <button onclick="filterGuruJadwal('Kamis')" id="gjKamis" class="gj-btn" style="flex-shrink:0;padding:7px 12px;border:2px solid #e2e8f0;border-radius:20px;background:white;color:#333;font-size:12px;font-weight:600;cursor:pointer;">Kamis</button>
+        <button onclick="filterGuruJadwal('Jumat')" id="gjJumat" class="gj-btn" style="flex-shrink:0;padding:7px 12px;border:2px solid #e2e8f0;border-radius:20px;background:white;color:#333;font-size:12px;font-weight:600;cursor:pointer;">Jumat</button>
+        <button onclick="filterGuruJadwal('Sabtu')" id="gjSabtu" class="gj-btn" style="flex-shrink:0;padding:7px 12px;border:2px solid #e2e8f0;border-radius:20px;background:white;color:#333;font-size:12px;font-weight:600;cursor:pointer;">Sabtu</button>
+        <button onclick="filterGuruJadwal('Ahad')" id="gjAhad" class="gj-btn" style="flex-shrink:0;padding:7px 12px;border:2px solid #e2e8f0;border-radius:20px;background:white;color:#333;font-size:12px;font-weight:600;cursor:pointer;">Ahad</button>
+      </div>
+      <div id="guruJadwalLengkapList" style="max-height:60vh;overflow-y:auto;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL INPUT NILAI GURU ===== -->
+<div id="modalNilaiGuru" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:10001;overflow-y:auto;">
+  <div style="min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:16px;">
+    <div style="background:white;border-radius:20px;max-width:500px;width:100%;padding:20px;margin-top:8px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <h3 style="margin:0;color:var(--primary);">Input Nilai</h3>
+        <button onclick="document.getElementById('modalNilaiGuru').style.display='none'" style="background:none;border:none;font-size:22px;cursor:pointer;">&#10005;</button>
+      </div>
+      <div style="display:grid;gap:10px;margin-bottom:14px;background:#f8fafc;padding:14px;border-radius:12px;">
+        <div><label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">Kelas</label>
+          <select id="guruNilaiKelas" onchange="loadSantriNilaiGuru()" style="width:100%;padding:9px;border:2px solid #e2e8f0;border-radius:8px;font-size:13px;"></select></div>
+        <div><label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">Santri</label>
+          <select id="guruNilaiSantri" style="width:100%;padding:9px;border:2px solid #e2e8f0;border-radius:8px;font-size:13px;"><option value="">-- Pilih Santri --</option></select></div>
+        <div><label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">Mata Pelajaran</label>
+          <select id="guruNilaiMapel" style="width:100%;padding:9px;border:2px solid #e2e8f0;border-radius:8px;font-size:13px;"></select></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div><label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">Jenis</label>
+            <select id="guruNilaiJenis" style="width:100%;padding:9px;border:2px solid #e2e8f0;border-radius:8px;font-size:13px;">
+              <option value="UH">Ulangan Harian</option>
+              <option value="UTS">UTS</option>
+              <option value="UAS">UAS</option>
+              <option value="Hafalan">Hafalan</option>
+              <option value="Praktik">Praktik</option>
+            </select></div>
+          <div><label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">Nilai (0-100)</label>
+            <input type="number" id="guruNilaiAngka" min="0" max="100" placeholder="85" style="width:100%;padding:9px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;"></div>
+        </div>
+        <div><label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">Tanggal</label>
+          <input type="date" id="guruNilaiTanggal" style="width:100%;padding:9px;border:2px solid #e2e8f0;border-radius:8px;font-size:13px;box-sizing:border-box;"></div>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button onclick="document.getElementById('modalNilaiGuru').style.display='none'" style="flex:1;padding:12px;background:#f1f5f9;color:#333;border:none;border-radius:10px;font-weight:600;cursor:pointer;">Batal</button>
+        <button onclick="simpanNilaiGuru()" style="flex:2;padding:12px;background:#3b82f6;color:white;border:none;border-radius:10px;font-weight:700;cursor:pointer;">&#128190; Simpan Nilai</button>
+      </div>
     </div>
   </div>
 </div>
@@ -14601,6 +14703,35 @@ function initGuruMode() {
             absEl.innerHTML=ah;
         }
     }
+
+    // Tampilkan nilai hari ini
+    try { renderGuruNilaiHariIni(); } catch(e) {}
+
+    // Tampilkan rekap jika wali kelas
+    var rekapSection = document.getElementById('guruRekapSection');
+    if (guru.kelasWaliId && rekapSection) {
+        rekapSection.style.display = 'block';
+        try { initGuruRekap(); } catch(e) {}
+    } else if (rekapSection) {
+        rekapSection.style.display = 'none';
+    }
+
+    // Tampilkan daftar santri jika guru adalah wali kelas
+    var kelasSection=document.getElementById('guruKelasSection');
+    if (guru.kelasWaliId && kelasSection) {
+        kelasSection.style.display='block';
+        var kNama=getKelasNama(guru.kelasWaliId);
+        var kNamaEl=document.getElementById('guruKelasNama');
+        if(kNamaEl) kNamaEl.textContent=kNama;
+        // Load jamaahList jika belum ada
+        if (typeof jamaahList!=='undefined' && jamaahList && jamaahList.length>0) {
+            renderGuruSantriList();
+        } else if (typeof loadJamaahData==='function') {
+            loadJamaahData().then(function(){ renderGuruSantriList(); }).catch(function(){ renderGuruSantriList(); });
+        }
+    } else if (kelasSection) {
+        kelasSection.style.display='none';
+    }
 }
 
 function logoutAdmin() {
@@ -14616,6 +14747,451 @@ function logoutGuru() {
     var splash=document.getElementById('splashScreen');
     if (splash) { splash.style.display='flex'; splash.style.opacity='1'; }
     showToast('Berhasil logout!');
+}
+
+
+
+// ─── GURU: INPUT NILAI ───
+function bukaFormNilaiGuru() {
+    var guru = getCurrentGuru();
+    if (!guru) return;
+
+    // Populate kelas - berdasarkan jadwal guru atau kelas wali
+    var ks = document.getElementById('guruNilaiKelas');
+    if (ks) {
+        var opts = '<option value="">-- Pilih Kelas --</option>';
+        // Kumpulkan kelas yang diajar guru dari jadwal
+        var kelasIds = {};
+        if (guru.kelasWaliId) kelasIds[String(guru.kelasWaliId)] = true;
+        for (var i = 0; i < jadwalList.length; i++) {
+            if (jadwalList[i].pengajar === guru.nama) {
+                // Cari kelas berdasarkan nama
+                for (var j = 0; j < kelasList.length; j++) {
+                    if (kelasList[j].nama === jadwalList[i].kelas) {
+                        kelasIds[String(kelasList[j].id)] = true;
+                    }
+                }
+            }
+        }
+        // Kalau tidak ada dari jadwal, tampilkan semua kelas
+        var hasKelas = Object.keys(kelasIds).length > 0;
+        var kelasTampil = [];
+        for (var k = 0; k < kelasList.length; k++) {
+            if (!hasKelas || kelasIds[String(kelasList[k].id)]) {
+                kelasTampil.push(kelasList[k]);
+            }
+        }
+        for (var m = 0; m < kelasTampil.length; m++) {
+            opts += '<option value="' + kelasTampil[m].id + '">' + kelasTampil[m].nama + '</option>';
+        }
+        ks.innerHTML = opts;
+    }
+
+    // Populate mapel - berdasarkan mapel yang diajar guru
+    var ms = document.getElementById('guruNilaiMapel');
+    if (ms) {
+        var mopts = '<option value="">-- Pilih Mapel --</option>';
+        var mapelGuru = {};
+        for (var n = 0; n < jadwalList.length; n++) {
+            if (jadwalList[n].pengajar === guru.nama && jadwalList[n].mapel) {
+                mapelGuru[jadwalList[n].mapel] = true;
+            }
+        }
+        var hasMapel = Object.keys(mapelGuru).length > 0;
+        if (hasMapel) {
+            for (var mapelNm in mapelGuru) {
+                mopts += '<option value="' + mapelNm + '">' + mapelNm + '</option>';
+            }
+        } else {
+            for (var mp = 0; mp < mapelList.length; mp++) {
+                mopts += '<option value="' + mapelList[mp].nama + '">' + mapelList[mp].nama + '</option>';
+            }
+        }
+        ms.innerHTML = mopts;
+    }
+
+    // Set tanggal hari ini
+    var td = document.getElementById('guruNilaiTanggal');
+    if (td) td.value = new Date().toISOString().substr(0, 10);
+
+    // Reset santri
+    var ss = document.getElementById('guruNilaiSantri');
+    if (ss) ss.innerHTML = '<option value="">-- Pilih Kelas dulu --</option>';
+
+    var angka = document.getElementById('guruNilaiAngka');
+    if (angka) angka.value = '';
+
+    document.getElementById('modalNilaiGuru').style.display = 'flex';
+}
+
+function loadSantriNilaiGuru() {
+    var ks = document.getElementById('guruNilaiKelas');
+    var kelasId = ks ? ks.value : '';
+    var ss = document.getElementById('guruNilaiSantri');
+    if (!ss) return;
+    if (!kelasId) {
+        ss.innerHTML = '<option value="">-- Pilih Kelas dulu --</option>';
+        return;
+    }
+    var santri = getSantriByKelas(kelasId);
+    var p = getTerm('pesertaDidik');
+    var opts = '<option value="">-- Pilih ' + p + ' --</option>';
+    for (var i = 0; i < santri.length; i++) {
+        var nama = santri[i].nama_lengkap || santri[i].nama || '?';
+        opts += '<option value="' + santri[i].id + '">' + nama + '</option>';
+    }
+    ss.innerHTML = opts;
+}
+
+function simpanNilaiGuru() {
+    var guru = getCurrentGuru();
+    var santriId = (document.getElementById('guruNilaiSantri')||{value:''}).value;
+    var mapel = (document.getElementById('guruNilaiMapel')||{value:''}).value;
+    var jenis = (document.getElementById('guruNilaiJenis')||{value:'UH'}).value;
+    var nilai = (document.getElementById('guruNilaiAngka')||{value:''}).value;
+    var tanggal = (document.getElementById('guruNilaiTanggal')||{value:''}).value;
+
+    if (!santriId || !nilai) { showToast('Pilih santri dan isi nilai!'); return; }
+    if (parseFloat(nilai) < 0 || parseFloat(nilai) > 100) { showToast('Nilai harus 0-100!'); return; }
+
+    var data = {
+        id: Date.now(),
+        jamaahId: santriId,
+        mapel: mapel || '-',
+        jenis: jenis,
+        nilai: parseFloat(nilai),
+        tanggal: tanggal,
+        inputOleh: guru ? guru.nama : 'Guru',
+        keterangan: ''
+    };
+
+    nilaiList.push(data);
+    saveNilai();
+    document.getElementById('modalNilaiGuru').style.display = 'none';
+
+    // Refresh tampilan nilai guru hari ini
+    renderGuruNilaiHariIni();
+    showToast('Nilai berhasil disimpan!');
+}
+
+function renderGuruNilaiHariIni() {
+    var el = document.getElementById('guruNilaiList');
+    if (!el) return;
+    var guru = getCurrentGuru();
+    if (!guru) return;
+
+    var today = new Date().toISOString().substr(0, 10);
+    var myNilai = [];
+    for (var i = 0; i < nilaiList.length; i++) {
+        if (nilaiList[i].tanggal === today && nilaiList[i].inputOleh === guru.nama) {
+            myNilai.push(nilaiList[i]);
+        }
+    }
+
+    if (!myNilai.length) {
+        el.innerHTML = '<div style="text-align:center;padding:10px;color:#94a3b8;font-size:13px;">Belum ada nilai yang diinput hari ini</div>';
+        return;
+    }
+
+    var clrFn = function(v) { return v>=90?'#10b981':v>=75?'#3b82f6':v>=60?'#f59e0b':'#ef4444'; };
+    var html = '';
+    for (var j = 0; j < myNilai.length; j++) {
+        var n = myNilai[j];
+        var jm = null;
+        if (typeof jamaahList !== 'undefined') {
+            for (var k = 0; k < jamaahList.length; k++) {
+                if (String(jamaahList[k].id) === String(n.jamaahId)) { jm = jamaahList[k]; break; }
+            }
+        }
+        var nama = jm ? (jm.nama_lengkap || jm.nama || '?') : '?';
+        html += '<div style="display:flex;align-items:center;gap:8px;padding:8px;background:#f8fafc;border-radius:8px;margin-bottom:6px;">'
+              + '<div style="width:36px;height:36px;background:'+clrFn(n.nilai)+';color:white;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex-shrink:0;">'+n.nilai+'</div>'
+              + '<div style="flex:1;min-width:0;"><div style="font-weight:600;font-size:13px;">'+nama+'</div>'
+              + '<div style="font-size:11px;color:#64748b;">'+n.mapel+' - '+n.jenis+'</div></div>'
+              + '</div>';
+    }
+    el.innerHTML = html;
+}
+
+
+
+// ─── GURU: JADWAL LENGKAP ───
+var _guruJadwalFilter = '';
+var JH_CLR2 = {Senin:'#3b82f6',Selasa:'#10b981',Rabu:'#f59e0b',Kamis:'#8b5cf6',Jumat:'#0D5C4A',Sabtu:'#ec4899',Ahad:'#ef4444'};
+var JH_ORD2 = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Ahad'];
+
+function bukaJadwalLengkap() {
+    var guru = getCurrentGuru();
+    if (!guru) return;
+
+    var namaEl = document.getElementById('guruJadwalNama');
+    if (namaEl) namaEl.textContent = guru.nama + (guru.bidang ? ' - ' + guru.bidang : '');
+
+    _guruJadwalFilter = '';
+    // Reset semua filter buttons
+    var btns = document.querySelectorAll('.gj-btn');
+    for (var i = 0; i < btns.length; i++) {
+        btns[i].style.background = 'white';
+        btns[i].style.color = '#333';
+        btns[i].style.borderColor = '#e2e8f0';
+    }
+    var allBtn = document.getElementById('gjHariAll');
+    if (allBtn) {
+        allBtn.style.background = 'var(--primary)';
+        allBtn.style.color = 'white';
+        allBtn.style.borderColor = 'var(--primary)';
+    }
+
+    document.getElementById('modalJadwalGuru').style.display = 'flex';
+    renderGuruJadwalLengkap();
+}
+
+function filterGuruJadwal(hari) {
+    _guruJadwalFilter = hari;
+    // Update button styles
+    var btns = document.querySelectorAll('.gj-btn');
+    for (var i = 0; i < btns.length; i++) {
+        btns[i].style.background = 'white';
+        btns[i].style.color = '#333';
+        btns[i].style.borderColor = '#e2e8f0';
+    }
+    var activeId = hari ? 'gj' + hari : 'gjHariAll';
+    var activeBtn = document.getElementById(activeId);
+    if (activeBtn) {
+        activeBtn.style.background = 'var(--primary)';
+        activeBtn.style.color = 'white';
+        activeBtn.style.borderColor = 'var(--primary)';
+    }
+    renderGuruJadwalLengkap();
+}
+
+function renderGuruJadwalLengkap() {
+    var guru = getCurrentGuru();
+    var ct = document.getElementById('guruJadwalLengkapList');
+    if (!ct || !guru) return;
+
+    // Filter jadwal milik guru ini
+    var myJadwal = [];
+    for (var i = 0; i < jadwalList.length; i++) {
+        var jd = jadwalList[i];
+        if (jd.pengajar === guru.nama) {
+            if (!_guruJadwalFilter || jd.hari === _guruJadwalFilter) {
+                myJadwal.push(jd);
+            }
+        }
+    }
+
+    // Sort by hari & jam
+    myJadwal.sort(function(a, b) {
+        var ha = JH_ORD2.indexOf(a.hari), hb = JH_ORD2.indexOf(b.hari);
+        if (ha !== hb) return ha - hb;
+        return (a.mulai||'').localeCompare(b.mulai||'');
+    });
+
+    if (!myJadwal.length) {
+        ct.innerHTML = '<div style="text-align:center;padding:40px;color:#94a3b8;">'
+            + '<div style="font-size:40px;margin-bottom:10px;">&#128197;</div>'
+            + '<div style="font-weight:600;">Tidak ada jadwal'
+            + (_guruJadwalFilter ? ' hari ' + _guruJadwalFilter : '')
+            + '</div></div>';
+        return;
+    }
+
+    var html = '';
+    var lastHari = '';
+
+    for (var j = 0; j < myJadwal.length; j++) {
+        var jd2 = myJadwal[j];
+        var cc = JH_CLR2[jd2.hari] || '#64748b';
+
+        // Header hari
+        if (!_guruJadwalFilter && jd2.hari !== lastHari) {
+            lastHari = jd2.hari;
+            html += '<div style="font-weight:700;font-size:12px;color:'+cc+';background:'+cc+'20;padding:5px 10px;border-radius:8px;display:inline-block;margin-bottom:6px;margin-top:'+(j>0?'12px':'0')+';">&#128197; '+jd2.hari+'</div><br>';
+        }
+
+        html += '<div style="display:flex;align-items:flex-start;gap:10px;padding:12px;background:#f8fafc;border-radius:12px;margin-bottom:8px;border-left:4px solid '+cc+';">'
+              + '<div style="min-width:52px;text-align:center;">'
+              + '<div style="font-weight:700;color:'+cc+';font-size:14px;">'+(jd2.mulai||'--:--')+'</div>'
+              + (jd2.selesai ? '<div style="font-size:11px;color:#94a3b8;">'+jd2.selesai+'</div>' : '')
+              + '</div>'
+              + '<div style="flex:1;">'
+              + '<div style="font-weight:700;font-size:15px;margin-bottom:3px;">'+jd2.mapel+'</div>'
+              + (jd2.kelas ? '<div style="font-size:12px;color:#64748b;">&#127963; '+jd2.kelas+'</div>' : '')
+              + (jd2.ruangan ? '<div style="font-size:12px;color:#64748b;">&#128205; '+jd2.ruangan+'</div>' : '')
+              + '</div></div>';
+    }
+
+    // Summary
+    html += '<div style="margin-top:8px;padding:10px;background:#f8fafc;border-radius:8px;text-align:center;font-size:12px;color:#64748b;">'
+          + 'Total ' + myJadwal.length + ' sesi mengajar'
+          + (_guruJadwalFilter ? ' hari ' + _guruJadwalFilter : ' per minggu')
+          + '</div>';
+
+    ct.innerHTML = html;
+}
+
+// ─── GURU: REKAP ABSENSI KELAS ───
+function initGuruRekap() {
+    // Populate bulan filter
+    var sel = document.getElementById('guruRekapBulan');
+    if (!sel) return;
+    var today = new Date();
+    var opts = '';
+    var bulanNames = ['Januari','Februari','Maret','April','Mei','Juni',
+                      'Juli','Agustus','September','Oktober','November','Desember'];
+    // Tampilkan 6 bulan terakhir
+    for (var i = 0; i < 6; i++) {
+        var d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+        var val = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
+        var label = bulanNames[d.getMonth()] + ' ' + d.getFullYear();
+        opts += '<option value="' + val + '"' + (i===0?' selected':'') + '>' + label + '</option>';
+    }
+    sel.innerHTML = opts;
+    renderGuruRekap();
+}
+
+function renderGuruRekap() {
+    var guru = getCurrentGuru();
+    if (!guru || !guru.kelasWaliId) return;
+
+    var bulanEl = document.getElementById('guruRekapBulan');
+    var jenisEl = document.getElementById('guruRekapJenis');
+    var ct = document.getElementById('guruRekapContent');
+    if (!ct) return;
+
+    var bulan = bulanEl ? bulanEl.value : '';
+    var jenis = jenisEl ? jenisEl.value : 'harian';
+    var p = getTerm('pesertaDidik');
+
+    var santri = getSantriByKelas(guru.kelasWaliId);
+    if (!santri.length) {
+        ct.innerHTML = '<div style="text-align:center;padding:20px;color:#94a3b8;">Belum ada '+p+' di kelas ini</div>';
+        return;
+    }
+
+    // Kumpulkan data absensi sesuai jenis & bulan
+    var absensiData = jenis === 'harian' ? getAbsensiHarianData() : getAbsensiPelajaranData();
+
+    // Filter by bulan & kelas
+    var filtered = [];
+    for (var i = 0; i < absensiData.length; i++) {
+        var a = absensiData[i];
+        var aKelasId = String(a.kelasId);
+        var aGrpKelasId = String(guru.kelasWaliId);
+        if (aKelasId !== aGrpKelasId) continue;
+        if (bulan && a.tanggal && a.tanggal.substr(0,7) !== bulan) continue;
+        filtered.push(a);
+    }
+
+    if (!filtered.length) {
+        ct.innerHTML = '<div style="text-align:center;padding:20px;color:#94a3b8;">Belum ada data absensi<br><span style="font-size:12px;">bulan ini</span></div>';
+        return;
+    }
+
+    // Hitung per santri
+    var stats = {};
+    for (var j = 0; j < santri.length; j++) {
+        stats[String(santri[j].id)] = { hadir:0, sakit:0, izin:0, alpha:0, total:0 };
+    }
+
+    for (var k = 0; k < filtered.length; k++) {
+        var rec = filtered[k];
+        for (var m = 0; m < rec.data.length; m++) {
+            var entry = rec.data[m];
+            var sId = String(entry.santriId);
+            if (!stats[sId]) stats[sId] = { hadir:0, sakit:0, izin:0, alpha:0, total:0 };
+            stats[sId][entry.status] = (stats[sId][entry.status]||0) + 1;
+            stats[sId].total++;
+        }
+    }
+
+    // Total pertemuan
+    var totalPertemuan = filtered.length;
+
+    // Build tampilan
+    var html = '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:8px;background:#f1f5f9;border-radius:8px;margin-bottom:10px;text-align:center;">'
+             + '<div style="font-size:10px;font-weight:700;color:#64748b;">NAMA</div>'
+             + '<div style="font-size:10px;font-weight:700;color:#10b981;">H</div>'
+             + '<div style="font-size:10px;font-weight:700;color:#ef4444;">A</div>'
+             + '<div style="font-size:10px;font-weight:700;color:#3b82f6;">%</div>'
+             + '</div>';
+
+    for (var n = 0; n < santri.length; n++) {
+        var s = santri[n];
+        var sId2 = String(s.id);
+        var st = stats[sId2] || { hadir:0, sakit:0, izin:0, alpha:0, total:0 };
+        var pct = st.total > 0 ? Math.round((st.hadir / st.total) * 100) : 0;
+        var pctColor = pct >= 80 ? '#10b981' : pct >= 60 ? '#f59e0b' : '#ef4444';
+        var nama = (s.nama_lengkap || s.nama || '?');
+        // Truncate nama panjang
+        var namaShort = nama.length > 15 ? nama.substr(0,14)+'...' : nama;
+
+        html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:8px;background:#f8fafc;border-radius:8px;margin-bottom:4px;align-items:center;">'
+              + '<div style="font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="'+nama+'">'+namaShort+'</div>'
+              + '<div style="text-align:center;font-size:13px;font-weight:700;color:#10b981;">'+st.hadir+'</div>'
+              + '<div style="text-align:center;font-size:13px;font-weight:700;color:#ef4444;">'+st.alpha+'</div>'
+              + '<div style="text-align:center;font-size:13px;font-weight:700;color:'+pctColor+';">'+pct+'%</div>'
+              + '</div>';
+    }
+
+    // Summary
+    html += '<div style="margin-top:10px;padding:10px;background:#f0fdf4;border-radius:8px;font-size:12px;color:#64748b;text-align:center;">'
+          + 'Total ' + totalPertemuan + ' pertemuan &nbsp;|&nbsp; '
+          + 'H=Hadir &nbsp; A=Alpha &nbsp; %=Kehadiran'
+          + '</div>';
+
+    ct.innerHTML = html;
+}
+
+// ─── GURU: DAFTAR SANTRI KELAS ───
+function renderGuruSantriList() {
+    var guru = getCurrentGuru();
+    if (!guru || !guru.kelasWaliId) return;
+
+    var ct = document.getElementById('guruSantriList');
+    if (!ct) return;
+
+    var q = '';
+    var srch = document.getElementById('guruSearchSantri');
+    if (srch) q = srch.value.toLowerCase();
+
+    var santri = getSantriByKelas(guru.kelasWaliId);
+    var p = getTerm('pesertaDidik');
+
+    if (!santri.length) {
+        ct.innerHTML = '<div style="text-align:center;padding:20px;color:#94a3b8;">Belum ada '+p+' di kelas ini</div>';
+        return;
+    }
+
+    // Filter by search
+    var fl = [];
+    for (var i = 0; i < santri.length; i++) {
+        var nama = santri[i].nama_lengkap || santri[i].nama || '';
+        var nis = santri[i].no_porsi || '';
+        if (!q || nama.toLowerCase().indexOf(q) >= 0 || nis.toLowerCase().indexOf(q) >= 0) {
+            fl.push(santri[i]);
+        }
+    }
+
+    if (!fl.length) {
+        ct.innerHTML = '<div style="text-align:center;padding:16px;color:#94a3b8;">Tidak ditemukan</div>';
+        return;
+    }
+
+    var html = '<div style="font-size:12px;color:#64748b;margin-bottom:8px;">'+fl.length+' '+p+'</div>';
+    for (var j = 0; j < fl.length; j++) {
+        var s = fl[j];
+        var nama2 = s.nama_lengkap || s.nama || '?';
+        var nis2 = s.no_porsi || '-';
+        html += '<div style="display:flex;align-items:center;gap:10px;padding:10px;background:#f8fafc;border-radius:10px;margin-bottom:6px;">'
+              + '<div style="width:32px;height:32px;background:var(--primary);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;">'+(j+1)+'</div>'
+              + '<div style="flex:1;min-width:0;">'
+              + '<div style="font-weight:600;font-size:14px;">'+nama2+'</div>'
+              + '<div style="font-size:12px;color:#64748b;">NIS: '+nis2+'</div>'
+              + '</div></div>';
+    }
+    ct.innerHTML = html;
 }
 
 // ─── ABSENSI PELAJARAN ───
