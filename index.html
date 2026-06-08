@@ -2848,12 +2848,38 @@
 </div>
 
 <!-- BOTTOM NAVIGATION -->
-<div class="bottom-nav-premium">
+<div class="bottom-nav-premium" id="bottomNavAdmin">
     <div class="nav-item-premium" data-page="home" onclick="showPage('home')"><i class="fas fa-home"></i><span>Home</span></div>
     <div class="nav-item-premium" data-page="estimasi" onclick="showPage('estimasi')"><i class="fas fa-calculator"></i><span>Kalkulator</span></div>
     <div class="nav-item-premium" data-page="kas" onclick="showPage('kas')"><i class="fas fa-wallet"></i><span>Kas</span></div>
     <div class="nav-item-premium" data-page="jamaah" onclick="showPage('jamaah')"><i class="fas fa-users"></i><span id="navLabelJamaah">Peserta</span></div>
     <div class="nav-item-premium" data-page="setting" onclick="showPage('setting')"><i class="fas fa-sliders-h"></i><span>Setting</span></div>
+</div>
+
+<!-- ===== BOTTOM NAV GURU ===== -->
+<div id="bottomNavGuru" style="display:none;position:fixed;bottom:0;left:0;right:0;background:white;border-top:2px solid #e2e8f0;z-index:1000;padding-bottom:env(safe-area-inset-bottom);">
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);height:60px;">
+    <div onclick="showPage('guru')" id="gnHome" class="guru-nav-item" style="display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:var(--primary);">
+      <i class="fas fa-home" style="font-size:18px;"></i>
+      <span style="font-size:10px;margin-top:3px;font-weight:600;">Beranda</span>
+    </div>
+    <div onclick="bukaJadwalLengkap()" id="gnJadwal" class="guru-nav-item" style="display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:#64748b;">
+      <i class="fas fa-calendar" style="font-size:18px;"></i>
+      <span style="font-size:10px;margin-top:3px;font-weight:600;">Jadwal</span>
+    </div>
+    <div onclick="bukaFormAbsensiPelajaran(null)" id="gnAbsensi" class="guru-nav-item" style="display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:#64748b;">
+      <i class="fas fa-clipboard-check" style="font-size:18px;"></i>
+      <span style="font-size:10px;margin-top:3px;font-weight:600;">Absensi</span>
+    </div>
+    <div onclick="bukaFormNilaiGuru()" id="gnNilai" class="guru-nav-item" style="display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:#64748b;">
+      <i class="fas fa-star" style="font-size:18px;"></i>
+      <span style="font-size:10px;margin-top:3px;font-weight:600;">Nilai</span>
+    </div>
+    <div onclick="logoutGuru()" id="gnKeluar" class="guru-nav-item" style="display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:#ef4444;">
+      <i class="fas fa-sign-out-alt" style="font-size:18px;"></i>
+      <span style="font-size:10px;margin-top:3px;font-weight:600;">Keluar</span>
+    </div>
+  </div>
 </div>
 
 <!-- MODALS -->
@@ -14638,6 +14664,16 @@ function doLoginGuru() {
 }
 
 function masukModeGuru(guru) {
+    // Sembunyikan nav admin, tampilkan nav guru
+    var navAdmin = document.getElementById('bottomNavAdmin');
+    var navGuru = document.getElementById('bottomNavGuru');
+    if (navAdmin) navAdmin.style.display = 'none';
+    if (navGuru) navGuru.style.display = 'block';
+
+    // Tambah padding bawah untuk page guru
+    var pageGuru = document.getElementById('page-guru');
+    if (pageGuru) pageGuru.style.paddingBottom = '70px';
+
     showPage('guru');
     initGuruMode();
 }
@@ -14914,6 +14950,40 @@ function renderGuruNilaiHariIni() {
 }
 
 
+
+
+// ─── SECURITY: BLOCK ADMIN PAGES SAAT GURU LOGIN ───
+var _origShowPage = showPage;
+var GURU_ALLOWED_PAGES = ['guru'];
+var GURU_BLOCKED_PAGES = ['kas','konfigurasi','lisensi','datamaster','setting','estimasi','catatan'];
+
+// Override showPage untuk block akses guru ke halaman admin
+window.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+        if (typeof showPage === 'function') {
+            var origSP = showPage;
+            showPage = function(pageId) {
+                // Kalau mode guru, block halaman sensitif
+                if (isGuruSession()) {
+                    for (var i = 0; i < GURU_BLOCKED_PAGES.length; i++) {
+                        if (pageId === GURU_BLOCKED_PAGES[i]) {
+                            showToast('Akses terbatas - Mode Guru');
+                            showPage('guru');
+                            return;
+                        }
+                    }
+                    // Halaman jamaah/pembayaran - redirect ke guru
+                    if (pageId === 'jamaah' || pageId === 'jamaahkita' || pageId === 'pembayaran') {
+                        showToast('Akses terbatas - Mode Guru');
+                        showPage('guru');
+                        return;
+                    }
+                }
+                origSP(pageId);
+            };
+        }
+    }, 2000);
+});
 
 // ─── GURU: JADWAL LENGKAP ───
 var _guruJadwalFilter = '';
