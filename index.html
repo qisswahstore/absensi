@@ -13499,7 +13499,8 @@ function simpanPengajar() {
         bidang: (document.getElementById('fPengajarBidang')||{value:''}).value.trim(),
         wa: (document.getElementById('fPengajarWA')||{value:''}).value.trim(),
         catatan: (document.getElementById('fPengajarCatatan')||{value:''}).value.trim(),
-        kelasWaliId: waliKelasId || ''
+        kelasWaliId: waliKelasId || '',
+        pin: (document.getElementById('fPengajarPIN')||{value:''}).value.trim()
     };
     if (id) {
         for (var i = 0; i < pengajarList.length; i++) {
