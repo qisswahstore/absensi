@@ -13213,9 +13213,9 @@ async function printPDFDirect(pdfDoc, filename = 'document.pdf') {
         <div><label style="display:block;font-weight:600;font-size:13px;margin-bottom:4px;">Jam Mulai *</label><input type="time" id="fJadwalMulai" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;"></div>
         <div><label style="display:block;font-weight:600;font-size:13px;margin-bottom:4px;">Jam Selesai</label><input type="time" id="fJadwalSelesai" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;"></div>
       </div>
-      <div><label style="display:block;font-weight:600;font-size:13px;margin-bottom:4px;">Mata Pelajaran *</label><input type="text" id="fJadwalMapel" placeholder="Contoh: Matematika / Ngaji Subuh" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;"></div>
-      <div><label style="display:block;font-weight:600;font-size:13px;margin-bottom:4px;">Pengajar</label><input type="text" id="fJadwalPengajar" placeholder="Nama pengajar (opsional)" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;"></div>
-      <div><label style="display:block;font-weight:600;font-size:13px;margin-bottom:4px;">Kelas / Tingkat</label><input type="text" id="fJadwalKelas" placeholder="Contoh: Kelas 7 / Tingkat Ula" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;"></div>
+      <div><label style="display:block;font-weight:600;font-size:13px;margin-bottom:4px;">Mata Pelajaran *</label><select id="fJadwalMapel" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;"><option value="">-- Pilih Mata Pelajaran --</option></select></div>
+      <div><label style="display:block;font-weight:600;font-size:13px;margin-bottom:4px;">Pengajar</label><select id="fJadwalPengajar" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;"><option value="">-- Pilih Pengajar --</option></select></div>
+      <div><label style="display:block;font-weight:600;font-size:13px;margin-bottom:4px;">Kelas / Tingkat</label><select id="fJadwalKelas" onchange="autoFillRuangan()" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;"><option value="">-- Pilih Kelas --</option></select></div>
       <div><label style="display:block;font-weight:600;font-size:13px;margin-bottom:4px;">Ruangan</label><input type="text" id="fJadwalRuangan" placeholder="Contoh: Kelas A / Masjid" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;"></div>
     </div>
     <div style="display:flex;gap:10px;margin-top:14px;"><button onclick="closeFormJadwal()" style="flex:1;padding:12px;background:#f1f5f9;color:#333;border:none;border-radius:10px;font-weight:600;cursor:pointer;">Batal</button><button onclick="simpanJadwal()" style="flex:2;padding:12px;background:var(--primary);color:white;border:none;border-radius:10px;font-weight:600;cursor:pointer;">💾 Simpan</button></div>
@@ -13742,7 +13742,39 @@ var JH_CLR = {Senin:'#3b82f6',Selasa:'#10b981',Rabu:'#f59e0b',Kamis:'#8b5cf6',Ju
 
 function saveJadwal() { localStorage.setItem('eduku_jadwal', JSON.stringify(jadwalList)); }
 function openFormJadwal(id) {
-    var flds = ['fJadwalMapel','fJadwalPengajar','fJadwalKelas','fJadwalRuangan','fJadwalMulai','fJadwalSelesai'];
+    // Populate dropdown Mapel
+    var mapelSel = document.getElementById('fJadwalMapel');
+    if (mapelSel) {
+        var mOpts = '<option value="">-- Pilih Mata Pelajaran --</option>';
+        for (var mi = 0; mi < mapelList.length; mi++) {
+            mOpts += '<option value="'+mapelList[mi].nama+'">'+mapelList[mi].nama+'</option>';
+        }
+        mapelSel.innerHTML = mOpts;
+    }
+
+    // Populate dropdown Pengajar
+    var pengSel = document.getElementById('fJadwalPengajar');
+    if (pengSel) {
+        var pOpts = '<option value="">-- Pilih Pengajar --</option>';
+        for (var pi = 0; pi < pengajarList.length; pi++) {
+            pOpts += '<option value="'+pengajarList[pi].nama+'">'+pengajarList[pi].nama
+                   + (pengajarList[pi].bidang ? ' ('+pengajarList[pi].bidang+')' : '')
+                   + '</option>';
+        }
+        pengSel.innerHTML = pOpts;
+    }
+
+    // Populate dropdown Kelas
+    var kelasSel = document.getElementById('fJadwalKelas');
+    if (kelasSel) {
+        var kOpts = '<option value="">-- Pilih Kelas --</option>';
+        for (var ki = 0; ki < kelasList.length; ki++) {
+            kOpts += '<option value="'+kelasList[ki].nama+'">'+kelasList[ki].nama+'</option>';
+        }
+        kelasSel.innerHTML = kOpts;
+    }
+
+    var flds = ['fJadwalRuangan','fJadwalMulai','fJadwalSelesai'];
     for (var i = 0; i < flds.length; i++) { var el = document.getElementById(flds[i]); if(el) el.value=''; }
     var editId = document.getElementById('jadwalEditId'); if(editId) editId.value = id||'';
     var title = document.getElementById('formJadwalTitle'); if(title) title.textContent = id?'Edit Jadwal':'Tambah Jadwal';
@@ -13751,6 +13783,9 @@ function openFormJadwal(id) {
             if (jadwalList[j].id == id) {
                 var jd = jadwalList[j];
                 var fh = document.getElementById('fJadwalHari'); if(fh) fh.value = jd.hari||'Senin';
+                var fm = document.getElementById('fJadwalMapel'); if(fm) fm.value = jd.mapel||'';
+                var fp = document.getElementById('fJadwalPengajar'); if(fp) fp.value = jd.pengajar||'';
+                var fk = document.getElementById('fJadwalKelas'); if(fk) fk.value = jd.kelas||'';
                 var fm = document.getElementById('fJadwalMulai'); if(fm) fm.value = jd.mulai||'';
                 var fs = document.getElementById('fJadwalSelesai'); if(fs) fs.value = jd.selesai||'';
                 var fmp = document.getElementById('fJadwalMapel'); if(fmp) fmp.value = jd.mapel||'';
@@ -13764,6 +13799,24 @@ function openFormJadwal(id) {
     var modal = document.getElementById('modalJadwal'); if(modal) modal.style.display='flex';
 }
 function closeFormJadwal() { var m=document.getElementById('modalJadwal'); if(m) m.style.display='none'; }
+
+function autoFillRuangan() {
+    var kelasEl = document.getElementById('fJadwalKelas');
+    var ruanganEl = document.getElementById('fJadwalRuangan');
+    if (!kelasEl || !ruanganEl) return;
+    var kelasNama = kelasEl.value;
+    if (!kelasNama) return;
+    // Cari ruangan dari data kelas
+    for (var i = 0; i < kelasList.length; i++) {
+        if (kelasList[i].nama === kelasNama && kelasList[i].ruangan) {
+            ruanganEl.value = kelasList[i].ruangan;
+            return;
+        }
+    }
+    // Kalau tidak ada ruangan di data kelas, kosongkan
+    ruanganEl.value = '';
+}
+
 function simpanJadwal() {
     var mapelEl = document.getElementById('fJadwalMapel');
     var mulaiEl = document.getElementById('fJadwalMulai');
@@ -15551,6 +15604,212 @@ function simpanAbsensiHarian(){
     document.getElementById('modalAbsensiHarian').style.display='none';
     var hadir=dataAbs.filter(function(d){return d.status==='hadir';}).length;
     showToast('Absensi '+sesi+' disimpan! Hadir: '+hadir+'/'+dataAbs.length);
+}
+
+
+// ─── CETAK REKAP ABSENSI KELAS ───
+var _rekapKelasId = null;
+
+function bukaRekapAbsensi(kelasId) {
+    _rekapKelasId = kelasId;
+    var detailModal = document.getElementById('modalDetailKelas');
+    if (detailModal) detailModal.style.display = 'none';
+    var info = document.getElementById('modalRekapKelasInfo');
+    if (info) info.textContent = getKelasNama(kelasId);
+    setPeriodeBulan();
+    document.getElementById('modalRekapAbsensi').style.display = 'flex';
+}
+
+function setPeriode(hari) {
+    var sampai = new Date();
+    var dari = new Date();
+    dari.setDate(dari.getDate() - hari);
+    var sd = document.getElementById('rekapDari');
+    var ss = document.getElementById('rekapSampai');
+    if (sd) sd.value = dari.toISOString().substr(0,10);
+    if (ss) ss.value = sampai.toISOString().substr(0,10);
+}
+
+function setPeriodeBulan() {
+    var now = new Date();
+    var dari = new Date(now.getFullYear(), now.getMonth(), 1);
+    var sampai = new Date(now.getFullYear(), now.getMonth()+1, 0);
+    var sd = document.getElementById('rekapDari');
+    var ss = document.getElementById('rekapSampai');
+    if (sd) sd.value = dari.toISOString().substr(0,10);
+    if (ss) ss.value = sampai.toISOString().substr(0,10);
+}
+
+function prosesRekapAbsensi() {
+    var kelasId = _rekapKelasId;
+    if (!kelasId) { showToast('Data kelas tidak ditemukan!'); return; }
+    var dari = (document.getElementById('rekapDari')||{value:''}).value;
+    var sampai = (document.getElementById('rekapSampai')||{value:''}).value;
+    var jenis = (document.getElementById('rekapJenis')||{value:'harian'}).value;
+    if (!dari || !sampai) { showToast('Pilih periode tanggal!'); return; }
+    if (dari > sampai) { showToast('Tanggal mulai harus sebelum tanggal akhir!'); return; }
+    if (typeof jamaahList === 'undefined' || !jamaahList || !jamaahList.length) {
+        if (typeof loadJamaahData === 'function') {
+            var res = loadJamaahData();
+            if (res && typeof res.then === 'function') {
+                res.then(function() { doCetakRekap(kelasId, dari, sampai, jenis); });
+                return;
+            }
+        }
+    }
+    doCetakRekap(kelasId, dari, sampai, jenis);
+}
+
+function doCetakRekap(kelasId, dari, sampai, jenis) {
+    var k = null;
+    for (var i = 0; i < kelasList.length; i++) {
+        if (String(kelasList[i].id) === String(kelasId)) { k = kelasList[i]; break; }
+    }
+    if (!k) { showToast('Kelas tidak ditemukan!'); return; }
+
+    var santri = getSantriByKelas(kelasId);
+    var p = getTerm('pesertaDidik');
+    var namaLembaga = localStorage.getItem('eduku_nama_lembaga') || 'EduKu';
+    var waliObj = getWaliKelasByKelasId(kelasId);
+    var waliNama = waliObj ? waliObj.nama : (k.wali || '-');
+
+    var allHarian = jenis !== 'pelajaran' ? getAbsensiHarianData() : [];
+    var allPelajaran = jenis !== 'harian' ? getAbsensiPelajaranData() : [];
+
+    var harianFiltered = [], pelajaranFiltered = [];
+    for (var j = 0; j < allHarian.length; j++) {
+        var a = allHarian[j];
+        if (String(a.kelasId) !== String(kelasId)) continue;
+        if (a.tanggal < dari || a.tanggal > sampai) continue;
+        harianFiltered.push(a);
+    }
+    for (var m = 0; m < allPelajaran.length; m++) {
+        var b = allPelajaran[m];
+        if (String(b.kelasId) !== String(kelasId)) continue;
+        if (b.tanggal < dari || b.tanggal > sampai) continue;
+        pelajaranFiltered.push(b);
+    }
+
+    // Hitung stats per santri
+    var stats = {};
+    for (var n = 0; n < santri.length; n++) {
+        stats[String(santri[n].id)] = {hadir_h:0,sakit_h:0,izin_h:0,alpha_h:0,total_h:0,hadir_p:0,sakit_p:0,izin_p:0,alpha_p:0,total_p:0};
+    }
+    for (var h = 0; h < harianFiltered.length; h++) {
+        for (var hd = 0; hd < harianFiltered[h].data.length; hd++) {
+            var e = harianFiltered[h].data[hd];
+            var sid = String(e.santriId);
+            if (!stats[sid]) continue;
+            stats[sid][e.status+'_h'] = (stats[sid][e.status+'_h']||0) + 1;
+            stats[sid].total_h++;
+        }
+    }
+    for (var pl = 0; pl < pelajaranFiltered.length; pl++) {
+        for (var pd = 0; pd < pelajaranFiltered[pl].data.length; pd++) {
+            var e2 = pelajaranFiltered[pl].data[pd];
+            var sid2 = String(e2.santriId);
+            if (!stats[sid2]) continue;
+            stats[sid2][e2.status+'_p'] = (stats[sid2][e2.status+'_p']||0) + 1;
+            stats[sid2].total_p++;
+        }
+    }
+
+    var fmtTgl = function(t) {
+        if (!t) return '-';
+        var d = t.split('-');
+        var bln = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+        return d[2]+' '+bln[parseInt(d[1])-1]+' '+d[0];
+    };
+
+    var showH = jenis !== 'pelajaran';
+    var showP = jenis !== 'harian';
+    var tglCetak = new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'});
+
+    var rows = '';
+    for (var r = 0; r < santri.length; r++) {
+        var s = santri[r];
+        var st = stats[String(s.id)] || {};
+        var pctH = st.total_h > 0 ? Math.round((st.hadir_h/st.total_h)*100) : null;
+        var pctP = st.total_p > 0 ? Math.round((st.hadir_p/st.total_p)*100) : null;
+        var cH = pctH !== null ? (pctH>=80?'#10b981':pctH>=60?'#f59e0b':'#ef4444') : '#94a3b8';
+        var cP = pctP !== null ? (pctP>=80?'#10b981':pctP>=60?'#f59e0b':'#ef4444') : '#94a3b8';
+        var bg = r%2===0 ? 'background:#f9f9f9;' : '';
+
+        rows += '<tr style="'+bg+'">'
+              + '<td style="text-align:center;font-size:11px;padding:5px;">'+(r+1)+'</td>'
+              + '<td style="font-size:11px;padding:5px;font-weight:600;">'+(s.nama_lengkap||s.nama||'?')+'</td>'
+              + '<td style="text-align:center;font-size:11px;padding:5px;">'+(s.no_porsi||'-')+'</td>';
+
+        if (showH) {
+            rows += '<td style="text-align:center;color:#10b981;font-weight:700;padding:5px;">'+(st.hadir_h||0)+'</td>'
+                  + '<td style="text-align:center;color:#ef4444;font-weight:700;padding:5px;">'+(st.alpha_h||0)+'</td>'
+                  + '<td style="text-align:center;color:#f59e0b;padding:5px;">'+(st.sakit_h||0)+'</td>'
+                  + '<td style="text-align:center;color:#3b82f6;padding:5px;">'+(st.izin_h||0)+'</td>'
+                  + '<td style="text-align:center;font-weight:700;color:'+cH+';padding:5px;">'+(pctH!==null?pctH+'%':'-')+'</td>';
+        }
+        if (showP) {
+            rows += '<td style="text-align:center;color:#10b981;font-weight:700;padding:5px;">'+(st.hadir_p||0)+'</td>'
+                  + '<td style="text-align:center;color:#ef4444;font-weight:700;padding:5px;">'+(st.alpha_p||0)+'</td>'
+                  + '<td style="text-align:center;color:#f59e0b;padding:5px;">'+(st.sakit_p||0)+'</td>'
+                  + '<td style="text-align:center;color:#3b82f6;padding:5px;">'+(st.izin_p||0)+'</td>'
+                  + '<td style="text-align:center;font-weight:700;color:'+cP+';padding:5px;">'+(pctP!==null?pctP+'%':'-')+'</td>';
+        }
+        rows += '</tr>';
+    }
+
+    var thH = showH ? '<th colspan="4" style="background:#0D5C4A;color:white;padding:6px;font-size:10px;">HARIAN ('+harianFiltered.length+' sesi)</th><th style="background:#e8f5e9;font-size:10px;">%</th>' : '';
+    var thP = showP ? '<th colspan="4" style="background:#3b82f6;color:white;padding:6px;font-size:10px;">PELAJARAN ('+pelajaranFiltered.length+' sesi)</th><th style="background:#e3f2fd;font-size:10px;">%</th>' : '';
+    var subH = showH ? '<th style="color:#10b981;font-size:10px;padding:4px;">H</th><th style="color:#ef4444;font-size:10px;padding:4px;">A</th><th style="color:#f59e0b;font-size:10px;padding:4px;">S</th><th style="color:#3b82f6;font-size:10px;padding:4px;">I</th><th style="font-size:10px;padding:4px;">%</th>' : '';
+    var subP = showP ? '<th style="color:#10b981;font-size:10px;padding:4px;">H</th><th style="color:#ef4444;font-size:10px;padding:4px;">A</th><th style="color:#f59e0b;font-size:10px;padding:4px;">S</th><th style="color:#3b82f6;font-size:10px;padding:4px;">I</th><th style="font-size:10px;padding:4px;">%</th>' : '';
+
+    var html = '<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"><title>Rekap Absensi - '+k.nama+'</title>'
+        + '<style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:Arial,sans-serif;padding:15px;}'
+        + '.kop{text-align:center;border-bottom:3px double #000;padding-bottom:8px;margin-bottom:12px;}'
+        + '.kop h2{font-size:15px;text-transform:uppercase;}.kop h3{font-size:12px;font-weight:normal;}'
+        + '.info{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;font-size:11px;}'
+        + '.info-row{display:flex;gap:4px;}.lbl{font-weight:bold;min-width:80px;}'
+        + 'table{width:100%;border-collapse:collapse;margin-bottom:14px;}'
+        + 'th,td{border:1px solid #ccc;}'
+        + '.leg{display:flex;gap:14px;margin-bottom:8px;font-size:10px;}'
+        + '.ttd{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:18px;text-align:center;font-size:11px;}'
+        + '.line{border-bottom:1px solid #000;margin:32px 10px 4px;}'
+        + '.np{display:block;text-align:center;margin-bottom:12px;}'
+        + '@media print{.np{display:none!important;}}</style></head><body>'
+        + '<div class="np"><button onclick="window.print()" style="padding:10px 24px;background:#10b981;color:white;border:none;border-radius:6px;font-size:14px;cursor:pointer;margin-right:8px;">Cetak / PDF</button>'
+        + '<button onclick="window.close()" style="padding:10px 16px;background:#666;color:white;border:none;border-radius:6px;font-size:14px;cursor:pointer;">Tutup</button></div>'
+        + '<div class="kop"><h2>'+namaLembaga+'</h2>'
+        + '<h3>REKAP ABSENSI '+p.toUpperCase()+' - KELAS '+k.nama.toUpperCase()+'</h3>'
+        + '<div style="font-size:10px;">Periode: '+fmtTgl(dari)+' s.d. '+fmtTgl(sampai)+'</div></div>'
+        + '<div class="info">'
+        + '<div class="info-row"><span class="lbl">Kelas</span><span>: '+k.nama+'</span></div>'
+        + '<div class="info-row"><span class="lbl">Wali Kelas</span><span>: '+waliNama+'</span></div>'
+        + '<div class="info-row"><span class="lbl">Jumlah</span><span>: '+santri.length+' '+p+'</span></div>'
+        + '<div class="info-row"><span class="lbl">Dicetak</span><span>: '+tglCetak+'</span></div>'
+        + '</div>'
+        + '<div class="leg">'
+        + '<span><b style="color:#10b981">H</b>=Hadir</span><span><b style="color:#ef4444">A</b>=Alpha</span>'
+        + '<span><b style="color:#f59e0b">S</b>=Sakit</span><span><b style="color:#3b82f6">I</b>=Izin</span>'
+        + '<span><b>%</b>=% Kehadiran</span></div>'
+        + '<table><thead>'
+        + '<tr><th rowspan="2" style="padding:5px;font-size:11px;width:25px;">No</th>'
+        + '<th rowspan="2" style="padding:5px;font-size:11px;text-align:left;">Nama</th>'
+        + '<th rowspan="2" style="padding:5px;font-size:11px;width:45px;">NIS</th>'
+        + thH + thP + '</tr>'
+        + '<tr>' + subH + subP + '</tr>'
+        + '</thead><tbody>'+rows+'</tbody></table>'
+        + '<div class="ttd">'
+        + '<div>Mengetahui,<br><small>Kepala Lembaga</small><div class="line"></div>( ________________________ )</div>'
+        + '<div>'+tglCetak+'<br><small>Wali Kelas</small><div class="line"></div>( '+waliNama+' )</div>'
+        + '</div>'
+        + '<div style="text-align:center;margin-top:12px;font-size:9px;color:#999;">Generated by EduKu</div>'
+        + '</body></html>';
+
+    document.getElementById('modalRekapAbsensi').style.display = 'none';
+    var w = window.open('','_blank','width=900,height=600');
+    if (!w) { showToast('Aktifkan popup browser untuk cetak!'); return; }
+    w.document.write(html);
+    w.document.close();
+    showToast('Rekap absensi siap dicetak!');
 }
 
 // ─── CETAK DAFTAR SANTRI ───
