@@ -14487,7 +14487,9 @@ function loginGuru() {
     if (sel) {
         var opts='<option value="">-- Pilih nama Anda --</option>';
         for (var i=0;i<pengajarList.length;i++) {
-            if (pengajarList[i].pin) opts+='<option value="'+pengajarList[i].id+'">'+pengajarList[i].nama+'</option>';
+            var p=pengajarList[i];
+            var label=p.nama+(p.pin?'':' (PIN belum diset)');
+            opts+='<option value="'+p.id+'"'+(p.pin?'':' style="color:#94a3b8;"')+'>'+label+'</option>';
         }
         sel.innerHTML=opts;
     }
@@ -14510,7 +14512,15 @@ function doLoginGuru() {
     for (var i=0;i<pengajarList.length;i++) {
         if (String(pengajarList[i].id)===String(pengajarId)) { guru=pengajarList[i]; break; }
     }
-    if (!guru || guru.pin!==pin) {
+    if (!guru) {
+        if(err){err.textContent='Guru tidak ditemukan!';err.style.display='block';}
+        return;
+    }
+    if (!guru.pin) {
+        if(err){err.textContent='PIN belum diset. Hubungi Admin untuk set PIN!';err.style.display='block';}
+        return;
+    }
+    if (guru.pin!==pin) {
         if(err){err.textContent='PIN salah! Coba lagi.';err.style.display='block';}
         if(inp){inp.value='';inp.focus();}
         return;
