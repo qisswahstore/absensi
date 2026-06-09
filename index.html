@@ -1962,27 +1962,84 @@
 
 <!-- ESTIMASI PAGE -->
 <div id="page-estimasi" class="page">
-    <div class="header-premium header-premium-small"><div class="back-header"><i class="fas fa-arrow-left" onclick="showPage('home')"></i><h2>Kalkulator Biaya Pendidikan</h2><div style="width:30px;"></div></div></div>
-    <div class="card-premium">
-        <div class="logo-box text-center"><img src="https://img.icons8.com/color/96/school.png" style="width:50px;"></div>
-        <p class="text-center" style="color:var(--gray); font-size:0.8rem;" id="dashFooterNama">EduKu</p>
-        <div class="section-title" style="margin-top:15px;"><span>DATA ROMBONGAN</span></div>
-        <div class="input-group"><label>Nama Paket / Lokasi</label><input type="text" id="lokasiPaket" value="Program 9 HARI"></div>
-        <div class="row"><div class="input-group"><label>Total Pax</label><input type="number" id="totJam" value="21"></div><div class="input-group"><label>Gratis</label><input type="number" id="jamGratis" value="1"></div><div class="input-group"><label>Jumlah TL</label><input type="number" id="numTL" value="1"></div></div>
-        <div class="section-title"><span>KOMPONEN BIAYA</span></div>
-        <div class="row"><div class="input-group"><label>Tiket</label><input type="text" id="cTiket" class="money-input" value="15.450.000"></div><div class="input-group"><label>LA / Hotel</label><input type="text" id="cLA" class="money-input" value="14.450.000"></div></div>
-        <div class="row"><div class="input-group"><label>Asuransi</label><input type="text" id="cAsuransi" class="money-input" value="60.000"></div><div class="input-group"><label>Handling</label><input type="text" id="cHandling" class="money-input" value="100.000"></div></div>
-        <div class="row"><div class="input-group"><label>Perlengkapan</label><input type="text" id="cAlat" class="money-input" value="1.000.000"></div><div class="input-group"><label>Aplikasi</label><input type="text" id="cAplikasi" class="money-input" value="60.000"></div></div>
-        <div class="row"><div class="input-group"><label>Diskon/PIC</label><input type="text" id="cPIC" class="money-input" value="0"></div><div class="input-group"><label>Lain-lain</label><input type="text" id="cLain" class="money-input" value="0"></div></div>
-        <div class="section-title"><span>Margin</span></div>
-        <div class="input-group"><label>Profit (%)</label><input type="number" id="profitPct" value="5"></div>
-        <button class="btn btn-primary" onclick="hitungUmroh()"><i class="fas fa-calculator"></i> HITUNG ESTIMASI</button>
-        <button class="btn btn-orange mt-2" onclick="resetEstimasiToDefault()"><i class="fas fa-undo-alt"></i> RESET KE DEFAULT</button>
+  <div class="header-premium header-premium-small">
+    <div class="back-header">
+      <i class="fas fa-arrow-left" onclick="showPage('home')"></i>
+      <h2>Kalkulator Biaya</h2>
+      <div style="width:30px;"></div>
     </div>
-    <div id="hasilEstimasi" class="res-card" style="display:none;"></div>
+  </div>
+  <div style="padding:16px;padding-bottom:80px;">
+
+    <!-- Info Santri -->
+    <div style="background:white;border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+      <div style="font-weight:700;font-size:15px;color:var(--primary);margin-bottom:12px;">&#128203; Info Santri</div>
+      <div style="display:grid;gap:10px;">
+        <div>
+          <label style="display:block;font-size:12px;font-weight:600;color:#64748b;margin-bottom:4px;">Nama Santri (opsional)</label>
+          <input type="text" id="kalcNama" placeholder="Contoh: Ahmad Fauzi" oninput="hitungKalkulator()" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;outline:none;">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div>
+            <label style="display:block;font-size:12px;font-weight:600;color:#64748b;margin-bottom:4px;">Kelas</label>
+            <select id="kalcKelas" onchange="hitungKalkulator()" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:13px;">
+              <option value="">-- Pilih Kelas --</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block;font-size:12px;font-weight:600;color:#64748b;margin-bottom:4px;">Periode</label>
+            <select id="kalcPeriode" onchange="hitungKalkulator()" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:13px;">
+              <option value="1">1 Bulan</option>
+              <option value="6">6 Bulan</option>
+              <option value="12" selected>1 Tahun</option>
+              <option value="36">3 Tahun</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Komponen Biaya -->
+    <div style="background:white;border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div style="font-weight:700;font-size:15px;color:var(--primary);">&#128176; Komponen Biaya</div>
+        <button onclick="tambahKomponenKalc()" style="background:var(--primary);color:white;border:none;border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;font-weight:600;">+ Tambah</button>
+      </div>
+      <div id="kalcKomponenList"></div>
+    </div>
+
+    <!-- Hasil Total -->
+    <div style="background:linear-gradient(135deg,var(--primary),#0a4a3a);color:white;border-radius:14px;padding:20px;margin-bottom:14px;">
+      <div style="font-size:13px;opacity:0.8;margin-bottom:4px;">Total Biaya</div>
+      <div id="kalcTotalPeriode" style="font-size:28px;font-weight:800;margin-bottom:8px;">Rp 0</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;background:rgba(255,255,255,0.1);border-radius:10px;padding:12px;">
+        <div style="text-align:center;">
+          <div style="font-size:11px;opacity:0.8;">Per Bulan</div>
+          <div id="kalcTotalBulan" style="font-size:16px;font-weight:700;">Rp 0</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:11px;opacity:0.8;">Per Tahun</div>
+          <div id="kalcTotalTahun" style="font-size:16px;font-weight:700;">Rp 0</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Aksi -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+      <button onclick="cetakKalkulator()" style="padding:12px;background:white;color:var(--primary);border:2px solid var(--primary);border-radius:10px;font-weight:700;cursor:pointer;font-size:13px;">&#128438; Cetak</button>
+      <button onclick="shareKalkulatorWA()" style="padding:12px;background:#25D366;color:white;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-size:13px;">&#128172; Share WA</button>
+    </div>
+
+    <!-- Simpan Template -->
+    <div style="background:white;border-radius:14px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+      <div style="font-weight:700;font-size:13px;color:#64748b;margin-bottom:10px;">&#128190; Template Tersimpan</div>
+      <div id="kalcTemplateList"></div>
+      <button onclick="simpanTemplateKalc()" style="width:100%;padding:10px;background:#f1f5f9;color:#333;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:13px;margin-top:8px;">+ Simpan sebagai Template</button>
+    </div>
+
+  </div>
 </div>
 
-<!-- KAS PAGE -->
 <div id="page-kas" class="page">
     <div class="header-premium header-premium-small"><div class="back-header"><i class="fas fa-arrow-left" onclick="showPage('home')"></i><h2>Uang Kas</h2><div style="width:30px;"></div></div></div>
     <div class="card-premium">
@@ -3072,6 +3129,7 @@ function internalShowPage(pageId) {
     if (pageId === 'mapel') { try{renderMapelList();}catch(e){} }
     if (pageId === 'raport') { try{initRaport();}catch(e){} }
     if (pageId === 'guru') { try{initGuruMode();}catch(e){} }
+    if (pageId === 'estimasi') { try{initKalkulator();}catch(e){} }
     if (pageId === 'absensi_harian') { try{bukaAbsensiHarian();showPage('home');}catch(e){} }
     if (pageId === 'uploaddokumen') { 
         // PENTING: Reload jamaah data DAN dokumen data untuk memastikan semua ter-load
@@ -15428,14 +15486,14 @@ function loadSantriUntukAbsensi() {
       +'</div>';
     for(var i=0;i<santri.length;i++){
         var s=santri[i];var sId=String(s.id);
-        h+='<div style="display:flex;align-items:center;gap:8px;padding:9px;border-bottom:1px solid #f1f5f9;" id="absRow_'+sId+'">'
-          +'<div style="flex:1;font-size:13px;font-weight:600;">'+(i+1)+'. '+(s.nama_lengkap||s.nama||'?')+'</div>'
-          +'<div style="display:flex;gap:4px;">'
-          +'<button data-sid="'+sId+'" data-sts="hadir" onclick="ekAbsClick(this)" class="abx-btn abx-hadir" style="padding:6px 10px;border:2px solid #10b981;border-radius:7px;background:#10b981;color:white;font-size:11px;font-weight:700;cursor:pointer;">H</button>'
-          +'<button data-sid="'+sId+'" data-sts="sakit" onclick="ekAbsClick(this)" class="abx-btn abx-sakit" style="padding:6px 10px;border:2px solid #f59e0b;border-radius:7px;background:white;color:#f59e0b;font-size:11px;font-weight:700;cursor:pointer;">S</button>'
-          +'<button data-sid="'+sId+'" data-sts="izin" onclick="ekAbsClick(this)" class="abx-btn abx-izin" style="padding:6px 10px;border:2px solid #3b82f6;border-radius:7px;background:white;color:#3b82f6;font-size:11px;font-weight:700;cursor:pointer;">I</button>'
-          +'<button data-sid="'+sId+'" data-sts="alpha" onclick="ekAbsClick(this)" class="abx-btn abx-alpha" style="padding:6px 10px;border:2px solid #ef4444;border-radius:7px;background:white;color:#ef4444;font-size:11px;font-weight:700;cursor:pointer;">A</button>'
-          +'</div></div>';
+        h += '<div style="display:flex;align-items:center;gap:8px;padding:9px;border-bottom:1px solid #f1f5f9;" id="absRow_'+sId+'">'
+           + '<div style="flex:1;font-size:13px;font-weight:600;">'+(i+1)+'. '+(s.nama_lengkap||s.nama||'?')+'</div>'
+           + '<div style="display:flex;gap:4px;">'
+           + '<button data-sid="'+sId+'" data-sts="hadir" onclick="ekAbsClick(this)" class="abx-btn abx-hadir" style="padding:6px 10px;border:2px solid #10b981;border-radius:7px;background:#10b981;color:white;font-size:11px;font-weight:700;cursor:pointer;">H</button>'
+           + '<button data-sid="'+sId+'" data-sts="sakit" onclick="ekAbsClick(this)" class="abx-btn abx-sakit" style="padding:6px 10px;border:2px solid #f59e0b;border-radius:7px;background:white;color:#f59e0b;font-size:11px;font-weight:700;cursor:pointer;">S</button>'
+           + '<button data-sid="'+sId+'" data-sts="izin" onclick="ekAbsClick(this)" class="abx-btn abx-izin" style="padding:6px 10px;border:2px solid #3b82f6;border-radius:7px;background:white;color:#3b82f6;font-size:11px;font-weight:700;cursor:pointer;">I</button>'
+           + '<button data-sid="'+sId+'" data-sts="alpha" onclick="ekAbsClick(this)" class="abx-btn abx-alpha" style="padding:6px 10px;border:2px solid #ef4444;border-radius:7px;background:white;color:#ef4444;font-size:11px;font-weight:700;cursor:pointer;">A</button>'
+           + '</div></div>';
     }
     ct.innerHTML=h;
 }
@@ -15539,14 +15597,18 @@ function loadSantriAbsensiHarian(){
       +'</div>';
     for(var k=0;k<santri.length;k++){
         var s=santri[k];var sId=String(s.id);var cur=_absHarianMap[sId]||'hadir';
-        h+='<div style="display:flex;align-items:center;gap:8px;padding:9px;border-bottom:1px solid #f1f5f9;" id="absHRow_'+sId+'">'
-          +'<div style="flex:1;font-size:13px;font-weight:600;">'+(k+1)+'. '+(s.nama_lengkap||s.nama||'?')+'</div>'
-          +'<div style="display:flex;gap:4px;">'
-          +'<button data-sid="'+sId+'" data-sts="hadir" onclick="ekHarianClick(this)" class="abh-btn abh-hadir" style="padding:6px 10px;border:2px solid #10b981;border-radius:7px;background:'+(cur==='hadir'?'#10b981':'white')+';color:'+(cur==='hadir'?'white':'#10b981')+';font-size:11px;font-weight:700;cursor:pointer;">H</button>'
-          +'<button data-sid="'+sId+'" data-sts="sakit" onclick="ekHarianClick(this)" class="abh-btn abh-sakit" style="padding:6px 10px;border:2px solid #f59e0b;border-radius:7px;background:'+(cur==='sakit'?'#f59e0b':'white')+';color:'+(cur==='sakit'?'white':'#f59e0b')+';font-size:11px;font-weight:700;cursor:pointer;">S</button>'
-          +'<button data-sid="'+sId+'" data-sts="izin" onclick="ekHarianClick(this)" class="abh-btn abh-izin" style="padding:6px 10px;border:2px solid #3b82f6;border-radius:7px;background:'+(cur==='izin'?'#3b82f6':'white')+';color:'+(cur==='izin'?'white':'#3b82f6')+';font-size:11px;font-weight:700;cursor:pointer;">I</button>'
-          +'<button data-sid="'+sId+'" data-sts="alpha" onclick="ekHarianClick(this)" class="abh-btn abh-alpha" style="padding:6px 10px;border:2px solid #ef4444;border-radius:7px;background:'+(cur==='alpha'?'#ef4444':'white')+';color:'+(cur==='alpha'?'white':'#ef4444')+';font-size:11px;font-weight:700;cursor:pointer;">A</button>'
-          +'</div></div>';
+        var bgH=cur==='hadir'?'#10b981':'white', clH=cur==='hadir'?'white':'#10b981';
+        var bgS=cur==='sakit'?'#f59e0b':'white', clS=cur==='sakit'?'white':'#f59e0b';
+        var bgI=cur==='izin'?'#3b82f6':'white',  clI=cur==='izin'?'white':'#3b82f6';
+        var bgA=cur==='alpha'?'#ef4444':'white', clA=cur==='alpha'?'white':'#ef4444';
+        h += '<div style="display:flex;align-items:center;gap:8px;padding:9px;border-bottom:1px solid #f1f5f9;" id="absHRow_'+sId+'">'
+           + '<div style="flex:1;font-size:13px;font-weight:600;">'+(k+1)+'. '+(s.nama_lengkap||s.nama||'?')+'</div>'
+           + '<div style="display:flex;gap:4px;">'
+           + '<button data-sid="'+sId+'" data-sts="hadir" onclick="ekHarianClick(this)" class="abh-btn abh-hadir" style="padding:6px 10px;border:2px solid #10b981;border-radius:7px;background:'+bgH+';color:'+clH+';font-size:11px;font-weight:700;cursor:pointer;">H</button>'
+           + '<button data-sid="'+sId+'" data-sts="sakit" onclick="ekHarianClick(this)" class="abh-btn abh-sakit" style="padding:6px 10px;border:2px solid #f59e0b;border-radius:7px;background:'+bgS+';color:'+clS+';font-size:11px;font-weight:700;cursor:pointer;">S</button>'
+           + '<button data-sid="'+sId+'" data-sts="izin" onclick="ekHarianClick(this)" class="abh-btn abh-izin" style="padding:6px 10px;border:2px solid #3b82f6;border-radius:7px;background:'+bgI+';color:'+clI+';font-size:11px;font-weight:700;cursor:pointer;">I</button>'
+           + '<button data-sid="'+sId+'" data-sts="alpha" onclick="ekHarianClick(this)" class="abh-btn abh-alpha" style="padding:6px 10px;border:2px solid #ef4444;border-radius:7px;background:'+bgA+';color:'+clA+';font-size:11px;font-weight:700;cursor:pointer;">A</button>'
+           + '</div></div>';
     }
     ct.innerHTML=h;
 }
@@ -15885,6 +15947,291 @@ function initAbsensiPage() {
     bukaAbsensiHarian();
     // Tidak ada page-absensi, redirect ke home
     showPage('home');
+}
+
+
+// ===== KALKULATOR BIAYA PENDIDIKAN =====
+var kalcKomponen = [
+    { id: 1, nama: 'SPP Bulanan', jumlah: 150000, tipe: 'bulanan' },
+    { id: 2, nama: 'Biaya Makan', jumlah: 300000, tipe: 'bulanan' },
+    { id: 3, nama: 'Biaya Kitab', jumlah: 50000,  tipe: 'bulanan' },
+    { id: 4, nama: 'Uang Gedung', jumlah: 500000, tipe: 'sekali' },
+    { id: 5, nama: 'Seragam',     jumlah: 200000, tipe: 'sekali' }
+];
+var kalcNextId = 6;
+
+function initKalkulator() {
+    // Populate dropdown kelas
+    var ks = document.getElementById('kalcKelas');
+    if (ks) {
+        var opts = '<option value="">-- Pilih Kelas --</option>';
+        for (var i = 0; i < kelasList.length; i++) {
+            opts += '<option value="'+kelasList[i].nama+'">'+kelasList[i].nama+'</option>';
+        }
+        ks.innerHTML = opts;
+    }
+    // Load template tersimpan
+    var saved = localStorage.getItem('eduku_kalc_komponen');
+    if (saved) {
+        try {
+            var loaded = JSON.parse(saved);
+            if (loaded && loaded.length) {
+                kalcKomponen = loaded;
+                kalcNextId = kalcKomponen.reduce(function(mx, k){ return Math.max(mx, k.id||0); }, 0) + 1;
+            }
+        } catch(e) {}
+    }
+    renderKomponenKalc();
+    renderTemplateKalc();
+    hitungKalkulator();
+}
+
+function renderKomponenKalc() {
+    var ct = document.getElementById('kalcKomponenList');
+    if (!ct) return;
+    if (!kalcKomponen.length) {
+        ct.innerHTML = '<div style="text-align:center;padding:16px;color:#94a3b8;font-size:13px;">Belum ada komponen biaya</div>';
+        return;
+    }
+    var html = '';
+    for (var i = 0; i < kalcKomponen.length; i++) {
+        var k = kalcKomponen[i];
+        var tipLabel = k.tipe === 'sekali' ? 'Sekali' : 'Per Bulan';
+        var tipColor = k.tipe === 'sekali' ? '#8b5cf6' : '#3b82f6';
+        html += '<div style="display:flex;align-items:center;gap:8px;padding:10px;background:#f8fafc;border-radius:10px;margin-bottom:8px;">'
+              + '<div style="flex:1;">'
+              + '<div style="font-weight:600;font-size:13px;">'+k.nama+'</div>'
+              + '<div style="font-size:11px;color:'+tipColor+';font-weight:600;">'+tipLabel+'</div>'
+              + '</div>'
+              + '<div style="font-weight:700;font-size:14px;color:var(--primary);">'+formatRp(k.jumlah)+'</div>'
+              + '<button data-kid="'+k.id+'" onclick="editKomponenKalc(this.dataset.kid)" style="background:#e2e8f0;border:none;border-radius:6px;padding:6px 8px;cursor:pointer;font-size:11px;">Edit</button>'
+              + '<button data-kid="'+k.id+'" onclick="hapusKomponenKalc(this.dataset.kid)" style="background:#fef2f2;border:none;border-radius:6px;padding:6px 8px;cursor:pointer;font-size:11px;color:#ef4444;">Hapus</button>'
+              + '</div>';
+    }
+    ct.innerHTML = html;
+}
+
+function tambahKomponenKalc() {
+    var nama = prompt('Nama komponen biaya:');
+    if (!nama) return;
+    var jumlahStr = prompt('Jumlah biaya (angka saja):', '0');
+    if (!jumlahStr) return;
+    var jumlah = parseInt(jumlahStr.replace(/\D/g,'')) || 0;
+    var tipe = confirm('Per bulan? (OK=Per Bulan, Batal=Sekali Bayar)') ? 'bulanan' : 'sekali';
+    kalcKomponen.push({ id: kalcNextId++, nama: nama, jumlah: jumlah, tipe: tipe });
+    simpanKomponenKalc();
+    renderKomponenKalc();
+    hitungKalkulator();
+}
+
+function editKomponenKalc(kid) {
+    var k = null;
+    for (var i = 0; i < kalcKomponen.length; i++) {
+        if (String(kalcKomponen[i].id) === String(kid)) { k = kalcKomponen[i]; break; }
+    }
+    if (!k) return;
+    var nama = prompt('Nama komponen:', k.nama);
+    if (!nama) return;
+    var jumlahStr = prompt('Jumlah biaya:', k.jumlah);
+    if (!jumlahStr) return;
+    var jumlah = parseInt(jumlahStr.replace(/\D/g,'')) || 0;
+    var tipe = confirm('Per bulan? (OK=Per Bulan, Batal=Sekali Bayar)') ? 'bulanan' : 'sekali';
+    k.nama = nama; k.jumlah = jumlah; k.tipe = tipe;
+    simpanKomponenKalc();
+    renderKomponenKalc();
+    hitungKalkulator();
+}
+
+function hapusKomponenKalc(kid) {
+    if (!confirm('Hapus komponen ini?')) return;
+    kalcKomponen = kalcKomponen.filter(function(k){ return String(k.id) !== String(kid); });
+    simpanKomponenKalc();
+    renderKomponenKalc();
+    hitungKalkulator();
+}
+
+function simpanKomponenKalc() {
+    localStorage.setItem('eduku_kalc_komponen', JSON.stringify(kalcKomponen));
+}
+
+function hitungKalkulator() {
+    var periode = parseInt((document.getElementById('kalcPeriode')||{value:'12'}).value) || 12;
+    var totalBulanan = 0, totalSekali = 0;
+    for (var i = 0; i < kalcKomponen.length; i++) {
+        if (kalcKomponen[i].tipe === 'bulanan') {
+            totalBulanan += kalcKomponen[i].jumlah;
+        } else {
+            totalSekali += kalcKomponen[i].jumlah;
+        }
+    }
+    var totalPeriode = (totalBulanan * periode) + totalSekali;
+    var totalTahun = (totalBulanan * 12) + totalSekali;
+
+    var elPeriode = document.getElementById('kalcTotalPeriode');
+    var elBulan = document.getElementById('kalcTotalBulan');
+    var elTahun = document.getElementById('kalcTotalTahun');
+
+    var periodeLabel = periode === 1 ? '1 Bulan' : periode === 6 ? '6 Bulan' : periode === 12 ? '1 Tahun' : periode + ' Bulan';
+    if (elPeriode) elPeriode.textContent = formatRp(totalPeriode);
+    if (elBulan) elBulan.textContent = formatRp(totalBulanan);
+    if (elTahun) elTahun.textContent = formatRp(totalTahun);
+}
+
+function formatRp(n) {
+    return 'Rp ' + (n||0).toLocaleString('id-ID');
+}
+
+function cetakKalkulator() {
+    var nama = (document.getElementById('kalcNama')||{value:''}).value || '-';
+    var kelas = (document.getElementById('kalcKelas')||{value:''}).value || '-';
+    var periodeEl = document.getElementById('kalcPeriode');
+    var periode = parseInt(periodeEl ? periodeEl.value : 12) || 12;
+    var periodeLabel = periode === 1 ? '1 Bulan' : periode === 6 ? '6 Bulan' : periode === 12 ? '1 Tahun' : periode + ' Bulan';
+    var namaLembaga = localStorage.getItem('eduku_nama_lembaga') || 'EduKu';
+    var tglCetak = new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'});
+
+    var totalBulanan = 0, totalSekali = 0;
+    var rows = '';
+    for (var i = 0; i < kalcKomponen.length; i++) {
+        var k = kalcKomponen[i];
+        if (k.tipe === 'bulanan') totalBulanan += k.jumlah;
+        else totalSekali += k.jumlah;
+        rows += '<tr><td style="padding:8px;">'+(i+1)+'</td>'
+              + '<td style="padding:8px;">'+k.nama+'</td>'
+              + '<td style="padding:8px;text-align:center;color:'+(k.tipe==='bulanan'?'#3b82f6':'#8b5cf6')+';font-size:11px;">'+(k.tipe==='bulanan'?'Per Bulan':'Sekali')+'</td>'
+              + '<td style="padding:8px;text-align:right;font-weight:600;">'+formatRp(k.jumlah)+'</td>'
+              + '<td style="padding:8px;text-align:right;color:#10b981;font-weight:600;">'+formatRp(k.tipe==='bulanan'?k.jumlah*periode:k.jumlah)+'</td></tr>';
+    }
+    var totalPeriode = (totalBulanan * periode) + totalSekali;
+    var totalTahun = (totalBulanan * 12) + totalSekali;
+
+    var html = '<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"><title>Rincian Biaya - '+nama+'</title>'
+        + '<style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:Arial,sans-serif;padding:20px;font-size:12px;}'
+        + '.kop{text-align:center;border-bottom:3px double #000;padding-bottom:10px;margin-bottom:14px;}'
+        + '.kop h2{font-size:16px;text-transform:uppercase;}.kop h3{font-size:13px;font-weight:normal;}'
+        + 'table{width:100%;border-collapse:collapse;margin:14px 0;}'
+        + 'th{background:#0D5C4A;color:white;padding:8px;text-align:left;}'
+        + 'td{border:1px solid #ddd;}'
+        + 'tr:nth-child(even){background:#f9f9f9;}'
+        + '.total{background:#0D5C4A;color:white;padding:14px;border-radius:8px;margin-top:14px;}'
+        + '.np{display:block;text-align:center;margin-bottom:14px;}'
+        + '@media print{.np{display:none!important;}}</style></head><body>'
+        + '<div class="np"><button onclick="window.print()" style="padding:10px 24px;background:#0D5C4A;color:white;border:none;border-radius:6px;font-size:14px;cursor:pointer;margin-right:8px;">Cetak / PDF</button>'
+        + '<button onclick="window.close()" style="padding:10px 16px;background:#666;color:white;border:none;border-radius:6px;font-size:14px;cursor:pointer;">Tutup</button></div>'
+        + '<div class="kop"><h2>'+namaLembaga+'</h2><h3>RINCIAN BIAYA PENDIDIKAN</h3></div>'
+        + '<table style="margin-bottom:14px;border:none;"><tr><td style="border:none;padding:4px;"><b>Nama Santri</b></td><td style="border:none;padding:4px;">: '+nama+'</td><td style="border:none;padding:4px;"><b>Kelas</b></td><td style="border:none;padding:4px;">: '+kelas+'</td></tr>'
+        + '<tr><td style="border:none;padding:4px;"><b>Periode</b></td><td style="border:none;padding:4px;">: '+periodeLabel+'</td><td style="border:none;padding:4px;"><b>Tanggal</b></td><td style="border:none;padding:4px;">: '+tglCetak+'</td></tr></table>'
+        + '<table><thead><tr><th style="width:30px;">No</th><th>Komponen Biaya</th><th style="width:80px;text-align:center;">Jenis</th><th style="width:100px;text-align:right;">Per Satuan</th><th style="width:100px;text-align:right;">Total</th></tr></thead>'
+        + '<tbody>'+rows+'</tbody></table>'
+        + '<div class="total">'
+        + '<div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span>Total Per Bulan:</span><span style="font-weight:700;">'+formatRp(totalBulanan)+'</span></div>'
+        + '<div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span>Biaya Sekali Bayar:</span><span style="font-weight:700;">'+formatRp(totalSekali)+'</span></div>'
+        + '<div style="display:flex;justify-content:space-between;border-top:1px solid rgba(255,255,255,0.3);padding-top:8px;margin-top:6px;"><span style="font-size:14px;font-weight:700;">TOTAL '+periodeLabel.toUpperCase()+':</span><span style="font-size:18px;font-weight:800;">'+formatRp(totalPeriode)+'</span></div>'
+        + '</div>'
+        + '<div style="text-align:center;margin-top:16px;font-size:10px;color:#999;">Generated by EduKu</div>'
+        + '</body></html>';
+
+    var w = window.open('','_blank','width=800,height=600');
+    if (!w) { showToast('Aktifkan popup browser!'); return; }
+    w.document.write(html);
+    w.document.close();
+}
+
+function shareKalkulatorWA() {
+    var nama = (document.getElementById('kalcNama')||{value:''}).value || 'Santri';
+    var kelas = (document.getElementById('kalcKelas')||{value:''}).value || '-';
+    var periodeEl = document.getElementById('kalcPeriode');
+    var periode = parseInt(periodeEl ? periodeEl.value : 12) || 12;
+    var periodeLabel = periode === 1 ? '1 Bulan' : periode === 6 ? '6 Bulan' : periode === 12 ? '1 Tahun' : periode + ' Bulan';
+    var namaLembaga = localStorage.getItem('eduku_nama_lembaga') || 'EduKu';
+
+    var totalBulanan = 0, totalSekali = 0;
+    var rincian = '';
+    for (var i = 0; i < kalcKomponen.length; i++) {
+        var k = kalcKomponen[i];
+        if (k.tipe === 'bulanan') totalBulanan += k.jumlah;
+        else totalSekali += k.jumlah;
+        rincian += '• '+k.nama+': '+formatRp(k.jumlah)+(k.tipe==='bulanan'?' /bulan':' (sekali)')+'\n';
+
+    }
+    var totalPeriode = (totalBulanan * periode) + totalSekali;
+
+    var nl = '\n';
+    var sep = '─────────────────';
+    var msg = '*RINCIAN BIAYA PENDIDIKAN*' + nl
+            + namaLembaga + nl
+            + sep + nl
+            + 'Nama   : ' + nama + nl
+            + 'Kelas  : ' + kelas + nl
+            + 'Periode: ' + periodeLabel + nl
+            + sep + nl
+            + rincian
+            + sep + nl
+            + 'Per Bulan : ' + formatRp(totalBulanan) + nl
+            + 'Total ' + periodeLabel + ': *' + formatRp(totalPeriode) + '*' + nl
+            + sep + nl
+            + '_Via EduKu_';
+
+    window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+}
+
+// Template functions
+function simpanTemplateKalc() {
+    var nama = prompt('Nama template (contoh: Kelas Reguler, Kelas Tahfidz):');
+    if (!nama) return;
+    var templates = [];
+    try { templates = JSON.parse(localStorage.getItem('eduku_kalc_templates')||'[]'); } catch(e) {}
+    templates.push({ id: Date.now(), nama: nama, komponen: JSON.parse(JSON.stringify(kalcKomponen)) });
+    localStorage.setItem('eduku_kalc_templates', JSON.stringify(templates));
+    renderTemplateKalc();
+    showToast('Template disimpan!');
+}
+
+function renderTemplateKalc() {
+    var ct = document.getElementById('kalcTemplateList');
+    if (!ct) return;
+    var templates = [];
+    try { templates = JSON.parse(localStorage.getItem('eduku_kalc_templates')||'[]'); } catch(e) {}
+    if (!templates.length) {
+        ct.innerHTML = '<div style="font-size:12px;color:#94a3b8;text-align:center;padding:8px;">Belum ada template</div>';
+        return;
+    }
+    var html = '';
+    for (var i = 0; i < templates.length; i++) {
+        var t = templates[i];
+        html += '<div style="display:flex;align-items:center;gap:8px;padding:8px;background:#f8fafc;border-radius:8px;margin-bottom:6px;">'
+              + '<div style="flex:1;font-size:13px;font-weight:600;">'+t.nama+'</div>'
+              + '<button data-tid="'+t.id+'" onclick="pakaiTemplateKalc(this.dataset.tid)" style="background:var(--primary);color:white;border:none;border-radius:6px;padding:6px 10px;font-size:11px;cursor:pointer;">Pakai</button>'
+              + '<button data-tid="'+t.id+'" onclick="hapusTemplateKalc(this.dataset.tid)" style="background:#fef2f2;color:#ef4444;border:none;border-radius:6px;padding:6px 8px;font-size:11px;cursor:pointer;">Hapus</button>'
+              + '</div>';
+    }
+    ct.innerHTML = html;
+}
+
+function pakaiTemplateKalc(tid) {
+    var templates = [];
+    try { templates = JSON.parse(localStorage.getItem('eduku_kalc_templates')||'[]'); } catch(e) {}
+    for (var i = 0; i < templates.length; i++) {
+        if (String(templates[i].id) === String(tid)) {
+            kalcKomponen = JSON.parse(JSON.stringify(templates[i].komponen));
+            kalcNextId = kalcKomponen.reduce(function(mx,k){return Math.max(mx,k.id||0);},0) + 1;
+            simpanKomponenKalc();
+            renderKomponenKalc();
+            hitungKalkulator();
+            showToast('Template "'+templates[i].nama+'" dipakai!');
+            return;
+        }
+    }
+}
+
+function hapusTemplateKalc(tid) {
+    if (!confirm('Hapus template ini?')) return;
+    var templates = [];
+    try { templates = JSON.parse(localStorage.getItem('eduku_kalc_templates')||'[]'); } catch(e) {}
+    templates = templates.filter(function(t){ return String(t.id) !== String(tid); });
+    localStorage.setItem('eduku_kalc_templates', JSON.stringify(templates));
+    renderTemplateKalc();
+    showToast('Template dihapus!');
 }
 
 // === INIT ===
