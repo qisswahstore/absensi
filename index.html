@@ -3117,7 +3117,7 @@ function internalShowPage(pageId) {
     if (pageId === 'zakat') { if(window.renderSumberHartaList) window.renderSumberHartaList(); }
     if (pageId === 'pembayaran') { if(window.renderPaymentDashboard) window.renderPaymentDashboard(); if(window.renderPaymentJamaahList) window.renderPaymentJamaahList(); if(window.populatePaymentJamaahDropdown) window.populatePaymentJamaahDropdown(); }
     if (pageId === 'datamaster') { if(window.loadMasterData) window.loadMasterData(); if(window.renderDynamicModeSwitcher) window.renderDynamicModeSwitcher(); }
-    if (pageId === 'home') { updateLicenseBanner(); updateLicenseSummary(); }
+    if (pageId === 'home') { updateLicenseBanner(); updateLicenseSummary(); try { updateHomeStats(); } catch(e) {} }
     if (pageId === 'lisensi') { renderLicenseStatus(); }
     if (pageId === 'setting') { updateLicenseSummary(); }
     if (pageId === 'konfigurasi') { if(window.loadKonfigurasiPro) window.loadKonfigurasiPro(); setTimeout(applyKonfigurasiLock, 400); }
@@ -12001,29 +12001,38 @@ async function initPremium() {
     initDarkMode();
     
     loadEstimasiData();
-    // Load semua data dari IndexedDB secara berurutan
-    await openIndexedDB(); // Pastikan DB terbuka dulu
-    await loadKonfigurasiPro();
-    await loadDynamicFieldsJamaah();
-    await loadJamaahData();
-    await loadJamaahKitaData();
-    await loadKasData();
-    await loadPaymentData();
-    await loadMasterData();
-    await loadFolderData();
-    loadModesFromStorage();
-    renderDynamicModeSwitcher();
-    loadCatatanData();
-    await loadDokumenData();
-    loadPengingatData();
-    await loadAbsensiData();
-    loadSumberHartaList();
+    // Load semua data - setiap step dibungkus try-catch
+    // agar error satu step tidak hentikan seluruh initPremium
+    try { await openIndexedDB(); } catch(e) { console.warn('openIndexedDB:', e.message); }
+    try { await loadKonfigurasiPro(); } catch(e) { console.warn('loadKonfigurasiPro:', e.message); }
+    try { await loadDynamicFieldsJamaah(); } catch(e) { console.warn('loadDynamicFieldsJamaah:', e.message); }
+    try { await loadJamaahData(); } catch(e) { console.warn('loadJamaahData:', e.message); }
+    try { await loadJamaahKitaData(); } catch(e) { console.warn('loadJamaahKitaData:', e.message); }
+    try { await loadKasData(); } catch(e) { console.warn('loadKasData:', e.message); }
+    try { await loadPaymentData(); } catch(e) { console.warn('loadPaymentData:', e.message); }
+    try { await loadMasterData(); } catch(e) { console.warn('loadMasterData:', e.message); }
+    try { await loadFolderData(); } catch(e) { console.warn('loadFolderData:', e.message); }
+    try { loadModesFromStorage(); } catch(e) { console.warn('loadModesFromStorage:', e.message); }
+    try { renderDynamicModeSwitcher(); } catch(e) { console.warn('renderDynamicModeSwitcher:', e.message); }
+    try { loadCatatanData(); } catch(e) { console.warn('loadCatatanData:', e.message); }
+    try { await loadDokumenData(); } catch(e) { console.warn('loadDokumenData:', e.message); }
+    try { loadPengingatData(); } catch(e) { console.warn('loadPengingatData:', e.message); }
+    try { await loadAbsensiData(); } catch(e) { console.warn('loadAbsensiData:', e.message); }
+    try { loadSumberHartaList(); } catch(e) { console.warn('loadSumberHartaList:', e.message); }
     
-    // UPDATE STATS SETELAH SEMUA DATA LOAD!
-    updateHomeStats();
+    // UPDATE STATS - selalu jalan walau ada error loading
+    try { updateHomeStats(); } catch(e) { console.warn('updateHomeStats:', e.message); }
     
-    document.getElementById('adminModeToggleBtn')?.addEventListener('click', (e) => { e.preventDefault(); toggleAdminMode(); });
-    document.getElementById('paymentFabOpen')?.addEventListener('click', () => openPaymentModal());
+    // Event listeners - selalu terpasang
+    var btnAdmin = document.getElementById('adminModeToggleBtn');
+    if (btnAdmin) btnAdmin.addEventListener('click', function(e) {
+        e.preventDefault();
+        if (typeof toggleAdminMode === 'function') toggleAdminMode();
+    });
+    var btnFab = document.getElementById('paymentFabOpen');
+    if (btnFab) btnFab.addEventListener('click', function() {
+        if (typeof openPaymentModal === 'function') openPaymentModal();
+    });
     
     document.addEventListener('input', function(e) {
         if(e.target.classList && e.target.classList.contains('money-input')) {
@@ -16798,6 +16807,16 @@ function hapusTemplateKalc(tid) {
 }
 
 // === INIT ===
+// Auto-update homeDate setiap menit
+setInterval(function() {
+    try {
+        var el = document.getElementById('homeDate');
+        if (el && el.textContent === 'Memuat...') {
+            el.innerHTML = new Date().toLocaleDateString('id-ID', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+        }
+    } catch(e) {}
+}, 1000);
+
 document.addEventListener('DOMContentLoaded', function() {
     setTimeout(function() { try { applyTermsToDOM(); } catch(e) {} }, 800);
 });
