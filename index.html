@@ -3096,7 +3096,7 @@ function showPage(pageId) {
         const state = { page: pageId };
         const url = new URL(window.location.href);
         url.hash = `#page-${pageId}`;
-        history.pushState(state, '', url);
+        try { history.pushState(state, '', url); } catch(e) {}
         lastPage = pageId;
     }
 }
@@ -14872,6 +14872,7 @@ function doLoginAdmin() {
         if (typeof pilihTanpaLogin==='function') pilihTanpaLogin();
         try { applyTermsToDOM(); } catch(e) {}
         showToast('Selamat datang, Admin!');
+    try { updateHomeStats(); } catch(e) {}
     }
 }
 
@@ -14939,9 +14940,7 @@ function masukModeGuru(guru) {
     showPage('guru');
     initGuruMode();
     // Push state agar back tidak keluar
-    if (window.history && window.history.pushState) {
-        window.history.pushState({ eduku: true, role: 'guru' }, '', '');
-    }
+    try { if (window.history && window.history.pushState) window.history.pushState({ eduku: true, role: 'guru' }, '', ''); } catch(e) {}
 }
 
 function initGuruMode() {
@@ -15312,8 +15311,7 @@ function applySessionGuard() {
 (function() {
     // Push state saat masuk app
     if (window.history && window.history.pushState) {
-        window.history.pushState({ eduku: true }, '', '');
-
+        try { window.history.pushState({ eduku: true }, '', ''); } catch(e) {}
         window.addEventListener('popstate', function(e) {
             var session = getEkSession();
 
@@ -15325,7 +15323,7 @@ function applySessionGuard() {
             }
 
             // Push state lagi agar back button tidak keluar dari app
-            window.history.pushState({ eduku: true }, '', '');
+            try { window.history.pushState({ eduku: true }, '', ''); } catch(e) {}
 
             if (session.role === 'guru') {
                 // Guru back → kembali ke halaman guru
@@ -15990,9 +15988,7 @@ function masukModeWali(santri) {
     if (navWali) navWali.style.display = 'block';
 
     // Push state
-    if (window.history && window.history.pushState) {
-        window.history.pushState({ eduku: true, role: 'wali' }, '', '');
-    }
+    try { if (window.history && window.history.pushState) window.history.pushState({ eduku: true, role: 'wali' }, '', ''); } catch(e) {}
 
     // Tampilkan page-wali langsung
     var allPages = document.querySelectorAll('.page');
@@ -16221,7 +16217,7 @@ function kirimPinWA(dataset) {
     if (waClean.startsWith('0')) waClean = '62' + waClean.substr(1);
 
     var nl = '\n';
-    var msg = 'Assalamu\'alaikum,' + nl
+    var msg = "Assalamu'alaikum," + nl
             + 'Berikut PIN akses EduKu untuk:' + nl + nl
             + 'Nama  : ' + nama + nl
             + 'NIS   : ' + nis + nl
