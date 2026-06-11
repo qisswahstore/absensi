@@ -3129,6 +3129,7 @@ function internalShowPage(pageId) {
     if (pageId === 'mapel') { try{renderMapelList();}catch(e){} }
     if (pageId === 'raport') { try{initRaport();}catch(e){} }
     if (pageId === 'guru') { try{initGuruMode();}catch(e){} }
+    if (pageId === 'wali') { try{initWaliMode();}catch(e){} }
     if (pageId === 'estimasi') { try{initKalkulator();}catch(e){} }
     if (pageId === 'absensi_harian') { try{bukaAbsensiHarian();showPage('home');}catch(e){} }
     if (pageId === 'uploaddokumen') { 
@@ -12723,6 +12724,110 @@ async function printPDFDirect(pdfDoc, filename = 'document.pdf') {
     
 <!-- ===== EDUKU EXTENSION HTML ===== -->
 
+
+<!-- ===== MODAL LOGIN WALI SANTRI ===== -->
+<div id="modalLoginWali" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:200000;">
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:white;border-radius:24px;max-width:360px;width:100%;padding:28px;">
+      <div style="text-align:center;margin-bottom:24px;">
+        <div style="font-size:48px;margin-bottom:8px;">&#128106;</div>
+        <h2 style="margin:0;color:var(--primary);">Login Wali Santri</h2>
+        <p style="color:#64748b;font-size:13px;margin:6px 0 0;">Masukkan NIS dan PIN anak Anda</p>
+      </div>
+      <div id="waliLoginError" style="display:none;background:#fef2f2;color:#ef4444;padding:10px;border-radius:8px;font-size:13px;margin-bottom:14px;text-align:center;"></div>
+      <div style="display:grid;gap:12px;margin-bottom:16px;">
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">NIS Santri</label>
+          <input type="text" id="inputWaliNIS" placeholder="Masukkan NIS..."
+            style="width:100%;padding:12px;border:2px solid #e2e8f0;border-radius:10px;font-size:15px;box-sizing:border-box;outline:none;">
+        </div>
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:6px;">PIN Wali (4 digit)</label>
+          <input type="password" id="inputWaliPIN" placeholder="&#8226;&#8226;&#8226;&#8226;" maxlength="6"
+            style="width:100%;padding:12px;border:2px solid #e2e8f0;border-radius:10px;font-size:24px;box-sizing:border-box;outline:none;letter-spacing:8px;text-align:center;">
+        </div>
+      </div>
+      <button onclick="doLoginWali()" style="width:100%;padding:14px;background:var(--primary);color:white;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;margin-bottom:10px;">Masuk</button>
+      <button onclick="document.getElementById('modalLoginWali').style.display='none'" style="width:100%;padding:12px;background:#f1f5f9;color:#333;border:none;border-radius:12px;font-size:14px;cursor:pointer;">Kembali</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL KELOLA PIN WALI ===== -->
+<div id="modalKelolaPin" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:10002;overflow-y:auto;">
+  <div style="min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:16px;">
+    <div style="background:white;border-radius:20px;max-width:500px;width:100%;padding:20px;margin-top:8px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <h3 style="margin:0;color:var(--primary);">&#128273; PIN Wali Santri</h3>
+        <button onclick="document.getElementById('modalKelolaPin').style.display='none'" style="background:none;border:none;font-size:22px;cursor:pointer;">&#10005;</button>
+      </div>
+      <div style="background:#fef3c7;border:1px solid #f59e0b;border-radius:10px;padding:12px;margin-bottom:14px;font-size:12px;color:#92400e;">
+        &#128161; PIN ini dikirim ke wali santri untuk login dan melihat data anak mereka.
+      </div>
+      <input type="text" id="pinSearchSantri" oninput="renderKelolaPin()" placeholder="Cari nama atau NIS..."
+        style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:13px;box-sizing:border-box;margin-bottom:12px;outline:none;">
+      <div style="display:flex;gap:8px;margin-bottom:12px;">
+        <button onclick="generateSemuaPin()" style="flex:1;padding:10px;background:#f59e0b;color:white;border:none;border-radius:8px;font-weight:600;font-size:12px;cursor:pointer;">&#9889; Generate Semua PIN</button>
+      </div>
+      <div id="kelolaPinList" style="max-height:55vh;overflow-y:auto;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PAGE MODE WALI ===== -->
+<div id="page-wali" class="page">
+  <div style="padding:16px;padding-bottom:80px;">
+    <div style="background:linear-gradient(135deg,var(--primary),#0a4a3a);color:white;padding:20px;border-radius:16px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:flex-start;">
+      <div>
+        <div style="font-size:13px;opacity:0.8;">Assalamu'alaikum,</div>
+        <div style="font-size:18px;font-weight:700;margin:4px 0;" id="waliSantriNama">Wali Santri</div>
+        <div style="font-size:12px;opacity:0.8;" id="waliKelasInfo"></div>
+      </div>
+      <button onclick="logoutWali()" style="background:rgba(255,255,255,0.2);color:white;border:none;border-radius:8px;padding:8px 14px;font-size:12px;cursor:pointer;font-weight:600;">Keluar &#x2192;</button>
+    </div>
+
+    <!-- Kehadiran bulan ini -->
+    <div style="background:white;border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+      <div style="font-weight:700;font-size:15px;color:var(--primary);margin-bottom:12px;">&#128197; Kehadiran Bulan Ini</div>
+      <div id="waliAbsensiSummary"></div>
+    </div>
+
+    <!-- Nilai terbaru -->
+    <div style="background:white;border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+      <div style="font-weight:700;font-size:15px;color:var(--primary);margin-bottom:12px;">&#128221; Nilai Terbaru</div>
+      <div id="waliNilaiList"></div>
+    </div>
+
+    <!-- Tagihan -->
+    <div style="background:white;border-radius:14px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+      <div style="font-weight:700;font-size:15px;color:var(--primary);margin-bottom:12px;">&#128176; Info Tagihan</div>
+      <div id="waliTagihanInfo"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== BOTTOM NAV WALI ===== -->
+<div id="bottomNavWali" style="display:none;position:fixed;bottom:0;left:0;right:0;background:white;border-top:2px solid #e2e8f0;z-index:1000;padding-bottom:env(safe-area-inset-bottom);">
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);height:60px;">
+    <div onclick="showPage('wali')" style="display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:var(--primary);">
+      <i class="fas fa-home" style="font-size:18px;"></i>
+      <span style="font-size:10px;margin-top:3px;font-weight:600;">Beranda</span>
+    </div>
+    <div onclick="bukaAbsensiWali()" style="display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:#64748b;">
+      <i class="fas fa-clipboard-check" style="font-size:18px;"></i>
+      <span style="font-size:10px;margin-top:3px;font-weight:600;">Absensi</span>
+    </div>
+    <div onclick="bukaNilaiWali()" style="display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:#64748b;">
+      <i class="fas fa-star" style="font-size:18px;"></i>
+      <span style="font-size:10px;margin-top:3px;font-weight:600;">Nilai</span>
+    </div>
+    <div onclick="logoutWali()" style="display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:#ef4444;">
+      <i class="fas fa-sign-out-alt" style="font-size:18px;"></i>
+      <span style="font-size:10px;margin-top:3px;font-weight:600;">Keluar</span>
+    </div>
+  </div>
+</div>
+
 <!-- ===== MODAL LOGIN ADMIN ===== -->
 <div id="modalLoginAdmin" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:200000;">
   <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;">
@@ -15131,10 +15236,23 @@ function applySessionGuard() {
         return;
     }
 
+    var navWali = document.getElementById('bottomNavWali');
+
+    if (session.role === 'wali') {
+        if (navAdmin) navAdmin.style.display = 'none';
+        if (navGuru) navGuru.style.display = 'none';
+        if (navWali) navWali.style.display = 'block';
+        var activeWali = document.querySelector('.page.active');
+        if (!activeWali || activeWali.id !== 'page-wali') {
+            if (typeof showPage === 'function') showPage('wali');
+        }
+        return;
+    }
+
     if (session.role === 'guru') {
-        // Paksa nav guru, sembunyikan nav admin
         if (navAdmin) navAdmin.style.display = 'none';
         if (navGuru) navGuru.style.display = 'block';
+        if (navWali) navWali.style.display = 'none';
 
         // Cek halaman aktif - kalau halaman terlarang, redirect ke guru
         var activePage = document.querySelector('.page.active');
@@ -15777,6 +15895,328 @@ function simpanAbsensiHarian(){
     showToast('Absensi '+sesi+' disimpan! Hadir: '+hadir+'/'+dataAbs.length);
 }
 
+
+
+// ===== LOGIN WALI SANTRI =====
+
+function getWaliPins() {
+    try { return JSON.parse(localStorage.getItem('eduku_wali_pins') || '{}'); } catch(e) { return {}; }
+}
+function saveWaliPins(data) { localStorage.setItem('eduku_wali_pins', JSON.stringify(data)); }
+
+function generatePin4() {
+    return String(Math.floor(1000 + Math.random() * 9000));
+}
+
+// ─── LOGIN WALI ───
+function loginWali() {
+    var modal = document.getElementById('modalLoginWali');
+    if (!modal) return;
+    var nis = document.getElementById('inputWaliNIS');
+    var pin = document.getElementById('inputWaliPIN');
+    var err = document.getElementById('waliLoginError');
+    if (nis) nis.value = '';
+    if (pin) pin.value = '';
+    if (err) err.style.display = 'none';
+    modal.style.display = 'flex';
+}
+
+function doLoginWali() {
+    var nis = (document.getElementById('inputWaliNIS') || {value:''}).value.trim();
+    var pin = (document.getElementById('inputWaliPIN') || {value:''}).value.trim();
+    var err = document.getElementById('waliLoginError');
+
+    if (!nis) { if(err){err.textContent='Masukkan NIS santri!';err.style.display='block';} return; }
+    if (!pin) { if(err){err.textContent='Masukkan PIN!';err.style.display='block';} return; }
+
+    // Cari santri berdasarkan NIS
+    var santri = null;
+    for (var i = 0; i < jamaahList.length; i++) {
+        var j = jamaahList[i];
+        var jNIS = j.no_porsi || (j.additional_fields ? j.additional_fields.nis || '' : '');
+        if (jNIS === nis) { santri = j; break; }
+    }
+
+    if (!santri) {
+        if(err){err.textContent='NIS tidak ditemukan!';err.style.display='block';}
+        return;
+    }
+
+    // Cek PIN
+    var pins = getWaliPins();
+    var savedPin = pins[String(santri.id)];
+    if (!savedPin) {
+        if(err){err.textContent='PIN belum diset. Hubungi Admin!';err.style.display='block';}
+        return;
+    }
+    if (savedPin !== pin) {
+        if(err){err.textContent='PIN salah! Coba lagi.';err.style.display='block';}
+        if(document.getElementById('inputWaliPIN')) document.getElementById('inputWaliPIN').value='';
+        return;
+    }
+
+    // Login berhasil
+    setEkSession({ role: 'wali', jamaahId: String(santri.id), loginTime: new Date().toISOString() });
+    document.getElementById('modalLoginWali').style.display = 'none';
+    localStorage.setItem('safara_mode', 'tanpa_login');
+    var splash = document.getElementById('splashScreen');
+    if (splash) { splash.style.opacity = '0'; setTimeout(function(){splash.style.display='none';},350); }
+    if (typeof pilihTanpaLogin === 'function') pilihTanpaLogin();
+    setTimeout(function() { masukModeWali(santri); }, 400);
+}
+
+function getCurrentWaliSantri() {
+    var s = getEkSession();
+    if (!s || s.role !== 'wali') return null;
+    for (var i = 0; i < jamaahList.length; i++) {
+        if (String(jamaahList[i].id) === String(s.jamaahId)) return jamaahList[i];
+    }
+    return null;
+}
+
+function masukModeWali(santri) {
+    var navAdmin = document.getElementById('bottomNavAdmin');
+    var navGuru = document.getElementById('bottomNavGuru');
+    var navWali = document.getElementById('bottomNavWali');
+    if (navAdmin) navAdmin.style.display = 'none';
+    if (navGuru) navGuru.style.display = 'none';
+    if (navWali) navWali.style.display = 'block';
+    if (window.history && window.history.pushState) {
+        window.history.pushState({ eduku: true, role: 'wali' }, '', '');
+    }
+    showPage('wali');
+    initWaliMode(santri);
+}
+
+function initWaliMode(santri) {
+    if (!santri) santri = getCurrentWaliSantri();
+    if (!santri) { logoutWali(); return; }
+
+    // Update header
+    var nama = santri.nama_lengkap || santri.nama || '?';
+    var wn = document.getElementById('waliSantriNama');
+    if (wn) wn.textContent = nama;
+
+    // Info kelas
+    var kelasId = getKelasIdBySantri(santri.id);
+    var kelasNama = kelasId ? getKelasNama(kelasId) : '-';
+    var waliKelas = kelasId ? getWaliKelasByKelasId(kelasId) : null;
+    var ki = document.getElementById('waliKelasInfo');
+    if (ki) ki.textContent = 'Kelas: ' + kelasNama + (waliKelas ? ' | Wali: ' + waliKelas.nama : '');
+
+    // Absensi summary bulan ini
+    renderWaliAbsensi(santri);
+
+    // Nilai terbaru
+    renderWaliNilai(santri);
+
+    // Tagihan
+    renderWaliTagihan(santri);
+}
+
+function renderWaliAbsensi(santri) {
+    var el = document.getElementById('waliAbsensiSummary');
+    if (!el) return;
+
+    var now = new Date();
+    var bulanIni = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
+    var sId = String(santri.id);
+
+    var harian = getAbsensiHarianData();
+    var hadir=0, alpha=0, sakit=0, izin=0, total=0;
+
+    for (var i = 0; i < harian.length; i++) {
+        var rec = harian[i];
+        if (!rec.tanggal || rec.tanggal.substr(0,7) !== bulanIni) continue;
+        for (var j = 0; j < rec.data.length; j++) {
+            if (String(rec.data[j].santriId) === sId) {
+                var sts = rec.data[j].status;
+                if (sts === 'hadir') hadir++;
+                else if (sts === 'alpha') alpha++;
+                else if (sts === 'sakit') sakit++;
+                else if (sts === 'izin') izin++;
+                total++;
+            }
+        }
+    }
+
+    var pct = total > 0 ? Math.round((hadir/total)*100) : 0;
+    var pctColor = pct >= 80 ? '#10b981' : pct >= 60 ? '#f59e0b' : '#ef4444';
+    var barWidth = total > 0 ? pct : 0;
+
+    if (total === 0) {
+        el.innerHTML = '<div style="text-align:center;padding:16px;color:#94a3b8;font-size:13px;">Belum ada data absensi bulan ini</div>';
+        return;
+    }
+
+    el.innerHTML = '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;">'
+        + '<div style="background:#f0fdf4;border-radius:10px;padding:10px;text-align:center;"><div style="font-size:22px;font-weight:800;color:#10b981;">'+hadir+'</div><div style="font-size:11px;color:#64748b;">Hadir</div></div>'
+        + '<div style="background:#fef2f2;border-radius:10px;padding:10px;text-align:center;"><div style="font-size:22px;font-weight:800;color:#ef4444;">'+alpha+'</div><div style="font-size:11px;color:#64748b;">Alpha</div></div>'
+        + '<div style="background:#fff7ed;border-radius:10px;padding:10px;text-align:center;"><div style="font-size:22px;font-weight:800;color:#f59e0b;">'+sakit+'</div><div style="font-size:11px;color:#64748b;">Sakit</div></div>'
+        + '<div style="background:#eff6ff;border-radius:10px;padding:10px;text-align:center;"><div style="font-size:22px;font-weight:800;color:#3b82f6;">'+izin+'</div><div style="font-size:11px;color:#64748b;">Izin</div></div>'
+        + '</div>'
+        + '<div style="background:#f1f5f9;border-radius:8px;overflow:hidden;height:10px;margin-bottom:6px;">'
+        + '<div style="height:100%;background:'+pctColor+';width:'+barWidth+'%;transition:width 0.5s;border-radius:8px;"></div></div>'
+        + '<div style="text-align:center;font-size:13px;font-weight:700;color:'+pctColor+';">Kehadiran: '+pct+'% ('+total+' pertemuan)</div>';
+}
+
+function renderWaliNilai(santri) {
+    var el = document.getElementById('waliNilaiList');
+    if (!el) return;
+    var sId = String(santri.id);
+    var myNilai = [];
+    for (var i = 0; i < nilaiList.length; i++) {
+        if (String(nilaiList[i].jamaahId) === sId) myNilai.push(nilaiList[i]);
+    }
+    // Sort terbaru dulu
+    myNilai.sort(function(a,b){ return (b.tanggal||'').localeCompare(a.tanggal||''); });
+    // Ambil 10 terbaru
+    var recent = myNilai.slice(0,10);
+
+    if (!recent.length) {
+        el.innerHTML = '<div style="text-align:center;padding:16px;color:#94a3b8;font-size:13px;">Belum ada data nilai</div>';
+        return;
+    }
+
+    var gradeColor = function(v) { return v>=90?'#10b981':v>=75?'#3b82f6':v>=60?'#f59e0b':'#ef4444'; };
+    var gradeLabel = function(v) { return v>=90?'A':v>=75?'B':v>=60?'C':'D'; };
+
+    var html = '';
+    for (var j = 0; j < recent.length; j++) {
+        var n = recent[j];
+        var cc = gradeColor(n.nilai);
+        html += '<div style="display:flex;align-items:center;gap:10px;padding:10px;background:#f8fafc;border-radius:10px;margin-bottom:6px;">'
+              + '<div style="width:42px;height:42px;background:'+cc+';color:white;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;">'
+              + '<div style="font-size:14px;font-weight:800;">'+n.nilai+'</div>'
+              + '<div style="font-size:9px;">'+gradeLabel(n.nilai)+'</div></div>'
+              + '<div style="flex:1;min-width:0;">'
+              + '<div style="font-weight:600;font-size:13px;">'+n.mapel+'</div>'
+              + '<div style="font-size:11px;color:#64748b;">'+n.jenis+' | '+(n.tanggal||'-')+'</div>'
+              + '</div></div>';
+    }
+    el.innerHTML = html;
+}
+
+function renderWaliTagihan(santri) {
+    var el = document.getElementById('waliTagihanInfo');
+    if (!el) return;
+    el.innerHTML = '<div style="text-align:center;padding:16px;color:#94a3b8;font-size:12px;">Info tagihan tersedia setelah data pembayaran diisi oleh Admin</div>';
+}
+
+function logoutWali() {
+    clearEkSession();
+    var navAdmin = document.getElementById('bottomNavAdmin');
+    var navWali = document.getElementById('bottomNavWali');
+    if (navAdmin) navAdmin.style.display = '';
+    if (navWali) navWali.style.display = 'none';
+    var splash = document.getElementById('splashScreen');
+    if (splash) { splash.style.display = 'flex'; splash.style.opacity = '1'; }
+    showToast('Berhasil logout!');
+}
+
+// ─── KELOLA PIN WALI (Admin) ───
+function bukaKelolaPin() {
+    document.getElementById('modalKelolaPin').style.display = 'flex';
+    renderKelolaPin();
+}
+
+function renderKelolaPin() {
+    var ct = document.getElementById('kelolaPinList');
+    if (!ct) return;
+    var q = (document.getElementById('pinSearchSantri')||{value:''}).value.toLowerCase();
+    var pins = getWaliPins();
+
+    if (!jamaahList || !jamaahList.length) {
+        ct.innerHTML = '<div style="text-align:center;padding:20px;color:#94a3b8;">Belum ada data santri</div>';
+        return;
+    }
+
+    var filtered = jamaahList.filter(function(j) {
+        var nama = (j.nama_lengkap||j.nama||'').toLowerCase();
+        var nis = (j.no_porsi||'').toLowerCase();
+        return !q || nama.indexOf(q) >= 0 || nis.indexOf(q) >= 0;
+    });
+
+    if (!filtered.length) {
+        ct.innerHTML = '<div style="text-align:center;padding:20px;color:#94a3b8;">Tidak ditemukan</div>';
+        return;
+    }
+
+    var html = '<div style="font-size:12px;color:#64748b;margin-bottom:8px;">'+filtered.length+' santri</div>';
+    for (var i = 0; i < filtered.length; i++) {
+        var j = filtered[i];
+        var jId = String(j.id);
+        var nama = j.nama_lengkap || j.nama || '?';
+        var nis = j.no_porsi || '-';
+        var pin = pins[jId] || '';
+        var waWali = j.additional_fields ? (j.additional_fields.wali_wa || j.additional_fields.no_hp_wali || '') : '';
+
+        html += '<div style="display:flex;align-items:center;gap:8px;padding:10px;background:#f8fafc;border-radius:10px;margin-bottom:6px;">'
+              + '<div style="flex:1;min-width:0;">'
+              + '<div style="font-weight:600;font-size:13px;">'+nama+'</div>'
+              + '<div style="font-size:11px;color:#64748b;">NIS: '+nis+'</div>'
+              + '<div style="font-size:12px;font-weight:700;color:'+(pin?'#10b981':'#ef4444')+';margin-top:2px;">'
+              + (pin ? '&#128273; PIN: <span style="letter-spacing:3px;">'+pin+'</span>' : '&#128273; Belum ada PIN')
+              + '</div></div>'
+              + '<div style="display:flex;flex-direction:column;gap:4px;">'
+              + '<button data-jid="'+jId+'" onclick="generateSatuPin(this.dataset.jid)" style="background:#f59e0b;color:white;border:none;border-radius:6px;padding:6px 8px;font-size:10px;cursor:pointer;font-weight:600;white-space:nowrap;">&#9889; Gen PIN</button>'
+              + (pin && waWali ? '<button data-jid="'+jId+'" data-nama="'+nama+'" data-nis="'+nis+'" data-pin="'+pin+'" data-wa="'+waWali+'" onclick="kirimPinWA(this.dataset)" style="background:#25D366;color:white;border:none;border-radius:6px;padding:6px 8px;font-size:10px;cursor:pointer;font-weight:600;white-space:nowrap;">&#128172; WA</button>' : '')
+              + '</div></div>';
+    }
+    ct.innerHTML = html;
+}
+
+function generateSatuPin(jId) {
+    var pins = getWaliPins();
+    pins[String(jId)] = generatePin4();
+    saveWaliPins(pins);
+    renderKelolaPin();
+    showToast('PIN berhasil dibuat!');
+}
+
+function generateSemuaPin() {
+    if (!confirm('Generate PIN untuk SEMUA santri yang belum punya PIN?')) return;
+    var pins = getWaliPins();
+    var count = 0;
+    for (var i = 0; i < jamaahList.length; i++) {
+        var jId = String(jamaahList[i].id);
+        if (!pins[jId]) {
+            pins[jId] = generatePin4();
+            count++;
+        }
+    }
+    saveWaliPins(pins);
+    renderKelolaPin();
+    showToast('PIN dibuat untuk ' + count + ' santri!');
+}
+
+function kirimPinWA(dataset) {
+    var nama = dataset.nama || '?';
+    var nis = dataset.nis || '-';
+    var pin = dataset.pin || '-';
+    var wa = dataset.wa || '';
+    var namaLembaga = localStorage.getItem('eduku_nama_lembaga') || 'EduKu';
+
+    if (!wa) { showToast('Nomor WA wali tidak ada!'); return; }
+
+    var waClean = wa.replace(/\D/g, '');
+    if (waClean.startsWith('0')) waClean = '62' + waClean.substr(1);
+
+    var nl = '\n';
+    var msg = 'Assalamu\'alaikum,' + nl
+            + 'Berikut PIN akses EduKu untuk:' + nl + nl
+            + 'Nama  : ' + nama + nl
+            + 'NIS   : ' + nis + nl
+            + 'PIN   : ' + pin + nl + nl
+            + 'Cara login:' + nl
+            + '1. Buka aplikasi EduKu' + nl
+            + '2. Klik [Login Wali Santri]' + nl
+            + '3. Masukkan NIS & PIN' + nl + nl
+            + 'Jangan berikan PIN kepada orang lain.' + nl + nl
+            + '_' + namaLembaga + '_';
+
+    window.open('https://wa.me/' + waClean + '?text=' + encodeURIComponent(msg), '_blank');
+}
 
 // ─── CETAK REKAP ABSENSI KELAS ───
 var _rekapKelasId = null;
