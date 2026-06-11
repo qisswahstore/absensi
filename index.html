@@ -14824,18 +14824,18 @@ function doLoginGuru() {
 }
 
 function masukModeGuru(guru) {
-    // Sembunyikan nav admin, tampilkan nav guru
     var navAdmin = document.getElementById('bottomNavAdmin');
     var navGuru = document.getElementById('bottomNavGuru');
     if (navAdmin) navAdmin.style.display = 'none';
     if (navGuru) navGuru.style.display = 'block';
-
-    // Tambah padding bawah untuk page guru
     var pageGuru = document.getElementById('page-guru');
     if (pageGuru) pageGuru.style.paddingBottom = '70px';
-
     showPage('guru');
     initGuruMode();
+    // Push state agar back tidak keluar
+    if (window.history && window.history.pushState) {
+        window.history.pushState({ eduku: true, role: 'guru' }, '', '');
+    }
 }
 
 function initGuruMode() {
@@ -15112,38 +15112,147 @@ function renderGuruNilaiHariIni() {
 
 
 
-// ─── SECURITY: BLOCK ADMIN PAGES SAAT GURU LOGIN ───
-var _origShowPage = showPage;
-var GURU_ALLOWED_PAGES = ['guru'];
-var GURU_BLOCKED_PAGES = ['kas','konfigurasi','lisensi','datamaster','setting','estimasi','catatan'];
 
-// Override showPage untuk block akses guru ke halaman admin
-window.addEventListener('DOMContentLoaded', function() {
-    setTimeout(function() {
-        if (typeof showPage === 'function') {
-            var origSP = showPage;
-            showPage = function(pageId) {
-                // Kalau mode guru, block halaman sensitif
-                if (isGuruSession()) {
-                    for (var i = 0; i < GURU_BLOCKED_PAGES.length; i++) {
-                        if (pageId === GURU_BLOCKED_PAGES[i]) {
-                            showToast('Akses terbatas - Mode Guru');
-                            showPage('guru');
-                            return;
-                        }
-                    }
-                    // Halaman jamaah/pembayaran - redirect ke guru
-                    if (pageId === 'jamaah' || pageId === 'jamaahkita' || pageId === 'pembayaran') {
-                        showToast('Akses terbatas - Mode Guru');
-                        showPage('guru');
-                        return;
-                    }
-                }
-                origSP(pageId);
-            };
+// ===== SECURITY: SESSION GUARD =====
+
+// Fungsi utama: terapkan nav & akses sesuai session
+function applySessionGuard() {
+    var session = getEkSession();
+    var navAdmin = document.getElementById('bottomNavAdmin');
+    var navGuru = document.getElementById('bottomNavGuru');
+    var splash = document.getElementById('splashScreen');
+
+    // Tidak ada session → tampilkan splash
+    if (!session) {
+        if (splash && splash.style.display === 'none') {
+            if (navAdmin) navAdmin.style.display = '';
+            if (navGuru) navGuru.style.display = 'none';
         }
-    }, 2000);
-});
+        return;
+    }
+
+    if (session.role === 'guru') {
+        // Paksa nav guru, sembunyikan nav admin
+        if (navAdmin) navAdmin.style.display = 'none';
+        if (navGuru) navGuru.style.display = 'block';
+
+        // Cek halaman aktif - kalau halaman terlarang, redirect ke guru
+        var activePage = document.querySelector('.page.active');
+        if (activePage) {
+            var pageId = activePage.id ? activePage.id.replace('page-', '') : '';
+            var blocked = ['kas','konfigurasi','lisensi','datamaster',
+                          'setting','estimasi','catatan','jamaah',
+                          'jamaahkita','pembayaran','scanqr','surat'];
+            for (var i = 0; i < blocked.length; i++) {
+                if (pageId === blocked[i]) {
+                    showPage('guru');
+                    showToast('Akses terbatas - Mode Guru');
+                    return;
+                }
+            }
+        }
+    } else if (session.role === 'admin') {
+        // Paksa nav admin, sembunyikan nav guru
+        if (navAdmin) navAdmin.style.display = '';
+        if (navGuru) navGuru.style.display = 'none';
+    }
+}
+
+// Override showPage untuk selalu cek session
+(function() {
+    var _origShowPage = window.showPage;
+    if (typeof _origShowPage !== 'function') return;
+
+    window.showPage = function(pageId) {
+        var session = getEkSession();
+
+        // Tidak ada session → tampilkan splash
+        if (!session) {
+            var splash = document.getElementById('splashScreen');
+            if (splash) { splash.style.display = 'flex'; splash.style.opacity = '1'; }
+            return;
+        }
+
+        // Mode guru → block halaman admin
+        if (session.role === 'guru') {
+            var blocked = ['kas','konfigurasi','lisensi','datamaster',
+                          'setting','estimasi','catatan','jamaah',
+                          'jamaahkita','pembayaran','scanqr','surat'];
+            for (var i = 0; i < blocked.length; i++) {
+                if (pageId === blocked[i]) {
+                    showToast('Akses terbatas - Mode Guru');
+                    _origShowPage('guru');
+                    applySessionGuard();
+                    return;
+                }
+            }
+        }
+
+        _origShowPage(pageId);
+        applySessionGuard();
+    };
+})();
+
+// Override tombol BACK browser
+(function() {
+    // Push state saat masuk app
+    if (window.history && window.history.pushState) {
+        window.history.pushState({ eduku: true }, '', '');
+
+        window.addEventListener('popstate', function(e) {
+            var session = getEkSession();
+
+            if (!session) {
+                // Tidak ada session → tampilkan splash
+                var splash = document.getElementById('splashScreen');
+                if (splash) { splash.style.display = 'flex'; splash.style.opacity = '1'; }
+                return;
+            }
+
+            // Push state lagi agar back button tidak keluar dari app
+            window.history.pushState({ eduku: true }, '', '');
+
+            if (session.role === 'guru') {
+                // Guru back → kembali ke halaman guru
+                applySessionGuard();
+                var activePage = document.querySelector('.page.active');
+                var onGuruPage = activePage && activePage.id === 'page-guru';
+                if (!onGuruPage) {
+                    if (typeof showPage === 'function') showPage('guru');
+                }
+            } else if (session.role === 'admin') {
+                // Admin back → kembali ke home
+                applySessionGuard();
+                var activeAdmin = document.querySelector('.page.active');
+                var onHome = activeAdmin && activeAdmin.id === 'page-home';
+                if (!onHome) {
+                    if (typeof showPage === 'function') showPage('home');
+                }
+            }
+        });
+    }
+})();
+
+// Jalankan guard setiap 500ms sebagai safety net
+setInterval(function() {
+    var session = getEkSession();
+    if (!session) return;
+    var navAdmin = document.getElementById('bottomNavAdmin');
+    var navGuru = document.getElementById('bottomNavGuru');
+    if (!navAdmin || !navGuru) return;
+    if (session.role === 'guru') {
+        if (navAdmin.style.display !== 'none') {
+            navAdmin.style.display = 'none';
+            navGuru.style.display = 'block';
+        }
+    } else if (session.role === 'admin') {
+        if (navGuru.style.display === 'block') {
+            navGuru.style.display = 'none';
+            navAdmin.style.display = '';
+        }
+    }
+}, 500);
+
 
 // ─── GURU: JADWAL LENGKAP ───
 var _guruJadwalFilter = '';
