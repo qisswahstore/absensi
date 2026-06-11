@@ -1899,7 +1899,8 @@
 </div>
 <div id="splashChoice" style="display:block; width:100%; max-width:320px;">
 <button onclick="try{loginAdmin();}catch(e){alert('Error: '+e.message);}" style="width:100%; padding:16px; background:white; color:var(--primary); border:none; border-radius:16px; font-size:16px; font-weight:700; cursor:pointer; margin-bottom:12px; box-shadow:0 4px 20px rgba(0,0,0,0.15);">🔐 Login Admin</button>
-<button onclick="try{loginGuru();}catch(e){alert('Error: '+e.message);}" style="width:100%; padding:16px; background:rgba(255,255,255,0.15); color:white; border:2px solid rgba(255,255,255,0.4); border-radius:16px; font-size:16px; font-weight:700; cursor:pointer;">👨‍🏫 Login Guru</button>
+<button onclick="try{loginGuru();}catch(e){alert('Error: '+e.message);}" style="width:100%; padding:16px; background:rgba(255,255,255,0.15); color:white; border:2px solid rgba(255,255,255,0.4); border-radius:16px; font-size:16px; font-weight:700; cursor:pointer; margin-bottom:0px;">👨‍🏫 Login Guru</button>
+<button onclick="try{loginWali();}catch(e){alert('Error: '+e.message);}" style="width:100%; padding:16px; background:rgba(255,255,255,0.08); color:white; border:2px solid rgba(255,255,255,0.25); border-radius:16px; font-size:16px; font-weight:700; cursor:pointer; margin-top:10px;">&#128106; Login Wali Santri</button>
 </div>
 </div>
 
@@ -15242,10 +15243,6 @@ function applySessionGuard() {
         if (navAdmin) navAdmin.style.display = 'none';
         if (navGuru) navGuru.style.display = 'none';
         if (navWali) navWali.style.display = 'block';
-        var activeWali = document.querySelector('.page.active');
-        if (!activeWali || activeWali.id !== 'page-wali') {
-            if (typeof showPage === 'function') showPage('wali');
-        }
         return;
     }
 
@@ -15358,16 +15355,19 @@ setInterval(function() {
     var navAdmin = document.getElementById('bottomNavAdmin');
     var navGuru = document.getElementById('bottomNavGuru');
     if (!navAdmin || !navGuru) return;
+    var navWali2 = document.getElementById('bottomNavWali');
     if (session.role === 'guru') {
-        if (navAdmin.style.display !== 'none') {
-            navAdmin.style.display = 'none';
-            navGuru.style.display = 'block';
-        }
+        if (navAdmin.style.display !== 'none') navAdmin.style.display = 'none';
+        if (navGuru.style.display !== 'block') navGuru.style.display = 'block';
+        if (navWali2 && navWali2.style.display !== 'none') navWali2.style.display = 'none';
+    } else if (session.role === 'wali') {
+        if (navAdmin.style.display !== 'none') navAdmin.style.display = 'none';
+        if (navGuru.style.display !== 'none') navGuru.style.display = 'none';
+        if (navWali2 && navWali2.style.display !== 'block') navWali2.style.display = 'block';
     } else if (session.role === 'admin') {
-        if (navGuru.style.display === 'block') {
-            navGuru.style.display = 'none';
-            navAdmin.style.display = '';
-        }
+        if (navGuru.style.display === 'block') navGuru.style.display = 'none';
+        if (navWali2 && navWali2.style.display === 'block') navWali2.style.display = 'none';
+        if (navAdmin.style.display === 'none') navAdmin.style.display = '';
     }
 }, 500);
 
@@ -15959,10 +15959,16 @@ function doLoginWali() {
     setEkSession({ role: 'wali', jamaahId: String(santri.id), loginTime: new Date().toISOString() });
     document.getElementById('modalLoginWali').style.display = 'none';
     localStorage.setItem('safara_mode', 'tanpa_login');
+
+    // Sembunyikan splash
     var splash = document.getElementById('splashScreen');
-    if (splash) { splash.style.opacity = '0'; setTimeout(function(){splash.style.display='none';},350); }
-    if (typeof pilihTanpaLogin === 'function') pilihTanpaLogin();
-    setTimeout(function() { masukModeWali(santri); }, 400);
+    if (splash) { splash.style.opacity = '0'; setTimeout(function(){splash.style.display='none';},300); }
+
+    // Load data Navara dulu, baru masuk mode wali
+    if (typeof pilihTanpaLogin === 'function') {
+        pilihTanpaLogin();
+    }
+    setTimeout(function() { masukModeWali(santri); }, 600);
 }
 
 function getCurrentWaliSantri() {
@@ -15975,17 +15981,29 @@ function getCurrentWaliSantri() {
 }
 
 function masukModeWali(santri) {
+    // Sembunyikan nav lain, tampilkan nav wali
     var navAdmin = document.getElementById('bottomNavAdmin');
     var navGuru = document.getElementById('bottomNavGuru');
     var navWali = document.getElementById('bottomNavWali');
     if (navAdmin) navAdmin.style.display = 'none';
     if (navGuru) navGuru.style.display = 'none';
     if (navWali) navWali.style.display = 'block';
+
+    // Push state
     if (window.history && window.history.pushState) {
         window.history.pushState({ eduku: true, role: 'wali' }, '', '');
     }
-    showPage('wali');
-    initWaliMode(santri);
+
+    // Tampilkan page-wali langsung
+    var allPages = document.querySelectorAll('.page');
+    for (var i = 0; i < allPages.length; i++) {
+        allPages[i].classList.remove('active');
+    }
+    var pageWali = document.getElementById('page-wali');
+    if (pageWali) pageWali.classList.add('active');
+
+    // Init content
+    setTimeout(function() { initWaliMode(santri); }, 100);
 }
 
 function initWaliMode(santri) {
