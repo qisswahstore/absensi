@@ -1977,8 +1977,10 @@
       <div style="font-weight:700;font-size:15px;color:var(--primary);margin-bottom:12px;">&#128203; Info Santri</div>
       <div style="display:grid;gap:10px;">
         <div>
-          <label style="display:block;font-size:12px;font-weight:600;color:#64748b;margin-bottom:4px;">Nama Santri (opsional)</label>
-          <input type="text" id="kalcNama" placeholder="Contoh: Ahmad Fauzi" oninput="hitungKalkulator()" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;outline:none;">
+          <label style="display:block;font-size:12px;font-weight:600;color:#64748b;margin-bottom:4px;">Santri</label>
+          <select id="kalcSantriId" onchange="kalcPilihSantri()" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;">
+            <option value="">-- Pilih Santri --</option>
+          </select>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
           <div>
@@ -2007,6 +2009,11 @@
         <button onclick="tambahKomponenKalc()" style="background:var(--primary);color:white;border:none;border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;font-weight:600;">+ Tambah</button>
       </div>
       <div id="kalcKomponenList"></div>
+    </div>
+
+    <!-- Summary Tagihan vs Bayar (muncul saat pilih santri) -->
+    <div id="kalcTagihanSummary" style="display:none;background:white;border-radius:14px;padding:14px;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+      <div style="font-weight:700;font-size:13px;color:var(--primary);margin-bottom:10px;">&#128202; Status Tagihan</div>
     </div>
 
     <!-- Hasil Total -->
@@ -16136,7 +16143,92 @@ function renderWaliNilai(santri) {
 function renderWaliTagihan(santri) {
     var el = document.getElementById('waliTagihanInfo');
     if (!el) return;
-    el.innerHTML = '<div style="text-align:center;padding:16px;color:#94a3b8;font-size:12px;">Info tagihan tersedia setelah data pembayaran diisi oleh Admin</div>';
+
+    // Ambil transaksi santri dari paymentTransaksiList
+    if (typeof paymentTransaksiList === 'undefined' || !paymentTransaksiList) {
+        el.innerHTML = '<div style="text-align:center;padding:16px;color:#94a3b8;font-size:12px;">Data pembayaran belum tersedia</div>';
+        return;
+    }
+
+    var sId = String(santri.id);
+    var transaksi = paymentTransaksiList.filter(function(t) {
+        return String(t.id_jamaah) === sId;
+    }).sort(function(a, b) {
+        return new Date(b.tanggal) - new Date(a.tanggal);
+    });
+
+    // Ambil data tagihan dari kalkulator
+    var tagihanData = {};
+    try { tagihanData = JSON.parse(localStorage.getItem('eduku_tagihan_santri') || '{}'); } catch(e) {}
+    var tagihanSantri = tagihanData[sId] || null;
+    var totalTagihan = tagihanSantri ? tagihanSantri.total : 0;
+
+    // Hitung total bayar
+    var totalBayar = transaksi.reduce(function(sum, t) { return sum + (t.nominal || 0); }, 0);
+
+    // Tampilkan summary tagihan kalau ada data kalkulator
+    var fmtRp = function(n) { return 'Rp ' + (n||0).toLocaleString('id-ID'); };
+    var summaryHtml = '';
+    if (totalTagihan > 0) {
+        var sisa = totalTagihan - totalBayar;
+        var sisakColor = sisa > 0 ? '#ef4444' : '#10b981';
+        summaryHtml = '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:12px;">'
+            + '<div style="background:#eff6ff;border-radius:10px;padding:10px;text-align:center;">'
+            + '<div style="font-size:10px;color:#64748b;">Tagihan</div>'
+            + '<div style="font-size:12px;font-weight:800;color:#3b82f6;">'+fmtRp(totalTagihan)+'</div></div>'
+            + '<div style="background:#f0fdf4;border-radius:10px;padding:10px;text-align:center;">'
+            + '<div style="font-size:10px;color:#64748b;">Dibayar</div>'
+            + '<div style="font-size:12px;font-weight:800;color:#10b981;">'+fmtRp(totalBayar)+'</div></div>'
+            + '<div style="background:'+(sisa>0?'#fef2f2':'#f0fdf4')+';border-radius:10px;padding:10px;text-align:center;">'
+            + '<div style="font-size:10px;color:#64748b;">'+(sisa>0?'Sisa':'Lebih')+'</div>'
+            + '<div style="font-size:12px;font-weight:800;color:'+sisakColor+';">'+fmtRp(Math.abs(sisa))+'</div></div>'
+            + '</div>';
+    }
+
+    if (!transaksi.length && !totalTagihan) {
+        el.innerHTML = '<div style="text-align:center;padding:16px;color:#94a3b8;font-size:13px;">Belum ada data tagihan</div>';
+        return;
+    }
+
+    // Format rupiah
+    var fmtRp = function(n) { return 'Rp ' + (n||0).toLocaleString('id-ID'); };
+
+    // Format tanggal
+    var fmtTgl = function(t) {
+        if (!t) return '-';
+        var d = new Date(t);
+        return d.toLocaleDateString('id-ID', {day:'2-digit', month:'short', year:'numeric'});
+    };
+
+    // Summary box
+    var html = summaryHtml + '<div style="background:#f0fdf4;border-radius:10px;padding:12px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;">'
+             + '<div><div style="font-size:11px;color:#64748b;">Total Pembayaran</div>'
+             + '<div style="font-size:20px;font-weight:800;color:#10b981;">'+fmtRp(totalBayar)+'</div></div>'
+             + '<div style="text-align:center;">'
+             + '<div style="font-size:22px;font-weight:800;color:var(--primary);">'+transaksi.length+'</div>'
+             + '<div style="font-size:11px;color:#64748b;">Transaksi</div>'
+             + '</div></div>';
+
+    // Daftar transaksi (10 terbaru)
+    var recent = transaksi.slice(0, 10);
+    for (var i = 0; i < recent.length; i++) {
+        var t = recent[i];
+        html += '<div style="display:flex;align-items:center;gap:10px;padding:10px;background:#f8fafc;border-radius:10px;margin-bottom:6px;">'
+              + '<div style="width:36px;height:36px;background:#dcfce7;color:#10b981;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px;">&#128178;</div>'
+              + '<div style="flex:1;min-width:0;">'
+              + '<div style="font-weight:600;font-size:13px;">'+fmtRp(t.nominal)+'</div>'
+              + '<div style="font-size:11px;color:#64748b;">'+fmtTgl(t.tanggal)+' &bull; '+(t.keterangan||'Pembayaran')+'</div>'
+              + (t.metode ? '<div style="font-size:10px;color:#94a3b8;">Via: '+t.metode+'</div>' : '')
+              + '</div>'
+              + '<div style="background:#10b981;color:white;border-radius:6px;padding:3px 8px;font-size:10px;font-weight:600;">Lunas</div>'
+              + '</div>';
+    }
+
+    if (transaksi.length > 10) {
+        html += '<div style="text-align:center;font-size:12px;color:#94a3b8;padding:8px;">+'+(transaksi.length-10)+' transaksi lainnya</div>';
+    }
+
+    el.innerHTML = html;
 }
 
 function logoutWali() {
@@ -16281,6 +16373,100 @@ function kirimPinWA(dataset) {
             + '_' + namaLembaga + '_';
 
     window.open('https://wa.me/' + waClean + '?text=' + encodeURIComponent(msg), '_blank');
+}
+
+
+function kalcPilihSantri() {
+    var sel = document.getElementById('kalcSantriId');
+    var santriId = sel ? sel.value : '';
+    if (!santriId) return;
+
+    // Cari santri
+    var santri = null;
+    for (var i = 0; i < jamaahList.length; i++) {
+        if (String(jamaahList[i].id) === String(santriId)) { santri = jamaahList[i]; break; }
+    }
+    if (!santri) return;
+
+    // Auto-fill kelas dari mapping kelas santri
+    var ks = document.getElementById('kalcKelas');
+    if (ks) {
+        var kelasId = getKelasIdBySantri(santriId);
+        if (kelasId) {
+            var kelasNama = getKelasNama(kelasId);
+            ks.value = kelasNama;
+        }
+    }
+
+    // Load template tersimpan santri ini (kalau ada)
+    var savedTemplates = {};
+    try { savedTemplates = JSON.parse(localStorage.getItem('eduku_kalc_santri_template') || '{}'); } catch(e) {}
+    if (savedTemplates[String(santriId)]) {
+        kalcKomponen = JSON.parse(JSON.stringify(savedTemplates[String(santriId)]));
+        kalcNextId = kalcKomponen.reduce(function(mx,k){return Math.max(mx,k.id||0);},0) + 1;
+    }
+
+    renderKomponenKalc();
+    hitungKalkulator();
+    renderTagihanSummary(santriId);
+}
+
+function renderTagihanSummary(santriId) {
+    var el = document.getElementById('kalcTagihanSummary');
+    if (!el) return;
+    if (!santriId) { el.style.display = 'none'; return; }
+
+    // Hitung total tagihan dari komponen
+    var periode = parseInt((document.getElementById('kalcPeriode')||{value:'12'}).value) || 12;
+    var totalBulanan = 0, totalSekali = 0;
+    for (var i = 0; i < kalcKomponen.length; i++) {
+        if (kalcKomponen[i].tipe === 'bulanan') totalBulanan += kalcKomponen[i].jumlah;
+        else totalSekali += kalcKomponen[i].jumlah;
+    }
+    var totalTagihan = (totalBulanan * periode) + totalSekali;
+
+    // Hitung total bayar dari paymentTransaksiList
+    var totalBayar = 0;
+    if (typeof paymentTransaksiList !== 'undefined') {
+        for (var j = 0; j < paymentTransaksiList.length; j++) {
+            if (String(paymentTransaksiList[j].id_jamaah) === String(santriId)) {
+                totalBayar += paymentTransaksiList[j].nominal || 0;
+            }
+        }
+    }
+    var sisa = totalTagihan - totalBayar;
+
+    var fmtRp = function(n) { return 'Rp ' + (n||0).toLocaleString('id-ID'); };
+    var sisakColor = sisa > 0 ? '#ef4444' : '#10b981';
+    var sisaLabel = sisa > 0 ? 'Sisa Tagihan' : 'Lebih Bayar';
+
+    el.style.display = 'block';
+    el.innerHTML = '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">'
+        + '<div style="background:#eff6ff;border-radius:10px;padding:10px;text-align:center;">'
+        + '<div style="font-size:10px;color:#64748b;margin-bottom:4px;">Total Tagihan</div>'
+        + '<div style="font-size:14px;font-weight:800;color:#3b82f6;">'+fmtRp(totalTagihan)+'</div></div>'
+        + '<div style="background:#f0fdf4;border-radius:10px;padding:10px;text-align:center;">'
+        + '<div style="font-size:10px;color:#64748b;margin-bottom:4px;">Sudah Bayar</div>'
+        + '<div style="font-size:14px;font-weight:800;color:#10b981;">'+fmtRp(totalBayar)+'</div></div>'
+        + '<div style="background:'+(sisa>0?'#fef2f2':'#f0fdf4')+';border-radius:10px;padding:10px;text-align:center;">'
+        + '<div style="font-size:10px;color:#64748b;margin-bottom:4px;">'+sisaLabel+'</div>'
+        + '<div style="font-size:14px;font-weight:800;color:'+sisakColor+';">'+fmtRp(Math.abs(sisa))+'</div></div>'
+        + '</div>';
+
+    // Simpan tagihan santri ini untuk wali
+    simpanTagihanSantri(santriId, totalTagihan);
+}
+
+function simpanTagihanSantri(santriId, totalTagihan) {
+    try {
+        var data = JSON.parse(localStorage.getItem('eduku_tagihan_santri') || '{}');
+        data[String(santriId)] = {
+            total: totalTagihan,
+            komponen: JSON.parse(JSON.stringify(kalcKomponen)),
+            updatedAt: new Date().toISOString()
+        };
+        localStorage.setItem('eduku_tagihan_santri', JSON.stringify(data));
+    } catch(e) {}
 }
 
 // ─── CETAK REKAP ABSENSI KELAS ───
@@ -16575,6 +16761,20 @@ var kalcKomponen = [
 var kalcNextId = 6;
 
 function initKalkulator() {
+    // Populate dropdown santri
+    var ss = document.getElementById('kalcSantriId');
+    if (ss) {
+        var sOpts = '<option value="">-- Pilih Santri --</option>';
+        if (typeof jamaahList !== 'undefined' && jamaahList.length) {
+            for (var si = 0; si < jamaahList.length; si++) {
+                var jm = jamaahList[si];
+                var nmSantri = jm.nama_lengkap || jm.nama || '?';
+                var nisSantri = getNIS(jm);
+                sOpts += '<option value="'+jm.id+'">'+nmSantri+(nisSantri !== '-' ? ' ('+nisSantri+')' : '')+'</option>';
+            }
+        }
+        ss.innerHTML = sOpts;
+    }
     // Populate dropdown kelas
     var ks = document.getElementById('kalcKelas');
     if (ks) {
@@ -16689,6 +16889,10 @@ function hitungKalkulator() {
     if (elPeriode) elPeriode.textContent = formatRp(totalPeriode);
     if (elBulan) elBulan.textContent = formatRp(totalBulanan);
     if (elTahun) elTahun.textContent = formatRp(totalTahun);
+
+    // Refresh tagihan summary kalau santri sudah dipilih
+    var sSel = document.getElementById('kalcSantriId');
+    if (sSel && sSel.value) { try { renderTagihanSummary(sSel.value); } catch(e) {} }
 }
 
 function formatRp(n) {
