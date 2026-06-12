@@ -2086,7 +2086,7 @@
 
 <!-- JAMAAH PAGE -->
 <div id="page-jamaah" class="page">
-    <div class="header-premium header-premium-small"><div class="back-header"><i class="fas fa-arrow-left" onclick="showPage('home')"></i><h2>Database Jamaah</h2><div style="width:30px;"></div></div></div>
+    <div class="header-premium header-premium-small"><div class="back-header"><i class="fas fa-arrow-left" onclick="showPage('home')"></i><h2>Data Peserta</h2><div style="display:flex;gap:6px;"><button onclick="bukaKelolaPin()" style="background:#f59e0b;color:white;border:none;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer;font-weight:600;">&#128273; PIN</button></div></div></div>
     <div class="card-premium">
         <div id="jamaahAdminPanel" class="setting-card" style="display:none"><h3 style="color:var(--primary);"> Panel Admin Jamaah</h3><button class="btn btn-primary btn-small mt-2" onclick="openTambahJamaahModal()"> + Tambah database</button><button class="btn btn-blue btn-small mt-2" onclick="openManageFieldsModal()"> Kelola Field Dinamis</button><button class="btn btn-teal btn-small mt-2" onclick="downloadTemplateExcel()" style="background:#1D6F42;">⬇️ Download Template Excel</button><button class="btn btn-teal btn-small mt-2" onclick="exportJamaahToExcel()"> Export ke Excel</button><button class="btn btn-orange btn-small mt-2" onclick="document.getElementById('importExcelFile').click()"> IMPORT EXCEL</button><input type="file" id="importExcelFile" accept=".xlsx,.xls" style="display:none" onchange="importJamaahFromExcel(this)"><button class="btn btn-danger btn-small mt-2" onclick="confirmDeleteAllJamaah()"> HAPUS SEMUA database</button></div>
         <div class="section-title"><span id="hdrDaftarJamaah">DAFTAR PESERTA DIDIK</span></div>
@@ -4150,27 +4150,20 @@ async function loadDynamicFieldsJamaah() {
         dynamicFieldsJamaah = saved;
     } else {
         dynamicFieldsJamaah = [
-            { name: 'nama_paspor',   label: 'Nama Paspor',   type: 'text',     icon: '👤', isRequired: false },
-            { name: 'no_porsi',      label: 'NIS',            type: 'text',     icon: '🔢', isRequired: false },
-            { name: 'jenis_kelamin', label: 'Jenis Kelamin',  type: 'text',     icon: '👤', isRequired: false },
-            { name: 'tempat_lahir',  label: 'Tempat Lahir',   type: 'text',     icon: '📍', isRequired: false },
-            { name: 'tgl_lahir',     label: 'Tanggal Lahir',  type: 'date',     icon: '🗓️', isRequired: false },
-            { name: 'no_paspor',     label: 'No Paspor',      type: 'text',     icon: '📘', isRequired: false },
-            { name: 'nik',           label: 'NIK',             type: 'text',     icon: '🪪', isRequired: false },
-            { name: 'kk',            label: 'KK',              type: 'text',     icon: '📋', isRequired: false },
-            { name: 'alamat',        label: 'Alamat',          type: 'text',     icon: '🏠', isRequired: false },
-            { name: 'kec',           label: 'Kec',             type: 'text',     icon: '🏘️', isRequired: false },
-            { name: 'kab_kota',      label: 'Kab / Kota',     type: 'text',     icon: '🏙️', isRequired: false },
-            { name: 'whatsapp',      label: 'WhatsApp',        type: 'tel',      icon: '📞', isRequired: true  },
-            { name: 'rombongan',     label: 'Rombongan',       type: 'text',     icon: '👥', isRequired: false },
-            { name: 'regu',          label: 'Regu',            type: 'text',     icon: '👥', isRequired: false },
-            { name: 'visa',          label: 'Visa',            type: 'text',     icon: '📘', isRequired: false },
-            { name: 'kamar',         label: 'Kamar',           type: 'text',     icon: '🛏️', isRequired: false },
-            { name: 'bus',           label: 'Bus',             type: 'text',     icon: '🚌', isRequired: false },
-            { name: 'kamar',         label: 'No Kamar/Kelas',  type: 'text',     icon: '🏠', isRequired: false },
-            { name: 'wali',          label: 'Nama Wali',       type: 'text',     icon: '👤', isRequired: false },
-            { name: 'warna',         label: 'Warna',           type: 'text',     icon: '🏷️', isRequired: false },
-            { name: 'keterangan',    label: 'Keterangan',      type: 'textarea', icon: '📝', isRequired: false }
+            { name: 'no_porsi',      label: 'NIS',                    type: 'text',     icon: '🔢', isRequired: false },
+            { name: 'jenis_kelamin', label: 'Jenis Kelamin',           type: 'text',     icon: '👤', isRequired: false },
+            { name: 'tempat_lahir',  label: 'Tempat Lahir',            type: 'text',     icon: '📍', isRequired: false },
+            { name: 'tgl_lahir',     label: 'Tanggal Lahir',           type: 'date',     icon: '🗓️', isRequired: false },
+            { name: 'nik',           label: 'NIK',                     type: 'text',     icon: '🪪', isRequired: false },
+            { name: 'alamat',        label: 'Alamat',                  type: 'text',     icon: '🏠', isRequired: false },
+            { name: 'kec',           label: 'Kecamatan',               type: 'text',     icon: '🏘️', isRequired: false },
+            { name: 'kab_kota',      label: 'Kab / Kota',             type: 'text',     icon: '🏙️', isRequired: false },
+            { name: 'asal_sekolah',  label: 'Asal Sekolah',           type: 'text',     icon: '🏫', isRequired: false },
+            { name: 'tahun_masuk',   label: 'Tahun Masuk',            type: 'text',     icon: '📅', isRequired: false },
+            { name: 'wali',          label: 'Nama Wali / Orang Tua',  type: 'text',     icon: '👤', isRequired: false },
+            { name: 'hp_wali',       label: 'No HP Wali',             type: 'tel',      icon: '📞', isRequired: false },
+            { name: 'whatsapp',      label: 'WhatsApp',                type: 'tel',      icon: '💬', isRequired: true  },
+            { name: 'keterangan',    label: 'Keterangan',              type: 'textarea', icon: '📝', isRequired: false }
         ];
         await idbSet(STORE_JAMAAH, 'jamaah_fields', dynamicFieldsJamaah);
     }
@@ -5637,7 +5630,7 @@ function getAbsensiColumns() {
         }
     }
     // Default: bangun dari dynamicFieldsJamaah
-    const DEFAULT_ON = ['no_porsi', 'kamar', 'bus', 'rombongan'];
+    const DEFAULT_ON = ['no_porsi', 'jenis_kelamin', 'hp_wali', 'wali'];
     const cols = [
         { id: 'no',   label: 'No',          show: true, required: true },
         { id: 'nama', label: 'Nama Jamaah',  show: true, required: true },
@@ -6552,27 +6545,20 @@ function importJamaahFromExcel(input){
 let jamaahKitaList = [], dynamicFieldsJamaahKita = [], selectedJamaahKitaIds = [], editingJamaahKitaId = null;
 
 const defaultJamaahKitaFields = [
-    { name: 'nama_paspor',   label: 'Nama Paspor',   type: 'text',     icon: '👤', isRequired: false },
-    { name: 'no_porsi',      label: 'NIS',            type: 'text',     icon: '🔢', isRequired: false },
-    { name: 'jenis_kelamin', label: 'Jenis Kelamin',  type: 'text',     icon: '👤', isRequired: false },
-    { name: 'tempat_lahir',  label: 'Tempat Lahir',   type: 'text',     icon: '📍', isRequired: false },
-    { name: 'tgl_lahir',     label: 'Tanggal Lahir',  type: 'date',     icon: '🗓️', isRequired: false },
-    { name: 'no_paspor',     label: 'No Paspor',      type: 'text',     icon: '📘', isRequired: false },
-    { name: 'nik',           label: 'NIK',             type: 'text',     icon: '🪪', isRequired: false },
-    { name: 'kk',            label: 'KK',              type: 'text',     icon: '📋', isRequired: false },
-    { name: 'alamat',        label: 'Alamat',          type: 'text',     icon: '🏠', isRequired: false },
-    { name: 'kec',           label: 'Kec',             type: 'text',     icon: '🏘️', isRequired: false },
-    { name: 'kab_kota',      label: 'Kab / Kota',     type: 'text',     icon: '🏙️', isRequired: false },
-    { name: 'whatsapp',      label: 'WhatsApp',        type: 'tel',      icon: '📞', isRequired: true  },
-    { name: 'rombongan',     label: 'Rombongan',       type: 'text',     icon: '👥', isRequired: false },
-    { name: 'regu',          label: 'Regu',            type: 'text',     icon: '👥', isRequired: false },
-    { name: 'visa',          label: 'Visa',            type: 'text',     icon: '📘', isRequired: false },
-    { name: 'kamar',         label: 'Kamar',           type: 'text',     icon: '🛏️', isRequired: false },
-    { name: 'bus',           label: 'Bus',             type: 'text',     icon: '🚌', isRequired: false },
-    { name: 'kamar',         label: 'No Kamar/Kelas',  type: 'text',     icon: '🏠', isRequired: false },
-    { name: 'wali',          label: 'Nama Wali',       type: 'text',     icon: '👤', isRequired: false },
-    { name: 'warna',         label: 'Warna',           type: 'text',     icon: '🏷️', isRequired: false },
-    { name: 'keterangan',    label: 'Keterangan',      type: 'textarea', icon: '📝', isRequired: false }
+            { name: 'no_porsi',      label: 'NIS',                    type: 'text',     icon: '🔢', isRequired: false },
+            { name: 'jenis_kelamin', label: 'Jenis Kelamin',           type: 'text',     icon: '👤', isRequired: false },
+            { name: 'tempat_lahir',  label: 'Tempat Lahir',            type: 'text',     icon: '📍', isRequired: false },
+            { name: 'tgl_lahir',     label: 'Tanggal Lahir',           type: 'date',     icon: '🗓️', isRequired: false },
+            { name: 'nik',           label: 'NIK',                     type: 'text',     icon: '🪪', isRequired: false },
+            { name: 'alamat',        label: 'Alamat',                  type: 'text',     icon: '🏠', isRequired: false },
+            { name: 'kec',           label: 'Kecamatan',               type: 'text',     icon: '🏘️', isRequired: false },
+            { name: 'kab_kota',      label: 'Kab / Kota',             type: 'text',     icon: '🏙️', isRequired: false },
+            { name: 'asal_sekolah',  label: 'Asal Sekolah',           type: 'text',     icon: '🏫', isRequired: false },
+            { name: 'tahun_masuk',   label: 'Tahun Masuk',            type: 'text',     icon: '📅', isRequired: false },
+            { name: 'wali',          label: 'Nama Wali / Orang Tua',  type: 'text',     icon: '👤', isRequired: false },
+            { name: 'hp_wali',       label: 'No HP Wali',             type: 'tel',      icon: '📞', isRequired: false },
+            { name: 'whatsapp',      label: 'WhatsApp',                type: 'tel',      icon: '💬', isRequired: true  },
+            { name: 'keterangan',    label: 'Keterangan',              type: 'textarea', icon: '📝', isRequired: false }
 ];
 
 async function loadJamaahKitaData() {
