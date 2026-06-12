@@ -4151,7 +4151,7 @@ async function loadDynamicFieldsJamaah() {
     } else {
         dynamicFieldsJamaah = [
             { name: 'nama_paspor',   label: 'Nama Paspor',   type: 'text',     icon: '👤', isRequired: false },
-            { name: 'no_porsi',      label: 'No Porsi',       type: 'text',     icon: '🔢', isRequired: false },
+            { name: 'no_porsi',      label: 'NIS',            type: 'text',     icon: '🔢', isRequired: false },
             { name: 'jenis_kelamin', label: 'Jenis Kelamin',  type: 'text',     icon: '👤', isRequired: false },
             { name: 'tempat_lahir',  label: 'Tempat Lahir',   type: 'text',     icon: '📍', isRequired: false },
             { name: 'tgl_lahir',     label: 'Tanggal Lahir',  type: 'date',     icon: '🗓️', isRequired: false },
@@ -4265,7 +4265,7 @@ NIK             : {nik}
 Tempat/Tgl Lahir: {tempat_lahir}, {tgl_lahir}
 Jenis Kelamin   : {jenis_kelamin}
 Alamat          : {alamat}
-No. Porsi       : {no_porsi}
+NIS             : {no_porsi}
 
 Adalah benar jamaah kami yang akan melaksanakan ibadah Haji/Umroh pada tahun ini. Oleh karena itu, kami merekomendasikan kepada instansi terkait untuk membantu proses pembuatan paspor yang bersangkutan.
 
@@ -4282,7 +4282,7 @@ NIK             : {nik}
 Tempat/Tgl Lahir: {tempat_lahir}, {tgl_lahir}
 Jenis Kelamin   : {jenis_kelamin}
 Alamat          : {alamat}
-No. Porsi       : {no_porsi}
+NIS             : {no_porsi}
 No. Paspor      : {no_paspor}
 Rombongan       : {rombongan}
 Kamar           : {kamar}
@@ -4332,7 +4332,7 @@ Nama        : {nama}
 NIK         : {nik}
 Alamat      : {alamat}
 No. Paspor  : {no_paspor}
-No. Porsi   : {no_porsi}
+NIS         : {no_porsi}
 
 Untuk keperluan:
 {keperluan}
@@ -4894,7 +4894,7 @@ async function tampilHasilScan(jamaah) {
         ? '<img src="' + foto + '" style="width:100%;height:100%;object-fit:cover;">'
         : '<span style="font-size:32px;">👤</span>';
     document.getElementById('hasilNama').textContent = jamaah.nama_lengkap;
-    document.getElementById('hasilNoPorsi').textContent = 'No Porsi: ' + (jamaah.additional_fields?.no_porsi || '-');
+    document.getElementById('hasilNoPorsi').textContent = 'NIS: ' + (jamaah.additional_fields?.no_porsi || '-');
     const absensiSesi = getAbsensiSesiAktif();
     const sudahHadir = absensiSesi.find(a => a.jamaahId === jamaah.id);
     const statusEl = document.getElementById('hasilStatusAbsen');
@@ -5041,7 +5041,7 @@ function renderRekapAbsensi() {
             html += `<div style="padding:8px;border-bottom:1px solid #eee;font-size:12px;display:flex;align-items:center;justify-content:space-between;">
                 <div>
                     <div style="font-weight:bold;">✅ ${escapeHtml(a.nama)}</div>
-                    <div style="color:#888;">No Porsi: ${a.no_porsi} | ${a.waktu}</div>
+                    <div style="color:#888;">NIS: ${a.no_porsi} | ${a.waktu}</div>
                 </div>
                 <button onclick="batalkanHadir(${a.jamaahId})" style="padding:4px 8px;background:#EF4444;color:white;border:none;border-radius:6px;font-size:11px;cursor:pointer;flex-shrink:0;">Batal</button>
             </div>`;
@@ -5902,7 +5902,7 @@ function eksporAbsensiExcel() {
         ['REKAP ABSENSI — ' + sesi.nama],
         [namaInstansi + ' | ' + sesi.tanggal + ' | Total Hadir: ' + sesi.absensi.length],
         [],
-        ['No', 'Nama Jamaah', 'No Porsi', 'Kamar', 'Bus', 'Rombongan', 'Waktu Hadir']
+        ['No', 'Nama Peserta', 'NIS', 'Kamar', 'Bus', 'Rombongan', 'Waktu Hadir']
     ];
     getSortedAbsensi(sesi.absensi).forEach((a, i) => {
         ws_data.push([i+1, a.nama, a.no_porsi, a.kamar||'-', a.bus||'-', a.rombongan||'-', a.waktu]);
@@ -5919,7 +5919,7 @@ function eksporAbsensiCSV() {
     const sesi = getSesiAktif();
     if (!sesi) return showToast('Pilih sesi dulu!');
     if (sesi.absensi.length === 0) return showToast('Belum ada data absensi!');
-    let csv = 'No,Nama Jamaah,No Porsi,Kamar,Bus,Rombongan,Waktu Hadir\n';
+    let csv = 'No,Nama Peserta,NIS,Kamar,Bus,Rombongan,Waktu Hadir\n';
     getSortedAbsensi(sesi.absensi).forEach((a, i) => {
         csv += [i+1, '"'+(a.nama||'').replace(/"/g,'""')+'"', '"'+(a.no_porsi||'-')+'"',
             '"'+(a.kamar||'-')+'"', '"'+(a.bus||'-')+'"', '"'+(a.rombongan||'-')+'"',
@@ -6553,7 +6553,7 @@ let jamaahKitaList = [], dynamicFieldsJamaahKita = [], selectedJamaahKitaIds = [
 
 const defaultJamaahKitaFields = [
     { name: 'nama_paspor',   label: 'Nama Paspor',   type: 'text',     icon: '👤', isRequired: false },
-    { name: 'no_porsi',      label: 'No Porsi',       type: 'text',     icon: '🔢', isRequired: false },
+    { name: 'no_porsi',      label: 'NIS',            type: 'text',     icon: '🔢', isRequired: false },
     { name: 'jenis_kelamin', label: 'Jenis Kelamin',  type: 'text',     icon: '👤', isRequired: false },
     { name: 'tempat_lahir',  label: 'Tempat Lahir',   type: 'text',     icon: '📍', isRequired: false },
     { name: 'tgl_lahir',     label: 'Tanggal Lahir',  type: 'date',     icon: '🗓️', isRequired: false },
@@ -13276,7 +13276,7 @@ async function printPDFDirect(pdfDoc, filename = 'document.pdf') {
         <div><label style="display:block;font-weight:600;font-size:13px;margin-bottom:4px;">Kode</label>
           <input type="text" id="fMapelKode" placeholder="Contoh: MTK / FQH (opsional)" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;"></div>
         <div><label style="display:block;font-weight:600;font-size:13px;margin-bottom:4px;">Pengajar</label>
-          <input type="text" id="fMapelPengajar" placeholder="Nama pengajar (opsional)" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;"></div>
+          <select id="fMapelPengajar" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;"><option value="">-- Opsional, pilih pengajar utama --</option></select></div>
         <div><label style="display:block;font-weight:600;font-size:13px;margin-bottom:4px;">KKM / Nilai Min</label>
           <input type="number" id="fMapelKKM" placeholder="Contoh: 75" min="0" max="100" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;"></div>
         <div><label style="display:block;font-weight:600;font-size:13px;margin-bottom:4px;">Keterangan</label>
@@ -13412,7 +13412,7 @@ async function printPDFDirect(pdfDoc, filename = 'document.pdf') {
     <input type="hidden" id="nilaiEditId">
     <div style="display:grid;gap:12px;">
       <div><label style="display:block;font-weight:600;font-size:13px;margin-bottom:4px;">Peserta Didik *</label><select id="fNilaiPeserta" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;"><option value="">Pilih peserta...</option></select></div>
-      <div><label style="display:block;font-weight:600;font-size:13px;margin-bottom:4px;">Mata Pelajaran</label><input type="text" id="fNilaiMapel" placeholder="Contoh: Matematika / Fiqh" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;"></div>
+      <div><label style="display:block;font-weight:600;font-size:13px;margin-bottom:4px;">Mata Pelajaran</label><select id="fNilaiMapel" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;"><option value="">-- Pilih Mata Pelajaran --</option></select></div>
       <div><label style="display:block;font-weight:600;font-size:13px;margin-bottom:4px;">Jenis Penilaian</label><select id="fNilaiJenis" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;"><option value="UH">Ulangan Harian</option><option value="UTS">UTS</option><option value="UAS">UAS</option><option value="Hafalan">Hafalan</option><option value="Praktik">Praktik</option></select></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
         <div><label style="display:block;font-weight:600;font-size:13px;margin-bottom:4px;">Nilai *</label><input type="number" id="fNilaiAngka" min="0" max="100" placeholder="85" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;"></div>
@@ -14060,6 +14060,26 @@ var nilaiList = (function(){
 })();
 function saveNilai() { localStorage.setItem('eduku_nilai', JSON.stringify(nilaiList)); }
 function openFormNilai(id) {
+    // Populate dropdown mapel
+    var nmSel = document.getElementById('fNilaiMapel');
+    if (nmSel) {
+        var nmOpts = '<option value="">-- Pilih Mata Pelajaran --</option>';
+        for (var nmi = 0; nmi < mapelList.length; nmi++) {
+            nmOpts += '<option value="'+mapelList[nmi].nama+'">'+mapelList[nmi].nama+'</option>';
+        }
+        nmSel.innerHTML = nmOpts;
+        // Auto-fill KKM saat pilih mapel
+        nmSel.onchange = function() {
+            var kkm = document.getElementById('fNilaiKKM');
+            if (!kkm) return;
+            for (var i = 0; i < mapelList.length; i++) {
+                if (mapelList[i].nama === nmSel.value) {
+                    kkm.value = mapelList[i].kkm || 75;
+                    return;
+                }
+            }
+        };
+    }
     var sel = document.getElementById('fNilaiPeserta');
     if (sel) {
         var p = getTerm('pesertaDidik');
@@ -14081,7 +14101,7 @@ function openFormNilai(id) {
             if (nilaiList[k].id==id) {
                 var n = nilaiList[k];
                 if(sel) sel.value=n.jamaahId||'';
-                var fm = document.getElementById('fNilaiMapel'); if(fm) fm.value=n.mapel||'';
+                var fm = document.getElementById('fNilaiMapel'); if(fm) setTimeout(function(){fm.value=n.mapel||'';},50);
                 var fj = document.getElementById('fNilaiJenis'); if(fj) fj.value=n.jenis||'UH';
                 var fa = document.getElementById('fNilaiAngka'); if(fa) fa.value=n.nilai||'';
                 if(td) td.value=n.tanggal||'';
@@ -14190,14 +14210,25 @@ var mapelList = (function(){
 })();
 function saveMapel() { localStorage.setItem('eduku_mapel', JSON.stringify(mapelList)); }
 function openFormMapel(id) {
-    var flds=['fMapelNama','fMapelKode','fMapelPengajar','fMapelKKM','fMapelKet'];
+    // Populate dropdown pengajar
+    var mpSel = document.getElementById('fMapelPengajar');
+    if (mpSel) {
+        var mpOpts = '<option value="">-- Opsional, pilih pengajar utama --</option>';
+        for (var mpi = 0; mpi < pengajarList.length; mpi++) {
+            mpOpts += '<option value="'+pengajarList[mpi].nama+'">'+pengajarList[mpi].nama
+                    + (pengajarList[mpi].bidang ? ' ('+pengajarList[mpi].bidang+')' : '')
+                    + '</option>';
+        }
+        mpSel.innerHTML = mpOpts;
+    }
+    var flds=['fMapelNama','fMapelKode','fMapelKKM','fMapelKet'];
     for(var i=0;i<flds.length;i++){var el=document.getElementById(flds[i]);if(el)el.value='';}
     var editId=document.getElementById('mapelEditId');if(editId)editId.value=id||'';
     var title=document.getElementById('formMapelTitle');if(title)title.textContent=id?'Edit Mapel':'Tambah Mapel';
     if(id){for(var j=0;j<mapelList.length;j++){if(mapelList[j].id==id){var m=mapelList[j];
         var fn=document.getElementById('fMapelNama');if(fn)fn.value=m.nama||'';
         var fk=document.getElementById('fMapelKode');if(fk)fk.value=m.kode||'';
-        var fp=document.getElementById('fMapelPengajar');if(fp)fp.value=m.pengajar||'';
+        var fp=document.getElementById('fMapelPengajar');if(fp) setTimeout(function(){fp.value=m.pengajar||'';},50);
         var fkm=document.getElementById('fMapelKKM');if(fkm)fkm.value=m.kkm||'';
         var fkt=document.getElementById('fMapelKet');if(fkt)fkt.value=m.keterangan||'';
         break;}}}
