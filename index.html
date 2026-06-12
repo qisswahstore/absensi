@@ -14512,7 +14512,7 @@ function renderPilihSantriList() {
         var j = jamaahList[i];
         var jId = String(j.id);
         var nama = j.nama_lengkap || j.nama || '?';
-        var nis = j.no_porsi || '-';
+        var nis = getNIS(j);
         
         // Search filter
         if (q && nama.toLowerCase().indexOf(q) < 0 && nis.toLowerCase().indexOf(q) < 0) continue;
@@ -15660,7 +15660,7 @@ function renderGuruSantriList() {
     for (var j = 0; j < fl.length; j++) {
         var s = fl[j];
         var nama2 = s.nama_lengkap || s.nama || '?';
-        var nis2 = s.no_porsi || '-';
+        var nis2 = getNIS(s);
         html += '<div style="display:flex;align-items:center;gap:10px;padding:10px;background:#f8fafc;border-radius:10px;margin-bottom:6px;">'
               + '<div style="width:32px;height:32px;background:var(--primary);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;">'+(j+1)+'</div>'
               + '<div style="flex:1;min-width:0;">'
@@ -15953,7 +15953,7 @@ function doLoginWali() {
     var santri = null;
     for (var i = 0; i < jamaahList.length; i++) {
         var j = jamaahList[i];
-        var jNIS = j.no_porsi || (j.additional_fields ? j.additional_fields.nis || '' : '');
+        var jNIS = getNIS(j);
         if (jNIS === nis) { santri = j; break; }
     }
 
@@ -16150,6 +16150,21 @@ function logoutWali() {
     showToast('Berhasil logout!');
 }
 
+
+// Helper: ambil NIS santri (bisa di no_porsi langsung atau additional_fields)
+function getNIS(j) {
+    if (!j) return '-';
+    if (j.no_porsi) return j.no_porsi;
+    if (j.additional_fields) {
+        for (var i = 0; i < j.additional_fields.length; i++) {
+            if (j.additional_fields[i].name === 'no_porsi' || j.additional_fields[i].name === 'nis') {
+                return j.additional_fields[i].value || '-';
+            }
+        }
+    }
+    return '-';
+}
+
 // ─── KELOLA PIN WALI (Admin) ───
 function bukaKelolaPin() {
     document.getElementById('modalKelolaPin').style.display = 'flex';
@@ -16183,7 +16198,7 @@ function renderKelolaPin() {
         var j = filtered[i];
         var jId = String(j.id);
         var nama = j.nama_lengkap || j.nama || '?';
-        var nis = j.no_porsi || '-';
+        var nis = getNIS(j);
         var pin = pins[jId] || '';
         var waWali = j.additional_fields ? (j.additional_fields.wali_wa || j.additional_fields.no_hp_wali || '') : '';
 
@@ -16385,7 +16400,7 @@ function doCetakRekap(kelasId, dari, sampai, jenis) {
         rows += '<tr style="'+bg+'">'
               + '<td style="text-align:center;font-size:11px;padding:5px;">'+(r+1)+'</td>'
               + '<td style="font-size:11px;padding:5px;font-weight:600;">'+(s.nama_lengkap||s.nama||'?')+'</td>'
-              + '<td style="text-align:center;font-size:11px;padding:5px;">'+(s.no_porsi||'-')+'</td>';
+              + '<td style="text-align:center;font-size:11px;padding:5px;">'+getNIS(s)+'</td>';
 
         if (showH) {
             rows += '<td style="text-align:center;color:#10b981;font-weight:700;padding:5px;">'+(st.hadir_h||0)+'</td>'
@@ -16482,7 +16497,7 @@ function doCetakDaftar(kelasId,k){
     var today=new Date().toLocaleDateString('id-ID',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
     var rows='';
     for(var i=0;i<peserta.length;i++){
-        var j=peserta[i];var nama=j.nama_lengkap||j.nama||'?';var nis=j.no_porsi||'-';
+        var j=peserta[i];var nama=j.nama_lengkap||j.nama||'?';var nis=getNIS(j);
         rows+='<tr><td style="text-align:center;">'+(i+1)+'</td><td>'+nama+'</td><td style="text-align:center;">'+nis+'</td><td></td><td></td><td></td><td></td></tr>';
     }
     if(!rows) rows='<tr><td colspan="7" style="text-align:center;color:#999;padding:16px;">Belum ada '+p+'</td></tr>';
