@@ -16210,7 +16210,11 @@ function renderKelolaPin() {
         var nama = j.nama_lengkap || j.nama || '?';
         var nis = getNIS(j);
         var pin = pins[jId] || '';
-        var waWali = j.additional_fields ? (j.additional_fields.wali_wa || j.additional_fields.no_hp_wali || '') : '';
+        var waWali = '';
+        if (j.additional_fields) {
+            var af = j.additional_fields;
+            waWali = af.hp_wali || af.wali_wa || af.no_hp_wali || af.whatsapp || '';
+        }
 
         html += '<div style="display:flex;align-items:center;gap:8px;padding:10px;background:#f8fafc;border-radius:10px;margin-bottom:6px;">'
               + '<div style="flex:1;min-width:0;">'
