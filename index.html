@@ -2940,6 +2940,10 @@
       <i class="fas fa-star" style="font-size:18px;"></i>
       <span style="font-size:10px;margin-top:3px;font-weight:600;">Nilai</span>
     </div>
+    <div onclick="bukaInputPelanggaran()" id="gnPelanggaran" class="guru-nav-item" style="display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:#ef4444;">
+      <i class="fas fa-exclamation-triangle" style="font-size:18px;"></i>
+      <span style="font-size:10px;margin-top:3px;font-weight:600;">Catat</span>
+    </div>
     <div onclick="logoutGuru()" id="gnKeluar" class="guru-nav-item" style="display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:#ef4444;">
       <i class="fas fa-sign-out-alt" style="font-size:18px;"></i>
       <span style="font-size:10px;margin-top:3px;font-weight:600;">Keluar</span>
@@ -3136,6 +3140,7 @@ function internalShowPage(pageId) {
     if (pageId === 'jadwal') { try{renderJadwalList();}catch(e){} }
     if (pageId === 'mapel') { try{renderMapelList();}catch(e){} }
     if (pageId === 'raport') { try{initRaport();}catch(e){} }
+    if (pageId === 'pelanggaran') { try{initPelanggaranPage();}catch(e){} }
     if (pageId === 'guru') { try{initGuruMode();}catch(e){} }
     if (pageId === 'wali') { try{initWaliMode();}catch(e){} }
     if (pageId === 'estimasi') { try{initKalkulator();}catch(e){} }
@@ -3293,6 +3298,7 @@ const menuItemsPremium = [
     { id: 'mapel',      icon: '📚', label: 'Mata Pelajaran',  badge: 'Mapel', idKey:'mapel' },
     { id: 'jadwal',     icon: '📅', label: 'Jadwal',          badge: 'Jadwal', idKey:'jadwal' },
     { id: 'raport',     icon: '📋', label: 'Raport',          badge: 'Raport', idKey:'raport' },
+    { id: 'pelanggaran', icon: '&#9888;', label: 'Pelanggaran',    badge: 'Poin', idKey:'pelanggaran' },
     { id: 'pembayaran', icon: '🧾', label: 'Pembayaran',      badge: 'Tagihan' },
     { id: 'kas',        icon: '💰', label: 'Uang Kas',        badge: 'Kas' },
     { id: 'catatan',    icon: '📝', label: 'Catatan',         badge: 'Notes' },
@@ -3310,7 +3316,7 @@ function renderMenuPremium() {
     let html = ''; 
     for(let i=0;i<menuItemsPremium.length;i++) { 
         const menu = menuItemsPremium[i]; 
-        const isVisible = localStorage.getItem(`menu_${menu.id}_visible`) !== 'false'; 
+        const isVisible = (menu.id === 'pelanggaran' || menu.id === 'absensi_harian') ? true : localStorage.getItem(`menu_${menu.id}_visible`) !== 'false'; 
         if(isVisible || isAdminModePremium) 
             html += `<div class="menu-card-premium" onclick="showPage('${menu.id}')">${isAdminModePremium ? '<div class="edit-badge">✏️</div>' : ''}<div class="menu-icon">${menu.icon}</div><div class="menu-label">${menu.label}</div><div class="menu-badge">${menu.badge}</div></div>`; 
         else 
@@ -12798,9 +12804,15 @@ async function printPDFDirect(pdfDoc, filename = 'document.pdf') {
     </div>
 
     <!-- Tagihan -->
-    <div style="background:white;border-radius:14px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+    <div style="background:white;border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
       <div style="font-weight:700;font-size:15px;color:var(--primary);margin-bottom:12px;">&#128176; Info Tagihan</div>
       <div id="waliTagihanInfo"></div>
+    </div>
+
+    <!-- Pelanggaran -->
+    <div style="background:white;border-radius:14px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+      <div style="font-weight:700;font-size:15px;color:var(--primary);margin-bottom:12px;">&#9888;&#65039; Catatan Pelanggaran</div>
+      <div id="waliPelanggaranInfo"></div>
     </div>
   </div>
 </div>
@@ -12823,6 +12835,148 @@ async function printPDFDirect(pdfDoc, filename = 'document.pdf') {
     <div onclick="logoutWali()" style="display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:#ef4444;">
       <i class="fas fa-sign-out-alt" style="font-size:18px;"></i>
       <span style="font-size:10px;margin-top:3px;font-weight:600;">Keluar</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- ===== PAGE PELANGGARAN ===== -->
+<div id="page-pelanggaran" class="page">
+  <div class="header-premium header-premium-small">
+    <div class="back-header">
+      <i class="fas fa-arrow-left" onclick="showPage('home')"></i>
+      <h2>&#9888;&#65039; Pelanggaran</h2>
+      <button onclick="bukaInputPelanggaran()" class="btn-primary btn-small">+ Input</button>
+    </div>
+  </div>
+  <div style="padding:16px;padding-bottom:80px;">
+
+    <!-- Stats -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;" id="pelanggaranStats"></div>
+
+    <!-- Filter -->
+    <div style="background:white;border-radius:12px;padding:12px;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <select id="filterPelKelas" onchange="renderPelanggaranList()" style="padding:9px;border:2px solid #e2e8f0;border-radius:8px;font-size:13px;">
+          <option value="">Semua Kelas</option>
+        </select>
+        <select id="filterPelBulan" onchange="renderPelanggaranList()" style="padding:9px;border:2px solid #e2e8f0;border-radius:8px;font-size:13px;">
+          <option value="">Semua Bulan</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Tab: Rekap Santri / Kategori -->
+    <div style="display:flex;gap:8px;margin-bottom:14px;">
+      <button id="tabRekap" onclick="switchPelTab('rekap')" style="flex:1;padding:10px;background:var(--primary);color:white;border:none;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;">&#128202; Rekap Santri</button>
+      <button id="tabKategori" onclick="switchPelTab('kategori')" style="flex:1;padding:10px;background:#f1f5f9;color:#333;border:none;border-radius:10px;font-weight:600;font-size:13px;cursor:pointer;">&#128193; Kategori</button>
+    </div>
+
+    <!-- Rekap Santri -->
+    <div id="tabRekapContent">
+      <div id="pelanggaranList"></div>
+    </div>
+
+    <!-- Kategori Pelanggaran -->
+    <div id="tabKategoriContent" style="display:none;">
+      <div style="background:white;border-radius:12px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <div style="font-weight:700;font-size:14px;">Kategori Pelanggaran</div>
+          <button onclick="bukaFormKategoriPel()" style="background:var(--primary);color:white;border:none;border-radius:8px;padding:7px 12px;font-size:12px;cursor:pointer;font-weight:600;">+ Tambah</button>
+        </div>
+        <div id="kategoriPelList"></div>
+      </div>
+
+      <!-- Threshold poin -->
+      <div style="background:white;border-radius:12px;padding:14px;margin-top:14px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+        <div style="font-weight:700;font-size:14px;margin-bottom:12px;">&#9888;&#65039; Batas Poin</div>
+        <div style="display:grid;gap:10px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:12px;height:12px;background:#f59e0b;border-radius:50%;"></div>
+            <span style="flex:1;font-size:13px;">Peringatan Pertama</span>
+            <input type="number" id="thresholdWarn" value="50" style="width:70px;padding:6px;border:2px solid #f59e0b;border-radius:8px;font-size:13px;text-align:center;" onchange="saveThreshold()">
+            <span style="font-size:12px;color:#64748b;">poin</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:12px;height:12px;background:#ef4444;border-radius:50%;"></div>
+            <span style="flex:1;font-size:13px;">Panggil Wali</span>
+            <input type="number" id="thresholdDanger" value="100" style="width:70px;padding:6px;border:2px solid #ef4444;border-radius:8px;font-size:13px;text-align:center;" onchange="saveThreshold()">
+            <span style="font-size:12px;color:#64748b;">poin</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL INPUT PELANGGARAN ===== -->
+<div id="modalInputPelanggaran" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:10001;overflow-y:auto;">
+  <div style="min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:16px;">
+    <div style="background:white;border-radius:20px;max-width:500px;width:100%;padding:20px;margin-top:8px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <h3 style="margin:0;color:var(--primary);">&#9888;&#65039; Input Pelanggaran</h3>
+        <button onclick="document.getElementById('modalInputPelanggaran').style.display='none'" style="background:none;border:none;font-size:22px;cursor:pointer;">&#10005;</button>
+      </div>
+      <div style="display:grid;gap:10px;background:#f8fafc;padding:14px;border-radius:12px;margin-bottom:14px;">
+        <div>
+          <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">Santri *</label>
+          <select id="pelSantriId" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:13px;"><option value="">-- Pilih Santri --</option></select>
+        </div>
+        <div>
+          <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">Kategori Pelanggaran *</label>
+          <select id="pelKategoriId" onchange="pelAutoFillPoin()" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:13px;"><option value="">-- Pilih Kategori --</option></select>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div>
+            <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">Poin</label>
+            <input type="number" id="pelPoin" min="1" max="100" placeholder="10" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;text-align:center;">
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">Tanggal</label>
+            <input type="date" id="pelTanggal" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:13px;box-sizing:border-box;">
+          </div>
+        </div>
+        <div>
+          <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">Keterangan (opsional)</label>
+          <textarea id="pelKeterangan" rows="2" placeholder="Detail kejadian..." style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:13px;box-sizing:border-box;resize:none;font-family:inherit;"></textarea>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button onclick="document.getElementById('modalInputPelanggaran').style.display='none'" style="flex:1;padding:12px;background:#f1f5f9;color:#333;border:none;border-radius:10px;font-weight:600;cursor:pointer;">Batal</button>
+        <button onclick="simpanPelanggaran()" style="flex:2;padding:12px;background:#ef4444;color:white;border:none;border-radius:10px;font-weight:700;cursor:pointer;">&#128190; Simpan</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL KATEGORI PELANGGARAN ===== -->
+<div id="modalKategoriPel" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:10002;">
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:white;border-radius:20px;max-width:400px;width:100%;padding:24px;">
+      <h3 style="margin:0 0 16px;color:var(--primary);">Kategori Pelanggaran</h3>
+      <div style="display:grid;gap:10px;margin-bottom:16px;">
+        <div>
+          <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">Nama Pelanggaran *</label>
+          <input type="text" id="katPelNama" placeholder="Contoh: Terlambat apel" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;">
+        </div>
+        <div>
+          <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">Poin *</label>
+          <input type="number" id="katPelPoin" placeholder="5" min="1" max="100" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;">
+        </div>
+        <div>
+          <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">Tingkat</label>
+          <select id="katPelTingkat" style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:13px;">
+            <option value="ringan">Ringan (1-10 poin)</option>
+            <option value="sedang">Sedang (11-30 poin)</option>
+            <option value="berat">Berat (31+ poin)</option>
+          </select>
+        </div>
+      </div>
+      <input type="hidden" id="katPelEditId">
+      <div style="display:flex;gap:10px;">
+        <button onclick="document.getElementById('modalKategoriPel').style.display='none'" style="flex:1;padding:12px;background:#f1f5f9;color:#333;border:none;border-radius:10px;font-weight:600;cursor:pointer;">Batal</button>
+        <button onclick="simpanKategoriPel()" style="flex:2;padding:12px;background:var(--primary);color:white;border:none;border-radius:10px;font-weight:700;cursor:pointer;">&#128190; Simpan</button>
+      </div>
     </div>
   </div>
 </div>
@@ -16055,6 +16209,8 @@ function initWaliMode(santri) {
 
     // Tagihan
     renderWaliTagihan(santri);
+    // Pelanggaran
+    try { renderWaliPelanggaran(santri); } catch(e) {}
 }
 
 function renderWaliAbsensi(santri) {
@@ -16267,6 +16423,444 @@ function getNIS(j) {
     return '-';
 }
 
+
+// ===== SISTEM PELANGGARAN SANTRI =====
+
+// ─── DATA STORAGE ───
+function getPelanggaranData() {
+    try { return JSON.parse(localStorage.getItem('eduku_pelanggaran') || '[]'); } catch(e) { return []; }
+}
+function savePelanggaranData(data) { localStorage.setItem('eduku_pelanggaran', JSON.stringify(data)); }
+
+function getKategoriPelData() {
+    var saved = localStorage.getItem('eduku_kategori_pelanggaran');
+    if (saved) { try { return JSON.parse(saved); } catch(e) {} }
+    // Default kategori
+    return [
+        { id:1, nama:'Terlambat apel/kegiatan', poin:5,  tingkat:'ringan' },
+        { id:2, nama:'Tidak pakai seragam',      poin:5,  tingkat:'ringan' },
+        { id:3, nama:'Tidak sholat berjamaah',   poin:10, tingkat:'sedang' },
+        { id:4, nama:'Tidak ikut kegiatan',      poin:10, tingkat:'sedang' },
+        { id:5, nama:'Keluar tanpa izin',         poin:25, tingkat:'berat'  },
+        { id:6, nama:'Melanggar tata tertib',     poin:15, tingkat:'sedang' },
+        { id:7, nama:'Berkelahi',                 poin:50, tingkat:'berat'  }
+    ];
+}
+function saveKategoriPelData(data) { localStorage.setItem('eduku_kategori_pelanggaran', JSON.stringify(data)); }
+
+function getThreshold() {
+    try { return JSON.parse(localStorage.getItem('eduku_pel_threshold') || '{"warn":50,"danger":100}'); } catch(e) { return {warn:50,danger:100}; }
+}
+function saveThreshold() {
+    var w = parseInt((document.getElementById('thresholdWarn')||{value:50}).value) || 50;
+    var d = parseInt((document.getElementById('thresholdDanger')||{value:100}).value) || 100;
+    localStorage.setItem('eduku_pel_threshold', JSON.stringify({warn:w, danger:d}));
+    showToast('Batas poin disimpan!');
+}
+
+// ─── INIT ───
+function initPelanggaranPage() {
+    // Pastikan menu ini selalu visible
+    localStorage.removeItem('menu_pelanggaran_visible');
+    // Populate filter kelas
+    var fk = document.getElementById('filterPelKelas');
+    if (fk) {
+        var kopts = '<option value="">Semua Kelas</option>';
+        for (var i = 0; i < kelasList.length; i++) kopts += '<option value="'+kelasList[i].id+'">'+kelasList[i].nama+'</option>';
+        fk.innerHTML = kopts;
+    }
+    // Populate filter bulan
+    var fb = document.getElementById('filterPelBulan');
+    if (fb) {
+        var now = new Date();
+        var bopts = '<option value="">Semua Bulan</option>';
+        var bln = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+        for (var j = 0; j < 6; j++) {
+            var d = new Date(now.getFullYear(), now.getMonth() - j, 1);
+            var val = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
+            bopts += '<option value="'+val+'"'+(j===0?' selected':'')+'>'+bln[d.getMonth()]+' '+d.getFullYear()+'</option>';
+        }
+        fb.innerHTML = bopts;
+    }
+    // Load threshold
+    var th = getThreshold();
+    var tw = document.getElementById('thresholdWarn'); if(tw) tw.value = th.warn;
+    var td2 = document.getElementById('thresholdDanger'); if(td2) td2.value = th.danger;
+
+    renderPelanggaranStats();
+    renderPelanggaranList();
+    renderKategoriPelList();
+}
+
+function switchPelTab(tab) {
+    var r = document.getElementById('tabRekapContent');
+    var k = document.getElementById('tabKategoriContent');
+    var br = document.getElementById('tabRekap');
+    var bk = document.getElementById('tabKategori');
+    if (tab === 'rekap') {
+        if(r) r.style.display = 'block';
+        if(k) k.style.display = 'none';
+        if(br) { br.style.background='var(--primary)'; br.style.color='white'; }
+        if(bk) { bk.style.background='#f1f5f9'; bk.style.color='#333'; }
+    } else {
+        if(r) r.style.display = 'none';
+        if(k) k.style.display = 'block';
+        if(br) { br.style.background='#f1f5f9'; br.style.color='#333'; }
+        if(bk) { bk.style.background='var(--primary)'; bk.style.color='white'; }
+        renderKategoriPelList();
+    }
+}
+
+// ─── STATS ───
+function renderPelanggaranStats() {
+    var el = document.getElementById('pelanggaranStats');
+    if (!el) return;
+    var data = getPelanggaranData();
+    var th = getThreshold();
+    var now = new Date();
+    var bulanIni = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
+
+    var bulanIniData = data.filter(function(p){ return p.tanggal && p.tanggal.substr(0,7) === bulanIni; });
+    var totalPoin = data.reduce(function(s,p){ return s + (p.poin||0); }, 0);
+    var santriMelanggar = {};
+    data.forEach(function(p){ if(p.santriId) santriMelanggar[p.santriId] = (santriMelanggar[p.santriId]||0) + (p.poin||0); });
+    var bahaya = Object.values(santriMelanggar).filter(function(v){ return v >= th.danger; }).length;
+
+    el.innerHTML = '<div style="background:white;border-radius:12px;padding:12px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.06);">'
+        + '<div style="font-size:22px;font-weight:800;color:#f59e0b;">'+bulanIniData.length+'</div>'
+        + '<div style="font-size:11px;color:#64748b;">Bulan Ini</div></div>'
+        + '<div style="background:white;border-radius:12px;padding:12px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.06);">'
+        + '<div style="font-size:22px;font-weight:800;color:#ef4444;">'+Object.keys(santriMelanggar).length+'</div>'
+        + '<div style="font-size:11px;color:#64748b;">Santri</div></div>'
+        + '<div style="background:'+(bahaya>0?'#fef2f2':'white')+';border-radius:12px;padding:12px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.06);">'
+        + '<div style="font-size:22px;font-weight:800;color:'+(bahaya>0?'#ef4444':'#10b981')+';">'+bahaya+'</div>'
+        + '<div style="font-size:11px;color:#64748b;">Panggil Wali</div></div>';
+}
+
+// ─── REKAP PER SANTRI ───
+function renderPelanggaranList() {
+    var el = document.getElementById('pelanggaranList');
+    if (!el) return;
+    var data = getPelanggaranData();
+    var th = getThreshold();
+    var filterKelas = (document.getElementById('filterPelKelas')||{value:''}).value;
+    var filterBulan = (document.getElementById('filterPelBulan')||{value:''}).value;
+
+    // Filter
+    if (filterBulan) data = data.filter(function(p){ return p.tanggal && p.tanggal.substr(0,7) === filterBulan; });
+
+    // Group by santri
+    var bySantri = {};
+    data.forEach(function(p) {
+        if (!bySantri[p.santriId]) bySantri[p.santriId] = { total:0, records:[] };
+        bySantri[p.santriId].total += (p.poin||0);
+        bySantri[p.santriId].records.push(p);
+    });
+
+    // Filter kelas
+    var santriIds = Object.keys(bySantri);
+    if (filterKelas) {
+        santriIds = santriIds.filter(function(sid) {
+            return String(getKelasIdBySantri(sid)) === String(filterKelas);
+        });
+    }
+
+    // Sort by poin desc
+    santriIds.sort(function(a,b){ return bySantri[b].total - bySantri[a].total; });
+
+    if (!santriIds.length) {
+        el.innerHTML = '<div style="text-align:center;padding:30px;color:#94a3b8;"><div style="font-size:40px;margin-bottom:10px;">&#10003;</div><div style="font-weight:600;">Tidak ada pelanggaran</div></div>';
+        return;
+    }
+
+    var html = '';
+    for (var i = 0; i < santriIds.length; i++) {
+        var sId = santriIds[i];
+        var st = bySantri[sId];
+        var santri = null;
+        for (var j = 0; j < jamaahList.length; j++) {
+            if (String(jamaahList[j].id) === String(sId)) { santri = jamaahList[j]; break; }
+        }
+        var nama = santri ? (santri.nama_lengkap || santri.nama || '?') : 'Santri #'+sId;
+        var nis = santri ? getNIS(santri) : '-';
+        var kelasId = getKelasIdBySantri(sId);
+        var kelasNama = kelasId ? getKelasNama(kelasId) : '-';
+
+        var poinColor = st.total >= th.danger ? '#ef4444' : st.total >= th.warn ? '#f59e0b' : '#10b981';
+        var statusLabel = st.total >= th.danger ? 'Panggil Wali' : st.total >= th.warn ? 'Peringatan' : 'Normal';
+        var statusBg = st.total >= th.danger ? '#fef2f2' : st.total >= th.warn ? '#fff7ed' : '#f0fdf4';
+
+        html += '<div style="background:white;border-radius:14px;padding:14px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,0.06);border-left:4px solid '+poinColor+';">'
+              + '<div style="display:flex;align-items:center;gap:10px;">'
+              + '<div style="flex:1;">'
+              + '<div style="font-weight:700;font-size:14px;">'+nama+'</div>'
+              + '<div style="font-size:12px;color:#64748b;">NIS: '+nis+' | '+kelasNama+'</div>'
+              + '</div>'
+              + '<div style="text-align:center;">'
+              + '<div style="font-size:24px;font-weight:800;color:'+poinColor+';">'+st.total+'</div>'
+              + '<div style="font-size:10px;color:'+poinColor+';">poin</div>'
+              + '</div>'
+              + '<div style="background:'+statusBg+';color:'+poinColor+';border-radius:8px;padding:4px 8px;font-size:10px;font-weight:700;">'+statusLabel+'</div>'
+              + '</div>'
+              + '<div style="margin-top:10px;border-top:1px solid #f1f5f9;padding-top:8px;">'
+              + '<div style="font-size:11px;color:#64748b;margin-bottom:6px;">'+st.records.length+' pelanggaran</div>';
+
+        var recentRecs = st.records.sort(function(a,b){ return (b.tanggal||'').localeCompare(a.tanggal||''); }).slice(0,3);
+        for (var k = 0; k < recentRecs.length; k++) {
+            var rec = recentRecs[k];
+            html += '<div style="display:flex;gap:6px;align-items:center;padding:4px 0;font-size:12px;">'
+                  + '<span style="color:#ef4444;font-weight:700;">+'+rec.poin+'</span>'
+                  + '<span style="flex:1;color:#374151;">'+rec.kategoriNama+'</span>'
+                  + '<span style="color:#94a3b8;">'+rec.tanggal+'</span>'
+                  + '<button data-rid="'+rec.id+'" onclick="hapusPelanggaran(this.dataset.rid)" style="background:none;border:none;color:#ef4444;font-size:14px;cursor:pointer;padding:0 4px;">&#215;</button>'
+                  + '</div>';
+        }
+        if (st.records.length > 3) html += '<div style="font-size:11px;color:#94a3b8;">+'+(st.records.length-3)+' lainnya...</div>';
+        html += '</div></div>';
+    }
+    el.innerHTML = html;
+}
+
+// ─── KATEGORI ───
+function renderKategoriPelList() {
+    var el = document.getElementById('kategoriPelList');
+    if (!el) return;
+    var list = getKategoriPelData();
+    var tingkatColor = {ringan:'#10b981', sedang:'#f59e0b', berat:'#ef4444'};
+
+    if (!list.length) {
+        el.innerHTML = '<div style="text-align:center;padding:16px;color:#94a3b8;">Belum ada kategori</div>';
+        return;
+    }
+    var html = '';
+    for (var i = 0; i < list.length; i++) {
+        var k = list[i];
+        var cc = tingkatColor[k.tingkat] || '#64748b';
+        html += '<div style="display:flex;align-items:center;gap:8px;padding:10px;background:#f8fafc;border-radius:10px;margin-bottom:6px;">'
+              + '<div style="width:32px;height:32px;background:'+cc+'20;color:'+cc+';border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;">'+k.poin+'</div>'
+              + '<div style="flex:1;"><div style="font-weight:600;font-size:13px;">'+k.nama+'</div>'
+              + '<div style="font-size:11px;color:'+cc+';font-weight:600;text-transform:capitalize;">'+k.tingkat+'</div></div>'
+              + '<button data-kid="'+k.id+'" onclick="editKategoriPel(this.dataset.kid)" style="background:#e2e8f0;border:none;border-radius:6px;padding:6px 8px;font-size:11px;cursor:pointer;">Edit</button>'
+              + '<button data-kid="'+k.id+'" onclick="hapusKategoriPel(this.dataset.kid)" style="background:#fef2f2;color:#ef4444;border:none;border-radius:6px;padding:6px 8px;font-size:11px;cursor:pointer;">Hapus</button>'
+              + '</div>';
+    }
+    el.innerHTML = html;
+}
+
+function bukaFormKategoriPel(editId) {
+    var modal = document.getElementById('modalKategoriPel');
+    var nm = document.getElementById('katPelNama');
+    var pn = document.getElementById('katPelPoin');
+    var tg = document.getElementById('katPelTingkat');
+    var eid = document.getElementById('katPelEditId');
+    if (nm) nm.value = '';
+    if (pn) pn.value = '';
+    if (tg) tg.value = 'ringan';
+    if (eid) eid.value = '';
+
+    if (editId) {
+        var list = getKategoriPelData();
+        for (var i = 0; i < list.length; i++) {
+            if (String(list[i].id) === String(editId)) {
+                if (nm) nm.value = list[i].nama;
+                if (pn) pn.value = list[i].poin;
+                if (tg) tg.value = list[i].tingkat || 'ringan';
+                if (eid) eid.value = editId;
+                break;
+            }
+        }
+    }
+    if (modal) modal.style.display = 'flex';
+}
+
+function editKategoriPel(kid) { bukaFormKategoriPel(kid); }
+
+function simpanKategoriPel() {
+    var nama = (document.getElementById('katPelNama')||{value:''}).value.trim();
+    var poin = parseInt((document.getElementById('katPelPoin')||{value:0}).value) || 0;
+    var tingkat = (document.getElementById('katPelTingkat')||{value:'ringan'}).value;
+    var editId = (document.getElementById('katPelEditId')||{value:''}).value;
+
+    if (!nama || !poin) { showToast('Isi nama dan poin!'); return; }
+
+    var list = getKategoriPelData();
+    if (editId) {
+        for (var i = 0; i < list.length; i++) {
+            if (String(list[i].id) === String(editId)) {
+                list[i].nama = nama; list[i].poin = poin; list[i].tingkat = tingkat; break;
+            }
+        }
+    } else {
+        var maxId = list.reduce(function(mx,k){ return Math.max(mx, k.id||0); }, 0);
+        list.push({ id: maxId+1, nama: nama, poin: poin, tingkat: tingkat });
+    }
+    saveKategoriPelData(list);
+    document.getElementById('modalKategoriPel').style.display = 'none';
+    renderKategoriPelList();
+    showToast('Kategori disimpan!');
+}
+
+function hapusKategoriPel(kid) {
+    if (!confirm('Hapus kategori ini?')) return;
+    var list = getKategoriPelData().filter(function(k){ return String(k.id) !== String(kid); });
+    saveKategoriPelData(list);
+    renderKategoriPelList();
+    showToast('Kategori dihapus!');
+}
+
+// ─── INPUT PELANGGARAN ───
+function bukaInputPelanggaran(santriIdPre) {
+    // Populate santri
+    var ss = document.getElementById('pelSantriId');
+    if (ss) {
+        var sopts = '<option value="">-- Pilih Santri --</option>';
+        if (typeof jamaahList !== 'undefined') {
+            for (var i = 0; i < jamaahList.length; i++) {
+                var jm = jamaahList[i];
+                sopts += '<option value="'+jm.id+'"'+(String(jm.id)===String(santriIdPre)?' selected':'')+'>'+(jm.nama_lengkap||jm.nama||'?')+'</option>';
+            }
+        }
+        ss.innerHTML = sopts;
+    }
+    // Populate kategori
+    var ks = document.getElementById('pelKategoriId');
+    if (ks) {
+        var kopts = '<option value="">-- Pilih Kategori --</option>';
+        var katList = getKategoriPelData();
+        for (var j = 0; j < katList.length; j++) {
+            kopts += '<option value="'+katList[j].id+'" data-poin="'+katList[j].poin+'">'+katList[j].nama+' ('+katList[j].poin+' poin)</option>';
+        }
+        ks.innerHTML = kopts;
+    }
+    // Set tanggal hari ini
+    var td = document.getElementById('pelTanggal');
+    if (td) td.value = new Date().toISOString().substr(0,10);
+    var pk = document.getElementById('pelPoin');
+    if (pk) pk.value = '';
+    var kt = document.getElementById('pelKeterangan');
+    if (kt) kt.value = '';
+    document.getElementById('modalInputPelanggaran').style.display = 'flex';
+}
+
+function pelAutoFillPoin() {
+    var ks = document.getElementById('pelKategoriId');
+    var pk = document.getElementById('pelPoin');
+    if (!ks || !pk) return;
+    var sel = ks.options[ks.selectedIndex];
+    if (sel && sel.getAttribute('data-poin')) {
+        pk.value = sel.getAttribute('data-poin');
+    }
+}
+
+function simpanPelanggaran() {
+    var santriId = (document.getElementById('pelSantriId')||{value:''}).value;
+    var katId = (document.getElementById('pelKategoriId')||{value:''}).value;
+    var poin = parseInt((document.getElementById('pelPoin')||{value:0}).value) || 0;
+    var tanggal = (document.getElementById('pelTanggal')||{value:''}).value;
+    var ket = (document.getElementById('pelKeterangan')||{value:''}).value.trim();
+
+    if (!santriId || !katId || !poin) { showToast('Isi santri, kategori, dan poin!'); return; }
+
+    var katList = getKategoriPelData();
+    var katNama = '';
+    for (var i = 0; i < katList.length; i++) {
+        if (String(katList[i].id) === String(katId)) { katNama = katList[i].nama; break; }
+    }
+
+    var inputOleh = 'Admin';
+    var gs = getEkSession();
+    if (gs && gs.role === 'guru') {
+        var guru = getCurrentGuru();
+        if (guru) inputOleh = guru.nama;
+    }
+
+    var record = {
+        id: Date.now(),
+        santriId: String(santriId),
+        kategoriId: String(katId),
+        kategoriNama: katNama,
+        poin: poin,
+        tanggal: tanggal || new Date().toISOString().substr(0,10),
+        keterangan: ket,
+        inputOleh: inputOleh
+    };
+
+    var data = getPelanggaranData();
+    data.push(record);
+    savePelanggaranData(data);
+    document.getElementById('modalInputPelanggaran').style.display = 'none';
+
+    // Cek apakah perlu peringatan
+    var totalPoin = data.filter(function(p){ return p.santriId === String(santriId); })
+                       .reduce(function(s,p){ return s + p.poin; }, 0);
+    var th = getThreshold();
+    if (totalPoin >= th.danger) {
+        showToast('Poin '+totalPoin+' - Perlu panggil wali!');
+    } else {
+        showToast('Pelanggaran disimpan! Total: '+totalPoin+' poin');
+    }
+
+    renderPelanggaranStats();
+    renderPelanggaranList();
+}
+
+function hapusPelanggaran(rid) {
+    if (!confirm('Hapus catatan pelanggaran ini?')) return;
+    var data = getPelanggaranData().filter(function(p){ return String(p.id) !== String(rid); });
+    savePelanggaranData(data);
+    renderPelanggaranStats();
+    renderPelanggaranList();
+    showToast('Catatan dihapus!');
+}
+
+// ─── GURU: INPUT PELANGGARAN ───
+function bukaInputPelanggaranGuru() {
+    var guru = getCurrentGuru();
+    if (!guru) return;
+    // Filter santri kelas guru (wali kelas)
+    bukaInputPelanggaran();
+}
+
+// ─── WALI: TAMPILAN PELANGGARAN ───
+function renderWaliPelanggaran(santri) {
+    var el = document.getElementById('waliPelanggaranInfo');
+    if (!el) return;
+    var sId = String(santri.id);
+    var data = getPelanggaranData().filter(function(p){ return p.santriId === sId; })
+                                    .sort(function(a,b){ return (b.tanggal||'').localeCompare(a.tanggal||''); });
+    var totalPoin = data.reduce(function(s,p){ return s + p.poin; }, 0);
+    var th = getThreshold();
+
+    var poinColor = totalPoin >= th.danger ? '#ef4444' : totalPoin >= th.warn ? '#f59e0b' : '#10b981';
+    var statusMsg = totalPoin >= th.danger ? 'Segera hubungi pihak pondok!' : totalPoin >= th.warn ? 'Harap perhatian lebih' : 'Perilaku baik';
+
+    var html = '<div style="display:flex;align-items:center;justify-content:space-between;background:'+
+        (totalPoin >= th.danger ? '#fef2f2' : totalPoin >= th.warn ? '#fff7ed' : '#f0fdf4')+
+        ';border-radius:10px;padding:14px;margin-bottom:12px;">'
+        + '<div><div style="font-size:12px;color:#64748b;">Total Poin Pelanggaran</div>'
+        + '<div style="font-size:28px;font-weight:800;color:'+poinColor+';">'+totalPoin+'</div>'
+        + '<div style="font-size:11px;color:'+poinColor+';">'+statusMsg+'</div></div>'
+        + '<div style="font-size:40px;">'+(totalPoin>=th.danger?'&#9888;&#65039;':totalPoin>=th.warn?'&#128203;':'&#9989;')+'</div>'
+        + '</div>';
+
+    if (!data.length) {
+        html += '<div style="text-align:center;padding:16px;color:#94a3b8;font-size:13px;">Tidak ada catatan pelanggaran</div>';
+    } else {
+        html += '<div style="font-size:12px;font-weight:600;color:#64748b;margin-bottom:8px;">Riwayat:</div>';
+        var recent = data.slice(0,5);
+        for (var i = 0; i < recent.length; i++) {
+            var p = recent[i];
+            html += '<div style="display:flex;gap:8px;align-items:center;padding:9px;background:#f8fafc;border-radius:8px;margin-bottom:6px;">'
+                  + '<div style="width:32px;height:32px;background:#fef2f2;color:#ef4444;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;">+'+p.poin+'</div>'
+                  + '<div style="flex:1;"><div style="font-size:13px;font-weight:600;">'+p.kategoriNama+'</div>'
+                  + '<div style="font-size:11px;color:#64748b;">'+p.tanggal+(p.keterangan?' | '+p.keterangan:'')+'</div></div>'
+                  + '</div>';
+        }
+        if (data.length > 5) html += '<div style="text-align:center;font-size:12px;color:#94a3b8;">+'+(data.length-5)+' lainnya</div>';
+    }
+    el.innerHTML = html;
+}
+
 // ─── KELOLA PIN WALI (Admin) ───
 function bukaKelolaPin() {
     document.getElementById('modalKelolaPin').style.display = 'flex';
@@ -16433,8 +17027,7 @@ function renderTagihanSummary(santriId) {
                 totalBayar += paymentTransaksiList[j].nominal || 0;
             }
         }
-    }
-    var sisa = totalTagihan - totalBayar;
+    }var sisa = totalTagihan - totalBayar;
 
     var fmtRp = function(n) { return 'Rp ' + (n||0).toLocaleString('id-ID'); };
     var sisakColor = sisa > 0 ? '#ef4444' : '#10b981';
@@ -16900,7 +17493,18 @@ function formatRp(n) {
 }
 
 function cetakKalkulator() {
-    var nama = (document.getElementById('kalcNama')||{value:''}).value || '-';
+    // Ambil nama dari dropdown santri
+    var kalcSelEl = document.getElementById('kalcSantriId');
+    var kalcSantriIdVal = kalcSelEl ? kalcSelEl.value : '';
+    var nama = '-';
+    if (kalcSantriIdVal && typeof jamaahList !== 'undefined') {
+        for (var ni = 0; ni < jamaahList.length; ni++) {
+            if (String(jamaahList[ni].id) === String(kalcSantriIdVal)) {
+                nama = jamaahList[ni].nama_lengkap || jamaahList[ni].nama || '-';
+                break;
+            }
+        }
+    }
     var kelas = (document.getElementById('kalcKelas')||{value:''}).value || '-';
     var periodeEl = document.getElementById('kalcPeriode');
     var periode = parseInt(periodeEl ? periodeEl.value : 12) || 12;
@@ -16956,7 +17560,17 @@ function cetakKalkulator() {
 }
 
 function shareKalkulatorWA() {
-    var nama = (document.getElementById('kalcNama')||{value:''}).value || 'Santri';
+    var kalcSelEl2 = document.getElementById('kalcSantriId');
+    var kalcSantriIdVal2 = kalcSelEl2 ? kalcSelEl2.value : '';
+    var nama = 'Santri';
+    if (kalcSantriIdVal2 && typeof jamaahList !== 'undefined') {
+        for (var ni2 = 0; ni2 < jamaahList.length; ni2++) {
+            if (String(jamaahList[ni2].id) === String(kalcSantriIdVal2)) {
+                nama = jamaahList[ni2].nama_lengkap || jamaahList[ni2].nama || 'Santri';
+                break;
+            }
+        }
+    }
     var kelas = (document.getElementById('kalcKelas')||{value:''}).value || '-';
     var periodeEl = document.getElementById('kalcPeriode');
     var periode = parseInt(periodeEl ? periodeEl.value : 12) || 12;
@@ -17053,6 +17667,10 @@ function hapusTemplateKalc(tid) {
 }
 
 // === INIT ===
+// Paksa menu baru EduKu selalu visible
+localStorage.removeItem('menu_pelanggaran_visible');
+localStorage.removeItem('menu_absensi_harian_visible');
+
 // Auto-update homeDate setiap menit
 setInterval(function() {
     try {
