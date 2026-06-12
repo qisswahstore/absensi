@@ -16154,11 +16154,21 @@ function logoutWali() {
 // Helper: ambil NIS santri (bisa di no_porsi langsung atau additional_fields)
 function getNIS(j) {
     if (!j) return '-';
+    // Cek langsung di root
     if (j.no_porsi) return j.no_porsi;
     if (j.additional_fields) {
-        for (var i = 0; i < j.additional_fields.length; i++) {
-            if (j.additional_fields[i].name === 'no_porsi' || j.additional_fields[i].name === 'nis') {
-                return j.additional_fields[i].value || '-';
+        var af = j.additional_fields;
+        // Format OBJECT: { no_porsi: '1234', ... } <- format Navara IndexedDB
+        if (typeof af === 'object' && !Array.isArray(af)) {
+            if (af.no_porsi) return af.no_porsi;
+            if (af.nis) return af.nis;
+        }
+        // Format ARRAY: [{name:'no_porsi', value:'1234'}, ...]
+        if (Array.isArray(af)) {
+            for (var i = 0; i < af.length; i++) {
+                if (af[i].name === 'no_porsi' || af[i].name === 'nis') {
+                    return af[i].value || '-';
+                }
             }
         }
     }
