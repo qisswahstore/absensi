@@ -3278,7 +3278,9 @@ const menuItemsPremium = [
     { id: 'pembayaran', icon: '🧾', label: 'Pembayaran',      badge: 'Tagihan' },
     { id: 'kas',        icon: '💰', label: 'Uang Kas',        badge: 'Kas' },
     { id: 'catatan',    icon: '📝', label: 'Catatan',         badge: 'Notes' },
-    { id: 'konfigurasi',icon: '⚙️', label: 'Konfigurasi',     badge: 'Setting' }
+    { id: 'konfigurasi',icon: '⚙️', label: 'Konfigurasi',     badge: 'Setting' },
+    { id: 'lisensi',    icon: '🔑', label: 'Lisensi',         badge: 'Lisensi' },
+    { id: 'fitur',      icon: '🚀', label: 'LENGKAP',         badge: 'Fitur' }
 ];
 
 let isAdminModePremium = false;
@@ -17022,6 +17024,7 @@ function simpanTagihanSantri(santriId, totalTagihan) {
         localStorage.setItem('eduku_tagihan_santri', JSON.stringify(data));
     } catch(e) {}
 }
+
 
 // ─── MODE WALI: DETAIL ABSENSI ───
 function bukaAbsensiWali() {
