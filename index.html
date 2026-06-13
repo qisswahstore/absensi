@@ -3274,7 +3274,7 @@ const menuItemsPremium = [
     { id: 'jadwal',     icon: '📅', label: 'Jadwal',          badge: 'Jadwal', idKey:'jadwal' },
     { id: 'raport',     icon: '📋', label: 'Raport',          badge: 'Raport', idKey:'raport' },
     { id: 'pelanggaran', icon: '&#9888;', label: 'Pelanggaran',    badge: 'Poin', idKey:'pelanggaran' },
-    { id: 'kalkulator', icon: '🧮', label: 'Kalkulator',      badge: 'Biaya', idKey:'kalkulator' },
+    { id: 'estimasi',   icon: '🧮', label: 'Kalkulator',      badge: 'Biaya', idKey:'estimasi' },
     { id: 'pembayaran', icon: '🧾', label: 'Pembayaran',      badge: 'Tagihan' },
     { id: 'kas',        icon: '💰', label: 'Uang Kas',        badge: 'Kas' },
     { id: 'catatan',    icon: '📝', label: 'Catatan',         badge: 'Notes' },
@@ -3291,7 +3291,7 @@ function renderMenuPremium() {
     let html = ''; 
     for(let i=0;i<menuItemsPremium.length;i++) { 
         const menu = menuItemsPremium[i]; 
-        const isVisible = (menu.id === 'pelanggaran' || menu.id === 'absensi_harian' || menu.id === 'kalkulator') ? true : localStorage.getItem(`menu_${menu.id}_visible`) !== 'false'; 
+        const isVisible = (menu.id === 'pelanggaran' || menu.id === 'absensi_harian' || menu.id === 'estimasi') ? true : localStorage.getItem(`menu_${menu.id}_visible`) !== 'false'; 
         if(isVisible || isAdminModePremium) 
             html += `<div class="menu-card-premium" onclick="showPage('${menu.id}')">${isAdminModePremium ? '<div class="edit-badge">✏️</div>' : ''}<div class="menu-icon">${menu.icon}</div><div class="menu-label">${menu.label}</div><div class="menu-badge">${menu.badge}</div></div>`; 
         else 
@@ -16423,7 +16423,7 @@ function saveThreshold() {
 function initPelanggaranPage() {
     // Pastikan menu ini selalu visible
     localStorage.removeItem('menu_pelanggaran_visible');
-localStorage.removeItem('menu_kalkulator_visible');
+localStorage.removeItem('menu_estimasi_visible');
     // Populate filter kelas
     var fk = document.getElementById('filterPelKelas');
     if (fk) {
@@ -17008,7 +17008,6 @@ function renderTagihanSummary(santriId) {
         + '<div style="font-size:10px;color:#64748b;margin-bottom:4px;">'+sisaLabel+'</div>'
         + '<div style="font-size:14px;font-weight:800;color:'+sisakColor+';">'+fmtRp(Math.abs(sisa))+'</div></div>'
         + '</div>';
-
     // Simpan tagihan santri ini untuk wali
     simpanTagihanSantri(santriId, totalTagihan);
 }
@@ -17835,7 +17834,7 @@ function hapusTemplateKalc(tid) {
 // === INIT ===
 // Paksa menu baru EduKu selalu visible
 localStorage.removeItem('menu_pelanggaran_visible');
-localStorage.removeItem('menu_kalkulator_visible');
+localStorage.removeItem('menu_estimasi_visible');
 localStorage.removeItem('menu_absensi_harian_visible');
 
 // Auto-update homeDate setiap menit
