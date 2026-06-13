@@ -2922,34 +2922,8 @@
 </div>
 
 <!-- ===== BOTTOM NAV GURU ===== -->
-<div id="bottomNavGuru" style="display:none;position:fixed;bottom:0;left:0;right:0;background:white;border-top:2px solid #e2e8f0;z-index:1000;padding-bottom:env(safe-area-inset-bottom);">
-  <div style="display:grid;grid-template-columns:repeat(5,1fr);height:60px;">
-    <div onclick="showPage('guru')" id="gnHome" class="guru-nav-item" style="display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:var(--primary);">
-      <i class="fas fa-home" style="font-size:18px;"></i>
-      <span style="font-size:10px;margin-top:3px;font-weight:600;">Beranda</span>
-    </div>
-    <div onclick="bukaJadwalLengkap()" id="gnJadwal" class="guru-nav-item" style="display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:#64748b;">
-      <i class="fas fa-calendar" style="font-size:18px;"></i>
-      <span style="font-size:10px;margin-top:3px;font-weight:600;">Jadwal</span>
-    </div>
-    <div onclick="bukaFormAbsensiPelajaran(null)" id="gnAbsensi" class="guru-nav-item" style="display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:#64748b;">
-      <i class="fas fa-clipboard-check" style="font-size:18px;"></i>
-      <span style="font-size:10px;margin-top:3px;font-weight:600;">Absensi</span>
-    </div>
-    <div onclick="bukaFormNilaiGuru()" id="gnNilai" class="guru-nav-item" style="display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:#64748b;">
-      <i class="fas fa-star" style="font-size:18px;"></i>
-      <span style="font-size:10px;margin-top:3px;font-weight:600;">Nilai</span>
-    </div>
-    <div onclick="bukaInputPelanggaran()" id="gnPelanggaran" class="guru-nav-item" style="display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:#ef4444;">
-      <i class="fas fa-exclamation-triangle" style="font-size:18px;"></i>
-      <span style="font-size:10px;margin-top:3px;font-weight:600;">Catat</span>
-    </div>
-    <div onclick="logoutGuru()" id="gnKeluar" class="guru-nav-item" style="display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:#ef4444;">
-      <i class="fas fa-sign-out-alt" style="font-size:18px;"></i>
-      <span style="font-size:10px;margin-top:3px;font-weight:600;">Keluar</span>
-    </div>
-  </div>
-</div>
+<!-- BOTTOM NAV GURU: dihapus - semua tombol sudah ada di halaman -->
+<div id="bottomNavGuru" style="display:none;"></div>
 
 <!-- MODALS -->
 <div id="jamaahModal" class="modal"><div class="modal-content"><h3 id="jamaahModalTitle">Tambah Peserta</h3><div id="jamaahFormContainer"></div><button class="btn btn-primary" onclick="saveJamaah()"> SIMPAN</button><button class="btn btn-danger mt-2" onclick="closeJamaahModal()">BATAL</button></div></div>
@@ -3141,6 +3115,7 @@ function internalShowPage(pageId) {
     if (pageId === 'mapel') { try{renderMapelList();}catch(e){} }
     if (pageId === 'raport') { try{initRaport();}catch(e){} }
     if (pageId === 'pelanggaran') { try{initPelanggaranPage();}catch(e){} }
+    if (pageId === 'kalkulator') { try{initKalkulator();}catch(e){} }
     if (pageId === 'guru') { try{initGuruMode();}catch(e){} }
     if (pageId === 'wali') { try{initWaliMode();}catch(e){} }
     if (pageId === 'estimasi') { try{initKalkulator();}catch(e){} }
@@ -3299,13 +3274,11 @@ const menuItemsPremium = [
     { id: 'jadwal',     icon: '📅', label: 'Jadwal',          badge: 'Jadwal', idKey:'jadwal' },
     { id: 'raport',     icon: '📋', label: 'Raport',          badge: 'Raport', idKey:'raport' },
     { id: 'pelanggaran', icon: '&#9888;', label: 'Pelanggaran',    badge: 'Poin', idKey:'pelanggaran' },
+    { id: 'kalkulator', icon: '🧮', label: 'Kalkulator',      badge: 'Biaya', idKey:'kalkulator' },
     { id: 'pembayaran', icon: '🧾', label: 'Pembayaran',      badge: 'Tagihan' },
     { id: 'kas',        icon: '💰', label: 'Uang Kas',        badge: 'Kas' },
     { id: 'catatan',    icon: '📝', label: 'Catatan',         badge: 'Notes' },
-    { id: 'datamaster', icon: '🗓️', label: 'Multi Event',     badge: 'Event' },
-    { id: 'konfigurasi',icon: '⚙️', label: 'Konfigurasi',     badge: 'Setting' },
-    { id: 'lisensi',    icon: '🔑', label: 'Lisensi',         badge: 'Lisensi' },
-    { id: 'fitur',      icon: '🚀', label: 'LENGKAP',         badge: 'Fitur' }
+    { id: 'konfigurasi',icon: '⚙️', label: 'Konfigurasi',     badge: 'Setting' }
 ];
 
 let isAdminModePremium = false;
@@ -3316,7 +3289,7 @@ function renderMenuPremium() {
     let html = ''; 
     for(let i=0;i<menuItemsPremium.length;i++) { 
         const menu = menuItemsPremium[i]; 
-        const isVisible = (menu.id === 'pelanggaran' || menu.id === 'absensi_harian') ? true : localStorage.getItem(`menu_${menu.id}_visible`) !== 'false'; 
+        const isVisible = (menu.id === 'pelanggaran' || menu.id === 'absensi_harian' || menu.id === 'kalkulator') ? true : localStorage.getItem(`menu_${menu.id}_visible`) !== 'false'; 
         if(isVisible || isAdminModePremium) 
             html += `<div class="menu-card-premium" onclick="showPage('${menu.id}')">${isAdminModePremium ? '<div class="edit-badge">✏️</div>' : ''}<div class="menu-icon">${menu.icon}</div><div class="menu-label">${menu.label}</div><div class="menu-badge">${menu.badge}</div></div>`; 
         else 
@@ -12793,13 +12766,19 @@ async function printPDFDirect(pdfDoc, filename = 'document.pdf') {
 
     <!-- Kehadiran bulan ini -->
     <div style="background:white;border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
-      <div style="font-weight:700;font-size:15px;color:var(--primary);margin-bottom:12px;">&#128197; Kehadiran Bulan Ini</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div style="font-weight:700;font-size:15px;color:var(--primary);">&#128197; Kehadiran Bulan Ini</div>
+        <button onclick="bukaAbsensiWali()" style="background:none;border:none;color:var(--primary);font-size:12px;font-weight:600;cursor:pointer;">Lihat Semua &#8250;</button>
+      </div>
       <div id="waliAbsensiSummary"></div>
     </div>
 
     <!-- Nilai terbaru -->
     <div style="background:white;border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
-      <div style="font-weight:700;font-size:15px;color:var(--primary);margin-bottom:12px;">&#128221; Nilai Terbaru</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div style="font-weight:700;font-size:15px;color:var(--primary);">&#128221; Nilai Terbaru</div>
+        <button onclick="bukaNilaiWali()" style="background:none;border:none;color:var(--primary);font-size:12px;font-weight:600;cursor:pointer;">Lihat Semua &#8250;</button>
+      </div>
       <div id="waliNilaiList"></div>
     </div>
 
@@ -12817,27 +12796,7 @@ async function printPDFDirect(pdfDoc, filename = 'document.pdf') {
   </div>
 </div>
 
-<!-- ===== BOTTOM NAV WALI ===== -->
-<div id="bottomNavWali" style="display:none;position:fixed;bottom:0;left:0;right:0;background:white;border-top:2px solid #e2e8f0;z-index:1000;padding-bottom:env(safe-area-inset-bottom);">
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);height:60px;">
-    <div onclick="showPage('wali')" style="display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:var(--primary);">
-      <i class="fas fa-home" style="font-size:18px;"></i>
-      <span style="font-size:10px;margin-top:3px;font-weight:600;">Beranda</span>
-    </div>
-    <div onclick="bukaAbsensiWali()" style="display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:#64748b;">
-      <i class="fas fa-clipboard-check" style="font-size:18px;"></i>
-      <span style="font-size:10px;margin-top:3px;font-weight:600;">Absensi</span>
-    </div>
-    <div onclick="bukaNilaiWali()" style="display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:#64748b;">
-      <i class="fas fa-star" style="font-size:18px;"></i>
-      <span style="font-size:10px;margin-top:3px;font-weight:600;">Nilai</span>
-    </div>
-    <div onclick="logoutWali()" style="display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:#ef4444;">
-      <i class="fas fa-sign-out-alt" style="font-size:18px;"></i>
-      <span style="font-size:10px;margin-top:3px;font-weight:600;">Keluar</span>
-    </div>
-  </div>
-</div>
+<!-- BOTTOM NAV WALI: dihapus - tombol Keluar sudah di header, detail ada di tiap section -->
 
 
 <!-- ===== PAGE PELANGGARAN ===== -->
@@ -13030,7 +12989,7 @@ async function printPDFDirect(pdfDoc, filename = 'document.pdf') {
 
 <!-- ===== PAGE MODE GURU ===== -->
 <div id="page-guru" class="page">
-  <div style="padding:16px;padding-top:16px;">
+  <div style="padding:16px;padding-top:16px;padding-bottom:24px;">
     <div style="background:linear-gradient(135deg,var(--primary),#0a4a3a);color:white;padding:20px;border-radius:16px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:flex-start;">
       <div>
         <div style="font-size:13px;opacity:0.8;">Selamat datang,</div>
@@ -13057,6 +13016,17 @@ async function printPDFDirect(pdfDoc, filename = 'document.pdf') {
       <div style="font-weight:700;font-size:15px;margin-bottom:12px;color:var(--primary);">&#128202; Input Nilai Santri</div>
       <div id="guruNilaiList" style="margin-bottom:10px;"></div>
       <button onclick="bukaFormNilaiGuru()" style="width:100%;padding:12px;background:#3b82f6;color:white;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-size:14px;">+ Input Nilai</button>
+    </div>
+
+    <!-- Catat Pelanggaran -->
+    <div style="background:white;border-radius:14px;padding:16px;margin-top:14px;box-shadow:0 2px 8px rgba(0,0,0,0.06);border-left:4px solid #ef4444;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <div style="font-weight:700;font-size:15px;color:#ef4444;">&#9888;&#65039; Catat Pelanggaran</div>
+          <div style="font-size:12px;color:#64748b;margin-top:2px;">Catat pelanggaran santri & poin</div>
+        </div>
+        <button onclick="bukaInputPelanggaran()" style="background:#ef4444;color:white;border:none;border-radius:10px;padding:10px 16px;font-weight:700;cursor:pointer;font-size:13px;">+ Catat</button>
+      </div>
     </div>
 
     <!-- Rekap Absensi Kelas (hanya jika wali kelas) -->
@@ -15419,12 +15389,9 @@ function applySessionGuard() {
         return;
     }
 
-    var navWali = document.getElementById('bottomNavWali');
-
     if (session.role === 'wali') {
         if (navAdmin) navAdmin.style.display = 'none';
         if (navGuru) navGuru.style.display = 'none';
-        if (navWali) navWali.style.display = 'block';
         return;
     }
 
@@ -15536,18 +15503,14 @@ setInterval(function() {
     var navAdmin = document.getElementById('bottomNavAdmin');
     var navGuru = document.getElementById('bottomNavGuru');
     if (!navAdmin || !navGuru) return;
-    var navWali2 = document.getElementById('bottomNavWali');
     if (session.role === 'guru') {
         if (navAdmin.style.display !== 'none') navAdmin.style.display = 'none';
         if (navGuru.style.display !== 'block') navGuru.style.display = 'block';
-        if (navWali2 && navWali2.style.display !== 'none') navWali2.style.display = 'none';
     } else if (session.role === 'wali') {
         if (navAdmin.style.display !== 'none') navAdmin.style.display = 'none';
         if (navGuru.style.display !== 'none') navGuru.style.display = 'none';
-        if (navWali2 && navWali2.style.display !== 'block') navWali2.style.display = 'block';
     } else if (session.role === 'admin') {
         if (navGuru.style.display === 'block') navGuru.style.display = 'none';
-        if (navWali2 && navWali2.style.display === 'block') navWali2.style.display = 'none';
         if (navAdmin.style.display === 'none') navAdmin.style.display = '';
     }
 }, 500);
@@ -16165,10 +16128,8 @@ function masukModeWali(santri) {
     // Sembunyikan nav lain, tampilkan nav wali
     var navAdmin = document.getElementById('bottomNavAdmin');
     var navGuru = document.getElementById('bottomNavGuru');
-    var navWali = document.getElementById('bottomNavWali');
     if (navAdmin) navAdmin.style.display = 'none';
     if (navGuru) navGuru.style.display = 'none';
-    if (navWali) navWali.style.display = 'block';
 
     // Push state
     try { if (window.history && window.history.pushState) window.history.pushState({ eduku: true, role: 'wali' }, '', ''); } catch(e) {}
@@ -16390,9 +16351,7 @@ function renderWaliTagihan(santri) {
 function logoutWali() {
     clearEkSession();
     var navAdmin = document.getElementById('bottomNavAdmin');
-    var navWali = document.getElementById('bottomNavWali');
     if (navAdmin) navAdmin.style.display = '';
-    if (navWali) navWali.style.display = 'none';
     var splash = document.getElementById('splashScreen');
     if (splash) { splash.style.display = 'flex'; splash.style.opacity = '1'; }
     showToast('Berhasil logout!');
@@ -16462,6 +16421,7 @@ function saveThreshold() {
 function initPelanggaranPage() {
     // Pastikan menu ini selalu visible
     localStorage.removeItem('menu_pelanggaran_visible');
+localStorage.removeItem('menu_kalkulator_visible');
     // Populate filter kelas
     var fk = document.getElementById('filterPelKelas');
     if (fk) {
@@ -16998,7 +16958,7 @@ function kalcPilihSantri() {
     if (savedTemplates[String(santriId)]) {
         kalcKomponen = JSON.parse(JSON.stringify(savedTemplates[String(santriId)]));
         kalcNextId = kalcKomponen.reduce(function(mx,k){return Math.max(mx,k.id||0);},0) + 1;
-    }}
+    }
 
     renderKomponenKalc();
     hitungKalkulator();
@@ -17062,7 +17022,6 @@ function simpanTagihanSantri(santriId, totalTagihan) {
         localStorage.setItem('eduku_tagihan_santri', JSON.stringify(data));
     } catch(e) {}
 }
-
 
 // ─── MODE WALI: DETAIL ABSENSI ───
 function bukaAbsensiWali() {
@@ -17873,6 +17832,7 @@ function hapusTemplateKalc(tid) {
 // === INIT ===
 // Paksa menu baru EduKu selalu visible
 localStorage.removeItem('menu_pelanggaran_visible');
+localStorage.removeItem('menu_kalkulator_visible');
 localStorage.removeItem('menu_absensi_harian_visible');
 
 // Auto-update homeDate setiap menit
