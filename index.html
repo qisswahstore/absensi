@@ -3279,7 +3279,6 @@ const menuItemsPremium = [
     { id: 'kas',        icon: '💰', label: 'Uang Kas',        badge: 'Kas' },
     { id: 'catatan',    icon: '📝', label: 'Catatan',         badge: 'Notes' },
     { id: 'konfigurasi',icon: '⚙️', label: 'Konfigurasi',     badge: 'Setting' },
-    { id: 'lisensi',    icon: '🔑', label: 'Lisensi',         badge: 'Lisensi' },
     { id: 'fitur',      icon: '🚀', label: 'LENGKAP',         badge: 'Fitur' }
 ];
 
@@ -15384,41 +15383,55 @@ function applySessionGuard() {
 
     // Tidak ada session → tampilkan splash
     if (!session) {
-        if (splash && splash.style.display === 'none') {
-            if (navAdmin) navAdmin.style.display = '';
-            if (navGuru) navGuru.style.display = 'none';
-        }
-        return;
-    }
-
-    if (session.role === 'wali') {
-        if (navAdmin) navAdmin.style.display = 'none';
+        if (splash) { splash.style.display = 'flex'; splash.style.opacity = '1'; }
+        if (navAdmin) navAdmin.style.display = '';
         if (navGuru) navGuru.style.display = 'none';
         return;
     }
 
-    if (session.role === 'guru') {
+    // Mode Wali → paksa ke page-wali, sembunyikan nav admin
+    if (session.role === 'wali') {
         if (navAdmin) navAdmin.style.display = 'none';
-        if (navGuru) navGuru.style.display = 'block';
-        if (navWali) navWali.style.display = 'none';
-
-        // Cek halaman aktif - kalau halaman terlarang, redirect ke guru
-        var activePage = document.querySelector('.page.active');
-        if (activePage) {
-            var pageId = activePage.id ? activePage.id.replace('page-', '') : '';
-            var blocked = ['kas','konfigurasi','lisensi','datamaster',
-                          'setting','estimasi','catatan','jamaah',
-                          'jamaahkita','pembayaran','scanqr','surat'];
-            for (var i = 0; i < blocked.length; i++) {
-                if (pageId === blocked[i]) {
-                    showPage('guru');
-                    showToast('Akses terbatas - Mode Guru');
-                    return;
-                }
+        if (navGuru) navGuru.style.display = 'none';
+        // Paksa halaman wali
+        var activeWali = document.querySelector('.page.active');
+        if (!activeWali || activeWali.id !== 'page-wali') {
+            var pw = document.getElementById('page-wali');
+            if (pw) {
+                document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+                pw.classList.add('active');
             }
         }
-    } else if (session.role === 'admin') {
-        // Paksa nav admin, sembunyikan nav guru
+        return;
+    }
+
+    // Mode Guru → paksa ke page-guru, block semua halaman admin
+    if (session.role === 'guru') {
+        if (navAdmin) navAdmin.style.display = 'none';
+        if (navGuru) navGuru.style.display = 'none'; // nav sudah dihapus
+
+        // Cek halaman aktif
+        var activePage = document.querySelector('.page.active');
+        var pageId = activePage ? (activePage.id || '').replace('page-', '') : '';
+
+        // Semua halaman KECUALI guru diblok
+        var guruAllowed = ['guru', 'wali']; // hanya halaman guru
+        var isAllowed = false;
+        for (var j = 0; j < guruAllowed.length; j++) {
+            if (pageId === guruAllowed[j]) { isAllowed = true; break; }
+        }
+        if (!isAllowed) {
+            var pg = document.getElementById('page-guru');
+            if (pg) {
+                document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+                pg.classList.add('active');
+            }
+        }
+        return;
+    }
+
+    // Mode Admin → tampilkan nav admin
+    if (session.role === 'admin') {
         if (navAdmin) navAdmin.style.display = '';
         if (navGuru) navGuru.style.display = 'none';
     }
@@ -17008,10 +17021,10 @@ function renderTagihanSummary(santriId) {
         + '<div style="font-size:10px;color:#64748b;margin-bottom:4px;">'+sisaLabel+'</div>'
         + '<div style="font-size:14px;font-weight:800;color:'+sisakColor+';">'+fmtRp(Math.abs(sisa))+'</div></div>'
         + '</div>';
+
     // Simpan tagihan santri ini untuk wali
     simpanTagihanSantri(santriId, totalTagihan);
 }
-
 function simpanTagihanSantri(santriId, totalTagihan) {
     try {
         var data = JSON.parse(localStorage.getItem('eduku_tagihan_santri') || '{}');
