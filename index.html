@@ -2135,7 +2135,7 @@
                     <option value="📘">📘 Paspor/Dokumen</option>
                     <option value="✈️">✈️ Penerbangan</option>
                     <option value="🗓️">🗓️ Tanggal</option>
-                    <option value="👤">👤 Orang/Jamaah</option>
+                    <option value="👤">👤 Orang/Peserta</option>
                     <option value="📞">📞 Telepon</option>
                     <option value="🏷️">🏷️ Label/Warna</option>
                     <option value="💳">💳 Kartu</option>
@@ -2159,7 +2159,7 @@
         </div>
         <div class="section-title"><span>📋 TAMBAH DATA</span></div>
         <div class="input-group">
-            <label>Pilih Jamaah dari database</label>
+            <label>Pilih Peserta dari database</label>
             <input type="text" id="searchJamaahKitaAdd" placeholder="🔍 Cari nama jamaah..." oninput="filterPilihJamaahKita()" style="margin-bottom:8px;">
             <div style="display:flex;gap:8px;margin-bottom:8px;">
                 <button onclick="pilihSemuaJamaahKita()" style="flex:1;padding:8px;background:#0D5C4A;color:white;border:none;border-radius:8px;font-size:12px;cursor:pointer;">✅ Pilih Semua</button>
@@ -2222,7 +2222,7 @@
 
 <div id="jamaahKitaEditModal" class="jamaahkita-modal">
     <div class="jamaahkita-modal-content">
-        <h3 id="jamaahKitaEditModalTitle">✏️ Edit Data Jamaah</h3>
+        <h3 id="jamaahKitaEditModalTitle">✏️ Edit Data Peserta</h3>
         <div id="jamaahKitaEditFormContainer"></div>
         <div class="row" style="margin-top:16px;">
             <button onclick="closeJamaahKitaEditModal()" style="background:#ccc; color:#333;">Batal</button>
@@ -2285,7 +2285,7 @@
             </div>
         </div>
         <div class="section-title"><span><i class="fas fa-users"></i> DAFTAR TAGIHAN JAMAAH</span></div>
-        <div id="paymentJamaahListContainer"><div style="text-align:center; padding:20px;">Memuat data jamaah...</div></div>
+        <div id="paymentJamaahListContainer"><div style="text-align:center; padding:20px;">Memuat data peserta...</div></div>
         <button class="payment-fab" id="paymentFabOpen"><i class="fas fa-plus"></i></button>
     </div>
 </div>
@@ -2390,7 +2390,7 @@
                 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
                     <div>
                         <div style="font-weight:bold;font-size:14px;">💰 Harga Paket Seragam</div>
-                        <div style="font-size:11px;color:#888;margin-top:2px;">ON = semua jamaah pakai harga ini<br>OFF = harga per jamaah dari field Database</div>
+                        <div style="font-size:11px;color:#888;margin-top:2px;">ON = semua peserta pakai harga ini<br>OFF = harga per peserta dari field Database</div>
                     </div>
                     <label style="position:relative;display:inline-block;width:50px;height:26px;">
                         <input type="checkbox" id="cfg_harga_seragam_aktif" style="opacity:0;width:0;height:0;" onchange="toggleHargaSeragamInput()">
@@ -2492,15 +2492,15 @@
             <div style="font-size:12px;color:#888;margin-bottom:12px;">Nominal akan muncul setelah pilih paket</div>
             <div style="display:flex;flex-direction:column;gap:8px;">
                 <div onclick="showPaymentModal('1 Hari', 10000)" style="border:1.5px solid #e2e8f0;border-radius:10px;padding:12px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;">
-                    <div><div style="font-weight:bold;">📅 1 Hari</div><div style="font-size:12px;color:#666;">Unlimited jamaah, 1 hari</div></div>
+                    <div><div style="font-weight:bold;">📅 1 Hari</div><div style="font-size:12px;color:#666;">Unlimited peserta, 1 hari</div></div>
                     <div><div style="font-weight:bold;color:var(--primary);">Rp 10.001 - 10.999</div><div style="font-size:11px;color:#888;text-align:right;">Ketuk untuk bayar</div></div>
                 </div>
                 <div onclick="showPaymentModal('7 Hari', 25000)" style="border:1.5px solid #e2e8f0;border-radius:10px;padding:12px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;">
-                    <div><div style="font-weight:bold;">📅 7 Hari</div><div style="font-size:12px;color:#666;">Unlimited jamaah, 7 hari</div></div>
+                    <div><div style="font-weight:bold;">📅 7 Hari</div><div style="font-size:12px;color:#666;">Unlimited peserta, 7 hari</div></div>
                     <div><div style="font-weight:bold;color:var(--primary);">Rp 25.001 - 25.999</div><div style="font-size:11px;color:#888;text-align:right;">Ketuk untuk bayar</div></div>
                 </div>
                 <div onclick="showPaymentModal('1 Bulan', 50000)" style="border:1.5px solid #e2e8f0;border-radius:10px;padding:12px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;">
-                    <div><div style="font-weight:bold;">🗓️ 1 Bulan</div><div style="font-size:12px;color:#666;">Unlimited jamaah</div></div>
+                    <div><div style="font-weight:bold;">🗓️ 1 Bulan</div><div style="font-size:12px;color:#666;">Unlimited peserta</div></div>
                     <div><div style="font-weight:bold;color:var(--primary);">Rp 50.001 - 50.999</div><div style="font-size:11px;color:#888;text-align:right;">Ketuk untuk bayar</div></div>
                 </div>
                 <div onclick="showPaymentModal('3 Bulan', 120000)" style="border:1.5px solid #e2e8f0;border-radius:10px;padding:12px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;">
@@ -2572,8 +2572,8 @@
             <div class="fitur-card" onclick="showPage('foldervirtual')"><div class="fitur-icon">📂</div><div class="fitur-title">Folder Virtual</div><div class="fitur-desc">Pisah per kelas/kegiatan</div></div>
             <div class="fitur-card" onclick="showPage('pengingatwa')"><div class="fitur-icon">📲</div><div class="fitur-title">Pengingat WA</div><div class="fitur-desc">Kirim pengingat otomatis</div></div>
             <div class="fitur-card" onclick="showPage('etikettiket')"><div class="fitur-icon">🪪</div><div class="fitur-title">Kartu Santri</div><div class="fitur-desc">Kartu identitas + QR absensi</div></div>
-            <div class="fitur-card" onclick="showPage('scanqr')"><div class="fitur-icon" style="font-size:40px;">📷</div><div class="fitur-title">Scan QR</div><div class="fitur-desc">Absensi & cek data jamaah</div></div>
-            <div class="fitur-card" onclick="showPage('suratresmi')"><div class="fitur-icon" style="font-size:40px;">📄</div><div class="fitur-title">Surat Resmi</div><div class="fitur-desc">Buat surat otomatis dari data jamaah</div></div>
+            <div class="fitur-card" onclick="showPage('scanqr')"><div class="fitur-icon" style="font-size:40px;">📷</div><div class="fitur-title">Scan QR</div><div class="fitur-desc">Absensi & cek data peserta</div></div>
+            <div class="fitur-card" onclick="showPage('suratresmi')"><div class="fitur-icon" style="font-size:40px;">📄</div><div class="fitur-title">Surat Resmi</div><div class="fitur-desc">Buat surat otomatis dari data peserta</div></div>
             <div class="fitur-card" onclick="showPage('cetaklabel')"><div class="fitur-icon">🏷️</div><div class="fitur-title">Label Santri</div><div class="fitur-desc">Name tag / label loker</div></div>
             <div class="fitur-card" onclick="showPage('cloudstorage')"><div class="fitur-icon">☁️</div><div class="fitur-title">Cloud Storage</div><div class="fitur-desc">Backup & Restore data</div></div>
             <div class="fitur-card" onclick="showPage('dashboard')"><div class="fitur-icon">📈</div><div class="fitur-title">Dashboard</div><div class="fitur-desc">Grafik statistik data</div></div>
@@ -2610,7 +2610,7 @@
                 <textarea id="reminderMessage" rows="4" placeholder="Contoh: Yth. [nama], jadwal pembayaran Anda jatuh tempo pada [tanggal]. Sisa tagihan: [sisa]"></textarea>
             </div>
             <div class="input-group">
-                <label>Pilih Jamaah</label>
+                <label>Pilih Peserta</label>
                 <input type="text" id="searchPengingatJamaah" placeholder="🔍 Cari nama jamaah..." oninput="filterPengingatJamaah()" style="margin-bottom:8px;">
                 <div style="display:flex;gap:8px;margin-bottom:8px;">
                     <button onclick="pilihSemuaPengingat()" style="flex:1;padding:8px;background:#0D5C4A;color:white;border:none;border-radius:8px;font-size:12px;cursor:pointer;">✅ Pilih Semua</button>
@@ -2650,7 +2650,7 @@
                 </select>
             </div>
             <div class="input-group" style="margin-bottom:10px;">
-                <label style="font-size:12px;">Pilih Jamaah</label>
+                <label style="font-size:12px;">Pilih Peserta</label>
                 <input type="text" id="searchSuratJamaah" placeholder="🔍 Cari nama jamaah..." oninput="filterSuratJamaah()" style="width:100%;padding:10px;border-radius:8px;border:1px solid #ddd;background:var(--input-bg);color:var(--text);font-size:13px;margin-bottom:6px;">
                 <select id="suratJamaahSelect" onchange="previewSurat()" style="width:100%;padding:10px;border-radius:8px;border:1px solid #ddd;background:var(--input-bg);color:var(--text);font-size:13px;max-height:160px;" size="5"></select>
             </div>
@@ -2684,7 +2684,7 @@
         <!-- Kelola Template -->
         <div class="card-premium">
             <div style="font-weight:bold;color:var(--primary);margin-bottom:10px;">⚙️ Template Kustom</div>
-            <div style="font-size:12px;color:#888;margin-bottom:10px;">Buat template surat sendiri dengan variabel otomatis dari data jamaah.</div>
+            <div style="font-size:12px;color:#888;margin-bottom:10px;">Buat template surat sendiri dengan variabel otomatis dari data peserta.</div>
             <div class="input-group" style="margin-bottom:8px;">
                 <label style="font-size:12px;">Judul Surat Kustom</label>
                 <input type="text" id="suratKustomJudul" placeholder="Contoh: SURAT PERNYATAAN KESANGGUPAN" style="width:100%;padding:10px;border-radius:8px;border:1px solid #ddd;background:var(--input-bg);color:var(--text);font-size:13px;">
@@ -2700,7 +2700,7 @@
 </div>
 
 <div id="page-scanqr" class="page">
-    <div class="header-premium header-premium-small"><div class="back-header"><i class="fas fa-arrow-left" onclick="showPage('fitur');stopScanner();"></i><h2>📷 Scan QR Absensi</h2><div style="width:30px;"></div></div></div>
+    <div class="header-premium header-premium-small"><div class="back-header"><i class="fas fa-arrow-left" onclick="stopScanner();(isGuruSession()?showPage('guru'):showPage('fitur'));"></i><h2>📷 Scan QR Absensi</h2><div style="width:30px;"></div></div></div>
     <div class="container">
 
         <!-- Kelola Sesi -->
@@ -2777,7 +2777,7 @@
     <div class="container">
         <div class="card-premium">
             <div class="input-group">
-                <label>Pilih Jamaah</label>
+                <label>Pilih Peserta</label>
                 <input type="text" id="searchTiketJamaah" placeholder="🔍 Cari nama jamaah..." oninput="filterTiketJamaah()" style="margin-bottom:8px;">
                 <div style="display:flex;gap:8px;margin-bottom:8px;">
                     <button onclick="pilihSemuaTiket()" style="flex:1;padding:8px;background:#0D5C4A;color:white;border:none;border-radius:8px;font-size:12px;cursor:pointer;">✅ Pilih Semua</button>
@@ -2799,7 +2799,7 @@
         <div class="card-premium">
             <div class="input-group"><label>Nama Acara / Kegiatan</label><input type="text" id="labelEvent" placeholder="Wisuda Tahfidz 2026"></div>
             <div class="input-group">
-                <label>Pilih Jamaah</label>
+                <label>Pilih Peserta</label>
                 <input type="text" id="searchLabelJamaah" placeholder="🔍 Cari nama jamaah..." oninput="filterLabelJamaah()" style="margin-bottom:8px;">
                 <div style="display:flex;gap:8px;margin-bottom:8px;">
                     <button onclick="pilihSemuaLabel()" style="flex:1;padding:8px;background:#0D5C4A;color:white;border:none;border-radius:8px;font-size:12px;cursor:pointer;">✅ Pilih Semua</button>
@@ -2932,13 +2932,13 @@
 <div id="fieldModal" class="modal"><div class="modal-content"><h3>Tambah Field Dinamis</h3><div class="dynamic-field"><label>Nama Field</label><input type="text" id="newFieldName" placeholder="Contoh: tanggal_lahir"><div class="error-message">Hanya huruf kecil, angka, underscore</div></div><div class="dynamic-field"><label>Label Field</label><input type="text" id="newFieldLabel" placeholder="Contoh: Tanggal Lahir"></div><div class="dynamic-field"><label>Tipe Field</label><select id="newFieldType"><option value="text">Text</option><option value="date">Tanggal</option><option value="tel">Telepon</option><option value="textarea">Text Area</option></select></div><div class="dynamic-field" style="display:flex;align-items:center;gap:8px;"><input type="checkbox" id="newFieldRahasia" style="width:18px;height:18px;"><label style="margin:0;">Sembunyikan di PDF Folder (Rahasia)</label></div><button class="btn btn-primary" onclick="addDynamicFieldJamaah()"> TAMBAH FIELD</button><button class="btn btn-danger mt-2" onclick="closeFieldModal()">BATAL</button></div></div>
 <div id="manageFieldsModal" class="modal"><div class="modal-content"><h3>Kelola Field Dinamis</h3><button class="btn btn-primary btn-small" style="margin-bottom:15px;" onclick="closeManageFieldsModal(); openFieldModal();">+ Tambah Field Baru</button><div id="fieldsListContainer"></div><button class="btn btn-primary mt-2" onclick="closeManageFieldsModal()">TUTUP</button></div></div>
 
-<div id="paymentModal" class="modal"><div class="modal-content"><h3> Input Pembayaran</h3><div class="input-group"><label> Tanggal</label><input type="date" id="paymentTanggal"></div><div class="input-group"><label> Nama Jamaah *</label><select id="paymentJamaahSelect"><option value="">-- Pilih Jamaah --</option></select></div><div class="input-group"><label> Nominal (Rp)</label><input type="number" id="paymentNominal" placeholder="Contoh: 5000000"></div><div class="input-group"><label> Metode</label><select id="paymentMetode"><option value="Transfer">Transfer</option><option value="Cash">Cash</option><option value="QRIS">QRIS</option></select></div><div class="input-group"><label> Keterangan</label><input type="text" id="paymentKeterangan" placeholder="DP / Cicilan / Pelunasan"></div><div class="row"><button class="btn btn-danger" onclick="closePaymentModal()" style="flex:1">Batal</button><button class="btn btn-primary" onclick="simpanPembayaran()" style="flex:1">Simpan</button></div></div></div>
+<div id="paymentModal" class="modal"><div class="modal-content"><h3> Input Pembayaran</h3><div class="input-group"><label> Tanggal</label><input type="date" id="paymentTanggal"></div><div class="input-group"><label> Nama Peserta *</label><select id="paymentJamaahSelect"><option value="">-- Pilih Peserta --</option></select></div><div class="input-group"><label> Nominal (Rp)</label><input type="number" id="paymentNominal" placeholder="Contoh: 5000000"></div><div class="input-group"><label> Metode</label><select id="paymentMetode"><option value="Transfer">Transfer</option><option value="Cash">Cash</option><option value="QRIS">QRIS</option></select></div><div class="input-group"><label> Keterangan</label><input type="text" id="paymentKeterangan" placeholder="DP / Cicilan / Pelunasan"></div><div class="row"><button class="btn btn-danger" onclick="closePaymentModal()" style="flex:1">Batal</button><button class="btn btn-primary" onclick="simpanPembayaran()" style="flex:1">Simpan</button></div></div></div>
 <div id="invoiceConfirmModal" class="modal"><div class="modal-content"><h3> Konfirmasi Kirim Invoice</h3><p>Akan dikirim ke nomor WhatsApp:</p><p id="invoiceWANumber" style="font-weight:bold; font-size:18px; background:#f0f0f0; padding:10px; border-radius:10px;"></p><p id="invoiceWAName" style="color:#666;"></p><div class="row" style="margin-top:20px;"><button class="btn btn-danger" onclick="closeInvoiceConfirmModal()" style="flex:1">Batal</button><button class="btn btn-wa" onclick="sendInvoiceWA()" style="flex:1">Kirim via WA</button><button class="btn btn-orange" onclick="copyInvoiceText()" style="flex:1">Salin Teks</button></div></div></div>
 <div id="editHargaModal" class="modal"><div class="modal-content"><h3> Edit Harga Paket</h3><p id="editHargaNama" style="font-weight:bold;"></p><div class="input-group"><label> Total Harga Paket (Rp)</label><input type="number" id="editHargaValue" placeholder="Contoh: 35000000"></div><div class="row"><button class="btn btn-danger" onclick="closeEditHargaModal()" style="flex:1">Batal</button><button class="btn btn-primary" onclick="saveEditHarga()" style="flex:1">Simpan</button></div></div></div>
 <div id="riwayatModal" class="modal"><div class="modal-content"><h3> Riwayat Pembayaran</h3><p id="riwayatNama" style="font-weight:bold;"></p><div id="riwayatListContainer" style="max-height:400px; overflow-y:auto;"></div><div class="row" style="margin-top:15px;"><button class="btn btn-danger" onclick="closeRiwayatModal()" style="flex:1">Tutup</button></div></div></div>
 <div id="masterFieldModal" class="modal"><div class="modal-content"><h3>Kelola Field Dinamis</h3><div class="dynamic-field"><label>Nama Field</label><input type="text" id="masterNewFieldName" placeholder="contoh: alamat, no_hp"></div><div class="dynamic-field"><label>Label Field</label><input type="text" id="masterNewFieldLabel" placeholder="Contoh: Alamat, No HP"></div><div class="dynamic-field"><label>Tipe</label><select id="masterNewFieldType"><option value="text">Text</option><option value="date">Tanggal</option><option value="tel">Telepon</option><option value="textarea">Text Area</option></select></div><button class="btn btn-primary" onclick="addMasterDynamicField()"> TAMBAH FIELD</button><div id="masterFieldsList" style="margin-top:15px;"></div><button class="btn btn-danger mt-2" onclick="closeMasterFieldModal()">TUTUP</button></div></div>
 <div id="masterItemModal" class="modal"><div class="modal-content"><h3>Kelola Daftar Item</h3><div class="row"><div class="input-group"><label>Nama Item</label><input type="text" id="masterNewItem" placeholder="Contoh: Seragam"></div><button class="btn-small" onclick="addMasterItem()" style="background:var(--primary); color:white; padding:0 15px;">+ Tambah</button></div><div id="masterItemList" style="margin-top:15px;"></div><button class="btn btn-danger mt-2" onclick="closeMasterItemModal()">TUTUP</button></div></div>
-<div id="copyModal" class="modal"><div class="modal-content"><h3>📋 Copy dari Database</h3><p style="font-size:14px;color:#333;margin:10px 0;">Semua jamaah dari database akan disalin ke Multi Event.</p><p style="font-size:12px;color:#0D5C4A;background:#f0fdf4;padding:10px;border-radius:8px;margin:10px 0;">✅ Nama yang sudah ada tidak akan dobel — otomatis dilewati.</p><div class="row"><button class="btn btn-danger" onclick="closeCopyModal()" style="flex:1">BATAL</button><button class="btn btn-primary" onclick="executeCopyFromJamaah()" style="flex:1">COPY SEKARANG</button></div></div></div>
+<div id="copyModal" class="modal"><div class="modal-content"><h3>📋 Copy dari Database</h3><p style="font-size:14px;color:#333;margin:10px 0;">Semua peserta dari database akan disalin ke Inventaris.</p><p style="font-size:12px;color:#0D5C4A;background:#f0fdf4;padding:10px;border-radius:8px;margin:10px 0;">✅ Nama yang sudah ada tidak akan dobel — otomatis dilewati.</p><div class="row"><button class="btn btn-danger" onclick="closeCopyModal()" style="flex:1">BATAL</button><button class="btn btn-primary" onclick="executeCopyFromJamaah()" style="flex:1">COPY SEKARANG</button></div></div></div>
 <div id="modeManagerModal" class="modal"><div class="modal-content"><h3><i class="fas fa-sliders-h"></i> Kelola Mode Switcher</h3><p style="font-size:12px; color:#666; margin-bottom:15px;">Centang mode yang ingin ditampilkan.</p><div id="modeManagerList" style="margin-bottom:20px;"></div><div class="row"><div class="input-group" style="flex:3"><input type="text" id="newModeName" placeholder="Nama mode baru (contoh: Wisata)"></div><button class="btn-small" onclick="addNewMode()" style="background:var(--primary); color:white; padding:0 15px;">+ TAMBAH</button></div><div class="row" style="margin-top:15px;"><button class="btn btn-danger" onclick="closeModeManager()" style="flex:1">BATAL</button><button class="btn btn-primary" onclick="saveModes()" style="flex:1"> SIMPAN PERUBAHAN</button></div></div></div>
 <div id="entryModal" class="modal"><div class="modal-content"><h3 id="entryModalTitle">Tambah Catatan</h3><div class="input-group"><label>Judul</label><input type="text" id="entryJudul" placeholder="Judul catatan..."></div><div class="input-group"><label>Isi</label><textarea id="entryIsi" rows="8" placeholder="Tulis catatan di sini..."></textarea></div><button class="btn btn-primary" onclick="saveCatatanEntry()"> SIMPAN</button><button class="btn btn-danger mt-2" onclick="closeEntryModal()">BATAL</button></div></div>
 <div id="detailModal" class="modal"><div class="modal-content"><h3 id="detailJudul"></h3><div id="detailIsi" style="margin:15px 0; white-space:pre-wrap;"></div><button class="btn btn-wa" onclick="shareDetailToWA()"> KIRIM KE WA</button><button class="btn btn-danger mt-2" onclick="closeDetailModal()">TUTUP</button></div></div>
@@ -3277,6 +3277,7 @@ const menuItemsPremium = [
     { id: 'raport',     icon: '📋', label: 'Raport',          badge: 'Raport', idKey:'raport' },
     { id: 'pelanggaran', icon: '&#9888;', label: 'Pelanggaran',    badge: 'Poin', idKey:'pelanggaran' },
     { id: 'estimasi',   icon: '🧮', label: 'Kalkulator',      badge: 'Biaya', idKey:'estimasi' },
+    { id: 'datamaster', icon: '🎒', label: 'Inventaris',      badge: 'Barang', idKey:'datamaster' },
     { id: 'pembayaran', icon: '🧾', label: 'Pembayaran',      badge: 'Tagihan' },
     { id: 'kas',        icon: '💰', label: 'Uang Kas',        badge: 'Kas' },
     { id: 'catatan',    icon: '📝', label: 'Catatan',         badge: 'Notes' },
@@ -3292,7 +3293,7 @@ function renderMenuPremium() {
     let html = ''; 
     for(let i=0;i<menuItemsPremium.length;i++) { 
         const menu = menuItemsPremium[i]; 
-        const isVisible = (menu.id === 'pelanggaran' || menu.id === 'absensi_harian' || menu.id === 'estimasi') ? true : localStorage.getItem(`menu_${menu.id}_visible`) !== 'false'; 
+        const isVisible = (menu.id === 'pelanggaran' || menu.id === 'absensi_harian' || menu.id === 'estimasi' || menu.id === 'datamaster') ? true : localStorage.getItem(`menu_${menu.id}_visible`) !== 'false'; 
         if(isVisible || isAdminModePremium) 
             html += `<div class="menu-card-premium" onclick="showPage('${menu.id}')">${isAdminModePremium ? '<div class="edit-badge">✏️</div>' : ''}<div class="menu-icon">${menu.icon}</div><div class="menu-label">${menu.label}</div><div class="menu-badge">${menu.badge}</div></div>`; 
         else 
@@ -3643,7 +3644,7 @@ async function downloadDashboardPDF() {
             doc.setFontSize(12);
             doc.setTextColor(0,0,0);
             doc.text(`Total Kas: Rp ${formatAngka(totalKas)}`, 20, 80);
-            doc.text(`Total Jamaah: ${jamaahData.length} orang`, 20, 90);
+            doc.text(`Total Peserta: ${jamaahData.length} orang`, 20, 90);
             doc.save(`Dashboard_${getKonfigurasiProData().instansi1?.nama || 'Dashboard'}.pdf`);
             showToast('PDF Dashboard berhasil dibuat');
         } catch(e) { showToast('Gagal PDF: ' + e.message); }
@@ -3658,7 +3659,7 @@ function exportDashboardExcel() {
     const wsKas = XLSX.utils.json_to_sheet(kasData);
     const wsPayment = XLSX.utils.json_to_sheet(paymentData);
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, wsJamaah, 'Jamaah');
+    XLSX.utils.book_append_sheet(wb, wsJamaah, 'Peserta');
     XLSX.utils.book_append_sheet(wb, wsKas, 'Kas');
     XLSX.utils.book_append_sheet(wb, wsPayment, 'Pembayaran');
     XLSX.writeFile(wb, `Dashboard_${getKonfigurasiProData().instansi1?.nama || 'Dashboard'}_${new Date().toLocaleDateString('id-ID').replace(/\//g,'-')}.xlsx`);
@@ -3726,12 +3727,12 @@ function hitungUmroh() {
     const f=n=>"Rp "+Math.round(n).toLocaleString('id-ID'); 
     const lokasi=document.getElementById('lokasiPaket').value; 
     const garis="━━━━━━━━━━━━━━━━━━━"; 
-    lastCalculatedText=`📊 *Ringkasan Estimasi Paket*\n${garis}\n📍 *${lokasi}*\n👥 *Total Jamaah:* ${nJam}\n💰 *Harga per Pax:* *${f(jual)}*\n${garis}\n📞 *Silakan hubungi admin untuk detail.*`; 
+    lastCalculatedText=`📊 *Ringkasan Estimasi Paket*\n${garis}\n📍 *${lokasi}*\n👥 *Total Peserta:* ${nJam}\n💰 *Harga per Pax:* *${f(jual)}*\n${garis}\n📞 *Silakan hubungi admin untuk detail.*`; 
     lastCalculatedPrice=jual; 
     lastCalculatedPaket=lokasi; 
     lastCalculatedTotalJam=nJam; 
     let hasil=document.getElementById('hasilEstimasi'); 
-    hasil.innerHTML=`<div class="res-item"><span>Modal Pokok / Pax</span><b>${f(sub)}</b></div><div class="res-item"><span>Total Omzet Grup</span><b>${f(totalOmzet)}</b></div><div class="res-item"><span>Profit Kotor Grup</span><span>${f(profitKotor)}</span></div><div class="res-item"><span>Biaya TL</span><span>${f(biayaTL)}</span></div><div class="res-item"><span>Profit Per Pax</span><span>${f(profitPerPax)}</span></div><div class="res-item" style="color:#2ecc71"><span>PROFIT BERSIH</span><b>${f(bersih)}</b></div><div class="res-item" style="border-top:2px solid var(--accent); margin-top:10px; padding-top:10px; flex-direction:column; align-items:center;"><span style="font-weight:bold">HARGA BROSUR</span><span class="highlight">${f(jual)}</span><p style="font-size:10px; margin-top:5px;">*Berdasarkan ${nJam-nFoc} jamaah bayar dan ${nFoc} gratis</p></div><div class="action-buttons" style="display:flex; gap:10px; margin-top:15px;"><button class="btn" onclick="salinRingkasan()" style="background:#34495e; margin-top:0; flex:1;">SALIN</button><button class="btn" onclick="cetakEstimasiPDFJamaah()" style="background:#2980b9; margin-top:0; flex:1; font-size:11px;">🖨️ CETAK JAMAAH</button><button class="btn" onclick="cetakEstimasiPDFInternal()" style="background:var(--orange); margin-top:0; flex:1; font-size:11px;">🖨️ CETAK INTERNAL</button></div>`; 
+    hasil.innerHTML=`<div class="res-item"><span>Modal Pokok / Pax</span><b>${f(sub)}</b></div><div class="res-item"><span>Total Omzet Grup</span><b>${f(totalOmzet)}</b></div><div class="res-item"><span>Profit Kotor Grup</span><span>${f(profitKotor)}</span></div><div class="res-item"><span>Biaya TL</span><span>${f(biayaTL)}</span></div><div class="res-item"><span>Profit Per Pax</span><span>${f(profitPerPax)}</span></div><div class="res-item" style="color:#2ecc71"><span>PROFIT BERSIH</span><b>${f(bersih)}</b></div><div class="res-item" style="border-top:2px solid var(--accent); margin-top:10px; padding-top:10px; flex-direction:column; align-items:center;"><span style="font-weight:bold">HARGA BROSUR</span><span class="highlight">${f(jual)}</span><p style="font-size:10px; margin-top:5px;">*Berdasarkan ${nJam-nFoc} peserta bayar dan ${nFoc} gratis</p></div><div class="action-buttons" style="display:flex; gap:10px; margin-top:15px;"><button class="btn" onclick="salinRingkasan()" style="background:#34495e; margin-top:0; flex:1;">SALIN</button><button class="btn" onclick="cetakEstimasiPDFJamaah()" style="background:#2980b9; margin-top:0; flex:1; font-size:11px;">🖨️ CETAK JAMAAH</button><button class="btn" onclick="cetakEstimasiPDFInternal()" style="background:var(--orange); margin-top:0; flex:1; font-size:11px;">🖨️ CETAK INTERNAL</button></div>`; 
     hasil.style.display='block'; 
     hasil.scrollIntoView({behavior:"smooth"}); 
 }
@@ -3764,7 +3765,7 @@ async function cetakEstimasiPDFJamaah() {
         <div class="content">
             ${headerHtml}
             <h2>INFORMASI HARGA PAKET</h2>
-            <div class="info"><div><strong>Paket &nbsp;&nbsp;:</strong> ${lastCalculatedPaket}</div><div><strong>Jamaah :</strong> ${lastCalculatedTotalJam} orang</div><div><strong>Tanggal :</strong> ${tgl}</div></div>
+            <div class="info"><div><strong>Paket &nbsp;&nbsp;:</strong> ${lastCalculatedPaket}</div><div><strong>Peserta :</strong> ${lastCalculatedTotalJam} orang</div><div><strong>Tanggal :</strong> ${tgl}</div></div>
             <hr class="divider">
             <div class="harga">${f(lastCalculatedPrice)}</div>
             <div style="color:#888;font-size:13px;">Harga Per Pax</div>
@@ -3834,7 +3835,7 @@ async function cetakEstimasiPDFInternal() {
         <div class="konfidensial">⚠️ Hanya Untuk Internal</div>
         <div class="info">
             <div><strong>Paket &nbsp;&nbsp;:</strong> ${lastCalculatedPaket}</div>
-            <div><strong>Jamaah :</strong> ${nJam} orang (${nFoc} gratis, ${nTL} TL)</div>
+            <div><strong>Peserta :</strong> ${nJam} orang (${nFoc} gratis, ${nTL} TL)</div>
             <div><strong>Tanggal :</strong> ${tgl}</div>
         </div>
         <table><thead><tr><th>Komponen Biaya</th><th style="text-align:right;">Per Pax</th></tr></thead>
@@ -4187,7 +4188,7 @@ function renderJamaahListWithPagination() {
         document.getElementById('paginationContainer').innerHTML=''; 
         return; 
     } 
-    let html=`<div style="margin-bottom:10px; font-size:0.8rem; color:var(--accent);"> Total: ${jamaahFilteredList.length} jamaah (halaman ${currentJamaahPage} dari ${totalPages})</div>`; 
+    let html=`<div style="margin-bottom:10px; font-size:0.8rem; color:var(--accent);"> Total: ${jamaahFilteredList.length} peserta (halaman ${currentJamaahPage} dari ${totalPages})</div>`; 
     pageData.forEach((j,idx)=>{ 
         const displayNum=start+idx+1; 
         html+=`<div class="jamaah-card"><div class="jamaah-header"><div style="display:flex;align-items:center;gap:10px;flex:1;"><div id="foto_thumb_${j.id}" style="width:44px;height:44px;border-radius:50%;background:#f0f0f0;border:2px solid #0D5C4A;overflow:hidden;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;" onclick="showFotoProfilModal(${j.id},'${escapeHtml(j.nama_lengkap).replace(/'/g,"\\'")}')"><span style="font-size:22px;">👤</span></div><div><div class="jamaah-nama"><span style="background:var(--primary); color:white; display:inline-block; width:28px; height:28px; border-radius:50%; text-align:center; line-height:28px; font-size:13px; margin-right:10px;">${displayNum}</span> ${escapeHtml(j.nama_lengkap)}</div><div class="jamaah-tgl"> ${j.created_at||'-'}</div></div></div><div class="jamaah-actions"><button class="btn-share-wa" onclick="shareSingleJamaahById('${j.id}')"><i class="fab fa-whatsapp"></i></button><button class="btn-edit-jamaah" onclick="editJamaahById('${j.id}')"><i class="fas fa-edit"></i></button><button class="btn-delete-jamaah" onclick="confirmDeleteJamaahById('${j.id}')"><i class="fas fa-trash"></i></button></div></div><div class="jamaah-detail">`; 
@@ -4418,7 +4419,7 @@ function previewSurat() {
     const keperluan = document.getElementById('suratKeperluan')?.value;
     const previewCard = document.getElementById('suratPreviewCard');
     if (!templateKey) return showToast('Pilih template surat dulu!');
-    if (!jamaahId) return showToast('Pilih jamaah dulu!');
+    if (!jamaahId) return showToast('Pilih peserta dulu!');
     const jamaah = jamaahList.find(j => j.id == jamaahId);
     if (!jamaah) { showToast('Peserta tidak ditemukan!'); return; }
     const vars = getSuratVariables(jamaah, nomorSurat, keperluan);
@@ -4510,7 +4511,7 @@ function cetakSurat() {
     const jamaahId = document.getElementById('suratJamaahSelect')?.value;
     const isi = document.getElementById('suratIsiEdit')?.value;
     if (!isi) return showToast('Buat surat dulu!');
-    if (!jamaahId) return showToast('Pilih jamaah dulu!');
+    if (!jamaahId) return showToast('Pilih peserta dulu!');
     const jamaah = jamaahList.find(j => j.id == jamaahId);
     if (!jamaah) return;
     const win = window.open('', '_blank');
@@ -4526,7 +4527,7 @@ async function generateSuratPDFSimple() {
     const judul = document.getElementById('suratJudulEdit')?.value || 'SURAT';
     const isi = document.getElementById('suratIsiEdit')?.value;
     if (!isi) { showToast('Buat surat dulu!'); return null; }
-    if (!jamaahId) { showToast('Pilih jamaah dulu!'); return null; }
+    if (!jamaahId) { showToast('Pilih peserta dulu!'); return null; }
     const jamaah = jamaahList.find(j => j.id == jamaahId);
     if (!jamaah) return null;
     
@@ -4650,7 +4651,7 @@ async function bagikanSurat() {
     const isi = document.getElementById('suratIsiEdit')?.value;
     const judul = document.getElementById('suratJudulEdit')?.value || 'SURAT';
     if (!isi) return showToast('Buat surat dulu!');
-    if (!jamaahId) return showToast('Pilih jamaah dulu!');
+    if (!jamaahId) return showToast('Pilih peserta dulu!');
     const jamaah = jamaahList.find(j => j.id == jamaahId);
     if (!jamaah) return;
     showToast('⏳ Menyiapkan gambar surat...');
@@ -4880,7 +4881,7 @@ async function prosesHasilScan(qrData) {
         (j.additional_fields?.no_porsi || '').trim().toLowerCase() === noPorsi.toLowerCase()
     );
     if (!jamaah) {
-        statusEl.textContent = '❌ Jamaah tidak ditemukan! No Porsi: ' + noPorsi;
+        statusEl.textContent = '❌ Peserta tidak ditemukan! NIS: ' + noPorsi;
         statusEl.style.color = '#EF4444';
         document.getElementById('hasilScanCard').style.display = 'none';
         return;
@@ -4974,7 +4975,7 @@ async function tandaiHadir() {
 }
 
 async function batalkanHadir(jamaahId) {
-    if (!confirm('Batalkan kehadiran jamaah ini?')) return;
+    if (!confirm('Batalkan kehadiran peserta ini?')) return;
     const sesi = getSesiAktif();
     if (!sesi) return;
     sesi.absensi = sesi.absensi.filter(a => a.jamaahId !== jamaahId);
@@ -5642,7 +5643,7 @@ function getAbsensiColumns() {
     const DEFAULT_ON = ['no_porsi', 'jenis_kelamin', 'hp_wali', 'wali'];
     const cols = [
         { id: 'no',   label: 'No',          show: true, required: true },
-        { id: 'nama', label: 'Nama Jamaah',  show: true, required: true },
+        { id: 'nama', label: 'Nama Peserta',  show: true, required: true },
     ];
     dynamicFieldsJamaah.forEach(df => {
         cols.push({
@@ -5877,7 +5878,7 @@ async function prosesHasilScan(qrData) {
     );
 
     if (!jamaah) {
-        statusEl.textContent = '❌ Jamaah tidak ditemukan! No Porsi: ' + noPorsi;
+        statusEl.textContent = '❌ Peserta tidak ditemukan! NIS: ' + noPorsi;
         statusEl.style.color = '#EF4444';
         document.getElementById('hasilScanCard').style.display = 'none';
         return;
@@ -6217,7 +6218,7 @@ function closeJamaahModal(){
 
 function shareAllJamaahToWA(){ 
     if(jamaahList.length===0) return showToast('Tidak ada database!'); 
-    let text=`*📋 DAFTAR JAMAAH*\n\n *Total: ${jamaahList.length} Jamaah*\n\n\n`; 
+    let text=`*📋 DAFTAR PESERTA*\n\n *Total: ${jamaahList.length} Peserta*\n\n\n`; 
     jamaahList.forEach((j,i)=>{ 
         text+=`${i+1}. *${j.nama_lengkap}*\n`; 
         for(const field of dynamicFieldsJamaah){ 
@@ -6261,13 +6262,13 @@ function downloadTemplateExcel() {
         wch: i === 0 ? 30 : h.length < 10 ? 15 : 22
     }));
 
-    XLSX.utils.book_append_sheet(wb, ws, 'Data Jamaah');
+    XLSX.utils.book_append_sheet(wb, ws, 'Data Peserta');
 
     // Sheet petunjuk
     const petunjuk = [
         ['PETUNJUK PENGISIAN TEMPLATE IMPORT JAMAAH'],
         [''],
-        ['1. Isi data jamaah mulai dari baris ke-3 (baris 2 adalah contoh, boleh dihapus)'],
+        ['1. Isi data peserta mulai dari baris ke-3 (baris 2 adalah contoh, boleh dihapus)'],
         ['2. Kolom "Nama Lengkap" wajib diisi'],
         ['3. Format Tanggal Lahir: YYYY-MM-DD (contoh: 1980-10-08)'],
         ['4. Jenis Kelamin: isi L atau P'],
@@ -6298,7 +6299,7 @@ function exportJamaahToExcel(){
     const ws=XLSX.utils.aoa_to_sheet([headers,...rows]); 
     const wb=XLSX.utils.book_new(); 
     XLSX.utils.book_append_sheet(wb,ws,'database'); 
-    XLSX.writeFile(wb,`Data_Jamaah_${new Date().toLocaleDateString('id-ID').replace(/\//g,'-')}.xlsx`); 
+    XLSX.writeFile(wb,`Data_Peserta_${new Date().toLocaleDateString('id-ID').replace(/\//g,'-')}.xlsx`); 
     showToast('Excel berhasil di-export'); 
 }
 
@@ -6307,7 +6308,7 @@ function backupJamaahData(){
     const backup={app:"EduKu - database", version:"1.0", created:new Date().toISOString(), fields:dynamicFieldsJamaah, data:jamaahList}; 
     const a=document.createElement('a'); 
     a.href=URL.createObjectURL(new Blob([JSON.stringify(backup,null,2)],{type:'application/json'})); 
-    a.download=`EduKu_Jamaah_Backup_${new Date().toLocaleDateString('id-ID').replace(/\//g,'-')}.json`; 
+    a.download=`EduKu_Peserta_Backup_${new Date().toLocaleDateString('id-ID').replace(/\//g,'-')}.json`; 
     a.click(); 
     showToast('Backup peserta berhasil'); 
 }
@@ -6446,7 +6447,7 @@ async function confirmDeleteAllJamaah(){
         showToast('Tidak ada data!'); 
         return; 
     } 
-    if(confirm(`⚠️ PERINGATAN!\n\nSemua ${jamaahList.length} data jamaah akan dihapus PERMANEN termasuk:\n- Data jamaah\n- Foto profil\n- Dokumen jamaah\n- On Proses\n- Folder Virtual\n\nField dinamis & konfigurasi TIDAK dihapus.\nLanjutkan?`)){ 
+    if(confirm(`⚠️ PERINGATAN!\n\nSemua ${jamaahList.length} data peserta akan dihapus PERMANEN termasuk:\n- Data jamaah\n- Foto profil\n- Dokumen jamaah\n- On Proses\n- Folder Virtual\n\nField dinamis & konfigurasi TIDAK dihapus.\nLanjutkan?`)){ 
         // Reset data jamaah saja, field tetap
         jamaahList = [];
         jamaahKitaList = [];
@@ -6467,7 +6468,7 @@ async function confirmDeleteAllJamaah(){
         // Hapus dari localStorage (fallback lama)
         ['navara_jamaah_list','navara_jamaah_kita_list','navara_folder_list'].forEach(k => localStorage.removeItem(k));
 
-        showToast('✅ Semua data jamaah telah dihapus');
+        showToast('✅ Semua data peserta telah dihapus');
         renderJamaahListWithPagination();
         renderJamaahKitaList();
         renderFolderList();
@@ -6543,7 +6544,7 @@ function importJamaahFromExcel(input){
             } 
             saveJamaahData(); 
             renderJamaahList();
-            showToast(`✅ Import selesai! ${added} jamaah ditambahkan`); 
+            showToast(`✅ Import selesai! ${added} peserta ditambahkan`); 
             input.value=''; 
         }; 
         reader.readAsArrayBuffer(file); 
@@ -6579,7 +6580,7 @@ async function loadJamaahKitaData() {
     dynamicFieldsJamaahKita = savedFields || defaultJamaahKitaFields;
 
     // Sinkronkan urutan + icon + label field On Proses mengikuti Database Jamaah
-    const dbFields = dynamicFieldsJamaah.length > 0 ? dynamicFieldsJamaah : 
+    const dbFields = dynamicFieldsJamaah.length > 0 ? dynamicFieldsPeserta : 
         JSON.parse(localStorage.getItem('navara_jamaah_fields') || '[]');
     if (dbFields.length > 0) {
         const dbOrder = dbFields.map(f => f.name);
@@ -6617,7 +6618,7 @@ function filterPilihJamaahKita() {
     if (!container) return;
     const filtered = jamaahList.filter(j => j.nama_lengkap.toLowerCase().includes(q));
     if (filtered.length === 0) {
-        container.innerHTML = '<div style="padding:10px;color:#999;text-align:center;font-size:13px;">Tidak ada jamaah ditemukan</div>';
+        container.innerHTML = '<div style="padding:10px;color:#999;text-align:center;font-size:13px;">Tidak ada peserta ditemukan</div>';
         return;
     }
     container.innerHTML = filtered.map((j, idx) => {
@@ -6638,7 +6639,7 @@ function filterPilihJamaahKita() {
 function updateJumlahDipilihKita() {
     const checked = document.querySelectorAll('#multiSelectJamaahKita input[type=checkbox]:checked:not(:disabled)');
     const el = document.getElementById('jumlahDipilihKita');
-    if (el) el.textContent = checked.length > 0 ? `${checked.length} jamaah dipilih` : '';
+    if (el) el.textContent = checked.length > 0 ? `${checked.length} peserta dipilih` : '';
 }
 
 function pilihSemuaJamaahKita() {
@@ -6688,11 +6689,11 @@ function tambahJamaahKitaMulti() {
         saveJamaahKitaData();
         renderJamaahKitaList();
         filterPilihJamaahKita();
-        let msg = `✅ ${berhasil} jamaah berhasil ditambahkan!`;
+        let msg = `✅ ${berhasil} peserta berhasil ditambahkan!`;
         if (duplikat > 0) msg += ` (${duplikat} sudah ada, dilewati)`;
         showToast(msg);
     } else {
-        showToast(`⚠️ ${duplikat} jamaah sudah ada di On Proses, tidak ada yang ditambahkan.`);
+        showToast(`⚠️ ${duplikat} peserta sudah ada di Pendaftaran Baru, tidak ada yang ditambahkan.`);
     }
 }
 
@@ -6738,16 +6739,16 @@ function autoFillJamaahKitaFields(selectedIndex) {
         input.value = val;
     });
 
-    showToast('✅ Data jamaah berhasil dimuat!');
+    showToast('✅ Data peserta berhasil dimuat!');
 }
 
 function tambahJamaahKita() {
     const select = document.getElementById('pilihJamaahKita');
     const selectedIndex = select.value;
-    if (!selectedIndex) return showToast('Pilih jamaah terlebih dahulu!');
+    if (!selectedIndex) return showToast('Pilih peserta terlebih dahulu!');
     const jamaah = jamaahList[parseInt(selectedIndex)];
     if (!jamaah) return;
-    if (jamaahKitaList.some(j => j.jamaahId === jamaah.id)) return showToast('Jamaah ini sudah ada di daftar On Proses!');
+    if (jamaahKitaList.some(j => j.jamaahId === jamaah.id)) return showToast('Peserta ini sudah ada di daftar Pendaftaran Baru!');
     const additional = {};
     dynamicFieldsJamaahKita.forEach(field => {
         const input = document.getElementById(`jamaahKitaField_${field.name}`);
@@ -6922,7 +6923,7 @@ function cetakRekapOnProses() {
         <div class="watermark-wrap">${watermarkHtml}</div>
         <div class="content">
             <h1>📋 REKAP DATA JAMAAH ON PROSES</h1>
-            <div class="sub">${namaInstansi} &nbsp;|&nbsp; ${sorted.length} jamaah &nbsp;|&nbsp; ${new Date().toLocaleDateString('id-ID')}</div>
+            <div class="sub">${namaInstansi} &nbsp;|&nbsp; ${sorted.length} peserta &nbsp;|&nbsp; ${new Date().toLocaleDateString('id-ID')}</div>
             <table>
                 <thead><tr>
                     <th>No</th>
@@ -6952,14 +6953,14 @@ function pilihSemuaOnProses() {
 
 function hapusPilihanOnProses() {
     const checked = document.querySelectorAll('#jamaahKitaListContainer input[type=checkbox]:checked');
-    if (checked.length === 0) return showToast('Pilih jamaah yang mau dihapus dulu!');
-    if (!confirm(`Hapus ${checked.length} jamaah dari On Proses?`)) return;
+    if (checked.length === 0) return showToast('Pilih peserta yang mau dihapus dulu!');
+    if (!confirm(`Hapus ${checked.length} peserta dari Pendaftaran Baru?`)) return;
     const ids = Array.from(checked).map(cb => parseInt(cb.value));
     jamaahKitaList = jamaahKitaList.filter(j => !ids.includes(j.id));
     saveJamaahKitaData();
     renderJamaahKitaList();
     filterPilihJamaahKita();
-    showToast(`🗑️ ${ids.length} jamaah berhasil dihapus!`);
+    showToast(`🗑️ ${ids.length} peserta berhasil dihapus!`);
 }
 
 function resetJamaahKitaFilter() {
@@ -6990,7 +6991,7 @@ function clearJamaahKitaSelection() {
 }
 
 function sendBatchWA() {
-    if (selectedJamaahKitaIds.length === 0) return showToast('Pilih jamaah terlebih dahulu!');
+    if (selectedJamaahKitaIds.length === 0) return showToast('Pilih peserta terlebih dahulu!');
     const selected = jamaahKitaList.filter(j => selectedJamaahKitaIds.includes(j.id));
     const printFieldNames = getOnProsesPrintFields();
     const printFields = dynamicFieldsJamaahKita.filter(f => printFieldNames.includes(f.name));
@@ -7056,7 +7057,7 @@ function saveEditJamaahKita() {
 }
 
 function confirmDeleteJamaahKitaById(id) {
-    if (confirm('Hapus jamaah ini dari daftar On Proses?')) {
+    if (confirm('Hapus peserta ini dari daftar Pendaftaran Baru?')) {
         jamaahKitaList = jamaahKitaList.filter(j => j.id !== id);
         selectedJamaahKitaIds = selectedJamaahKitaIds.filter(i => i !== id);
         saveJamaahKitaData();
@@ -7510,8 +7511,8 @@ function confirmDeleteJamaahKitaDynamicField(idx) {
 }
 
 function confirmDeleteAllJamaahKita() {
-    if (jamaahKitaList.length === 0) return showToast('Tidak ada data Jamaah on proses!');
-    if (confirm(`PERINGATAN: Semua ${jamaahKitaList.length} data Jamaah on proses akan dihapus PERMANEN! Lanjutkan?`)) {
+    if (jamaahKitaList.length === 0) return showToast('Tidak ada data Pendaftaran Baru!');
+    if (confirm(`PERINGATAN: Semua ${jamaahKitaList.length} data Pendaftaran Baru akan dihapus PERMANEN! Lanjutkan?`)) {
         jamaahKitaList = [];
         selectedJamaahKitaIds = [];
         saveJamaahKitaData();
@@ -7522,7 +7523,7 @@ function confirmDeleteAllJamaahKita() {
 
 function backupJamaahKitaData() {
     if (jamaahKitaList.length === 0 && dynamicFieldsJamaahKita.length === 0) return showToast("Tidak ada data!");
-    const backup = { app: "EduKu - Jamaah On Proses", version: "2.0", date: new Date().toISOString(), onProsesList: jamaahKitaList, dynamicFields: dynamicFieldsJamaahKita };
+    const backup = { app: "EduKu - Pendaftaran Baru", version: "2.0", date: new Date().toISOString(), onProsesList: jamaahKitaList, dynamicFields: dynamicFieldsJamaahKita };
     const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -7897,14 +7898,14 @@ function renderPaymentJamaahList() {
         else 
             html += `<div class="payment-jamaah-card" style="border-left-color: ${warna};"><div class="payment-jamaah-info"><h4>${escapeHtml(j.nama_lengkap)}</h4><div class="payment-price-detail">💰 Total Paket: ${formatRupiah(totalHargaPaket)}<br>💸 Dibayar: ${formatRupiah(totalBayar)}</div></div><div style="text-align: right;"><div class="payment-sisa-badge" style="color: ${warna}; margin-bottom: 8px;">${status === 'LUNAS' ? '✅ LUNAS' : '💵 Sisa ' + formatRupiah(sisa)}</div><div><button class="payment-btn-bayar" onclick="openPaymentModalWithJamaah('${j.id}')"><i class="fas fa-plus-circle"></i> Bayar</button><button class="payment-btn-bayar" onclick="prepareInvoice('${j.id}')"><i class="fas fa-file-invoice"></i> WA</button><button class="payment-btn-bayar" onclick="previewInvoicePDF('${j.id}')"><i class="fas fa-eye"></i> Preview</button><button class="payment-btn-bayar" onclick="cetakInvoiceAuto('${j.id}')"><i class="fas fa-print"></i> Cetak</button><button class="payment-btn-bayar" onclick="openEditHargaModal('${j.id}')"><i class="fas fa-edit"></i> Harga</button><button class="payment-btn-bayar" onclick="openRiwayatModal('${j.id}')"><i class="fas fa-history"></i> Riwayat</button></div></div></div>`; 
     }); 
-    if (filteredJamaah.length === 0) html = '<div style="text-align:center; padding:20px; color:#94a3b8;">Tidak ada jamaah yang sesuai dengan filter.</div>'; 
+    if (filteredJamaah.length === 0) html = '<div style="text-align:center; padding:20px; color:#94a3b8;">Tidak ada peserta yang sesuai dengan filter.</div>'; 
     container.innerHTML = html; 
 }
 
 function populatePaymentJamaahDropdown() { 
     const select = document.getElementById('paymentJamaahSelect'); 
     if (!select) return; 
-    select.innerHTML = '<option value="">-- Pilih Jamaah --</option>'; 
+    select.innerHTML = '<option value="">-- Pilih Peserta --</option>'; 
     jamaahList.forEach(j => { 
         const option = document.createElement('option'); 
         option.value = j.id; 
@@ -7937,10 +7938,10 @@ function simpanPembayaran() {
     const tanggal = document.getElementById('paymentTanggal').value; 
     const metode = document.getElementById('paymentMetode').value; 
     const keterangan = document.getElementById('paymentKeterangan').value.trim() || 'Pembayaran'; 
-    if (!idJamaah) { showToast('⚠️ Pilih jamaah!'); return; } 
+    if (!idJamaah) { showToast('⚠️ Pilih peserta!'); return; } 
     if (!nominal || nominal <= 0) { showToast('⚠️ Masukkan nominal!'); return; } 
     const jamaah = jamaahList.find(j => j.id == idJamaah); 
-    if (!jamaah) { showToast('Data jamaah tidak ditemukan'); return; } 
+    if (!jamaah) { showToast('Data peserta tidak ditemukan'); return; } 
     const newTrx = { 
         id: 'PMB-' + Date.now() + '-' + Math.floor(Math.random() * 1000), 
         id_jamaah: idJamaah, 
@@ -8010,7 +8011,7 @@ function copyInvoiceText() {
 // Generate invoice PDF - reusable untuk preview, cetak, download
 async function generateInvoicePDFDoc(jamaahId) {
     const jamaah = jamaahList.find(j => j.id == jamaahId);
-    if (!jamaah) { showToast('Data jamaah tidak ditemukan'); return null; }
+    if (!jamaah) { showToast('Data peserta tidak ditemukan'); return null; }
     
     const cfg = getKonfigurasiProData();
     const { jsPDF } = window.jspdf;
@@ -8168,7 +8169,7 @@ async function cetakInvoiceAuto(jamaahId) {
     showToast('Menyiapkan cetak...');
     try {
         const jamaah = jamaahList.find(j => j.id == jamaahId);
-        if (!jamaah) return showToast('Data jamaah tidak ditemukan');
+        if (!jamaah) return showToast('Data peserta tidak ditemukan');
         const cfg = getKonfigurasiProData();
         const transaksiList = paymentTransaksiList.filter(t => t.id_jamaah == jamaahId).sort((a,b) => new Date(a.tanggal) - new Date(b.tanggal));
         const totalBayar = hitungTotalBayarJamaah(jamaahId);
@@ -8181,7 +8182,7 @@ async function cetakInvoiceAuto(jamaahId) {
         const headerHtml = buildPrintHeader(cfg, tglCetak);
         const watermarkHtml = buildPrintWatermark(cfg);
         const ttdHtml = buildPrintTandaTangan(cfg, tglCetak);
-        const qrHtml = await buildPrintQR(cfg, `Invoice:${noInvoice}\nJamaah:${jamaah.nama_lengkap}\nStatus:${sisa<=0?'LUNAS':'BELUM LUNAS'}`);
+        const qrHtml = await buildPrintQR(cfg, `Invoice:${noInvoice}\nPeserta:${jamaah.nama_lengkap}\nStatus:${sisa<=0?'LUNAS':'BELUM LUNAS'}`);
         let rowsHtml = '';
         transaksiList.forEach((t,i) => {
             rowsHtml += `<tr><td style="padding:8px;border-bottom:1px solid #eee;text-align:center;">${i+1}</td><td style="padding:8px;border-bottom:1px solid #eee;">${t.tanggal}</td><td style="padding:8px;border-bottom:1px solid #eee;">${t.keterangan||'-'}</td><td style="padding:8px;border-bottom:1px solid #eee;">${t.metode||'-'}</td><td style="padding:8px;border-bottom:1px solid #eee;text-align:right;">${formatRupiah(t.nominal)}</td></tr>`;
@@ -8221,7 +8222,7 @@ async function cetakInvoiceAuto(jamaahId) {
                 <h2>INVOICE PEMBAYARAN</h2>
                 <div class="inv-sub">No: ${noInvoice}</div>
                 <div class="info-row">
-                    <div><strong>Nama Jamaah</strong><br>${jamaah.nama_lengkap}</div>
+                    <div><strong>Nama Peserta</strong><br>${jamaah.nama_lengkap}</div>
                     <div style="text-align:right;"><strong>Total Paket</strong><br>${formatRupiah(totalHargaPaket)}</div>
                 </div>
                 <table>
@@ -8390,7 +8391,7 @@ async function cetakPembayaranHTML() {
             ${headerHtml}
             <h2>LAPORAN PEMBAYARAN JAMAAH</h2>
             <div class="tgl">Tanggal Cetak: ${tglCetak}</div>
-            <table><thead><tr><th style="width:36px;">No</th><th>Tanggal</th><th>Jamaah</th><th>Keterangan</th><th>Metode</th><th style="text-align:right;">Nominal</th></tr></thead><tbody>${rowsHtml}</tbody></table>
+            <table><thead><tr><th style="width:36px;">No</th><th>Tanggal</th><th>Peserta</th><th>Keterangan</th><th>Metode</th><th style="text-align:right;">Nominal</th></tr></thead><tbody>${rowsHtml}</tbody></table>
             <div class="summary"><strong>TOTAL PEMASUKAN: <span style="color:#0D5C4A;">${formatRupiah(totalMasuk)}</span></strong></div>
             ${ttdHtml}
             ${qrHtml}
@@ -8409,7 +8410,7 @@ function exportPaymentExcel() {
     if (paymentTransaksiList.length === 0) { showToast('Tidak ada data transaksi!'); return; } 
     const totalMasuk = paymentTransaksiList.reduce((s,t)=>s+t.nominal,0); 
     const wsData = paymentTransaksiList.map(t => ({ Tanggal: t.tanggal, Jamaah: t.nama_jamaah, Keterangan: t.keterangan, Metode: t.metode, Nominal: t.nominal })); 
-    wsData.push({ Tanggal: '', Jamaah: '', Keterangan: 'TOTAL', Metode: '', Nominal: totalMasuk }); 
+    wsData.push({ Tanggal: '', Peserta: '', Keterangan: 'TOTAL', Metode: '', Nominal: totalMasuk }); 
     const wb = XLSX.utils.book_new(); 
     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(wsData), "Laporan Pembayaran"); 
     XLSX.writeFile(wb, `Laporan_Pembayaran_${new Date().toLocaleDateString('id-ID').replace(/\//g,'-')}.xlsx`); 
@@ -8548,13 +8549,13 @@ function renderFolderList() {
     const container = document.getElementById('folderListContainer'); 
     if(!container) return; 
     if(folderList.length === 0) { 
-        container.innerHTML = '<div class="card-premium"><p class="text-center">Belum ada folder. Buat folder baru untuk mengelompokkan jamaah.</p></div>'; 
+        container.innerHTML = '<div class="card-premium"><p class="text-center">Belum ada folder. Buat folder baru untuk mengelompokkan peserta.</p></div>'; 
         return; 
     } 
     let html = ''; 
     folderList.forEach(folder => { 
         const jamaahInFolder = folder.jamaahIds.map(id => jamaahList.find(j => j.id == id)).filter(j => j); 
-        html += `<div class="folder-card" onclick="openFolderDetail('${folder.id}')"><div class="folder-header"><div class="folder-name">📁 ${escapeHtml(folder.nama)}</div><div class="folder-stats">👥 ${jamaahInFolder.length} jamaah</div></div><div class="folder-actions" onclick="event.stopPropagation()"><button class="btn-edit-jamaah" onclick="editFolder('${folder.id}')"><i class="fas fa-edit"></i></button><button class="btn-delete-jamaah" onclick="confirmDeleteFolder('${folder.id}')"><i class="fas fa-trash"></i></button></div><div class="folder-stats" style="margin-top:8px;">📅 ${folder.created_at || '-'}</div></div>`; 
+        html += `<div class="folder-card" onclick="openFolderDetail('${folder.id}')"><div class="folder-header"><div class="folder-name">📁 ${escapeHtml(folder.nama)}</div><div class="folder-stats">👥 ${jamaahInFolder.length} peserta</div></div><div class="folder-actions" onclick="event.stopPropagation()"><button class="btn-edit-jamaah" onclick="editFolder('${folder.id}')"><i class="fas fa-edit"></i></button><button class="btn-delete-jamaah" onclick="confirmDeleteFolder('${folder.id}')"><i class="fas fa-trash"></i></button></div><div class="folder-stats" style="margin-top:8px;">📅 ${folder.created_at || '-'}</div></div>`; 
     }); 
     container.innerHTML = html; 
 }
@@ -8581,7 +8582,7 @@ function openFolderDetail(folderId) {
     <div id="jumlahDipilihFolder" style="font-size:12px;color:#0D5C4A;margin-top:6px;font-weight:bold;"></div>
     <button class="btn btn-primary btn-small mt-2" onclick="addJamaahToFolderMulti('${folderId}')">➕ Tambahkan ke Folder</button>
     </div>
-    <div class="section-title">📋 Daftar Jamaah dalam Folder</div>
+    <div class="section-title">📋 Daftar Peserta dalam Folder</div>
     <div style="display:flex;gap:8px;margin-bottom:10px;">
         <button onclick="pilihSemuaFolderList('${folderId}')" style="flex:1;padding:8px;background:#0D5C4A;color:white;border:none;border-radius:8px;font-size:12px;cursor:pointer;">✅ Pilih Semua</button>
         <button onclick="hapusPilihanFolder('${folderId}')" style="flex:1;padding:8px;background:#EF4444;color:white;border:none;border-radius:8px;font-size:12px;cursor:pointer;">🗑️ Hapus Dipilih</button>
@@ -8601,7 +8602,7 @@ function openFolderDetail(folderId) {
     });
     html += `</div><div class="card-premium" style="padding:12px;margin-bottom:12px;"><div style="font-weight:bold;margin-bottom:8px;color:#0D5C4A;">+ Tambah Field Baru</div><input type="text" id="newFieldLabel" placeholder="Nama field (contoh: Hotel, Maskapai)" style="width:100%;padding:8px;border-radius:8px;border:1px solid #ddd;margin-bottom:8px;"><input type="text" id="newFieldValue" placeholder="Isi/nilai field" style="width:100%;padding:8px;border-radius:8px;border:1px solid #ddd;margin-bottom:8px;"><button class="btn btn-primary btn-small" onclick="addFolderField('${folderId}')">+ Tambah Field</button></div>`;
     // Section pilih field untuk PDF/Excel
-    const allDynFields = dynamicFieldsJamaah.length > 0 ? dynamicFieldsJamaah : [];
+    const allDynFields = dynamicFieldsJamaah.length > 0 ? dynamicFieldsPeserta : [];
     const selectedFields = folder.selectedFields || [];
     // Gunakan fieldOrder jika ada, atau default dari dynamicFieldsJamaah
     if (!folder.fieldOrder || folder.fieldOrder.length === 0) {
@@ -8620,7 +8621,7 @@ function openFolderDetail(folderId) {
             <button onclick="event.stopPropagation();hapusPilihanFolderField('${folderId}')" style="flex:1;padding:8px;background:#e2e8f0;color:#333;border:none;border-radius:8px;font-size:12px;cursor:pointer;">❌ Hapus Pilihan</button>
         </div>`;
     if(allDynFields.length === 0) {
-        html += `<p style="color:#999;font-size:13px;">Belum ada field dinamis jamaah.</p>`;
+        html += `<p style="color:#999;font-size:13px;">Belum ada field dinamis peserta.</p>`;
     } else {
         orderedFields.forEach((fd, idx) => {
             const checked = selectedFields.includes(fd.name) ? 'checked' : '';
@@ -8686,7 +8687,7 @@ function renderFolderJamaahSection(folderId) {
     </div>
     <div id="multiFolderJamaahSelect" style="max-height:200px;overflow-y:auto;border:1px solid #ddd;border-radius:10px;padding:8px;background:var(--card-bg);">${
         availableJamaah.length === 0
-            ? '<p style="color:#999;font-size:13px;text-align:center;padding:8px;">Semua jamaah sudah ada di folder ini.</p>'
+            ? '<p style="color:#999;font-size:13px;text-align:center;padding:8px;">Semua peserta sudah ada di folder ini.</p>'
             : availableJamaah.map(j => `
         <label style="display:flex;align-items:center;gap:10px;padding:8px 6px;border-bottom:1px solid #eee;cursor:pointer;">
             <input type="checkbox" value="${j.id}" onchange="updateJumlahDipilihFolder()" style="width:18px;height:18px;accent-color:#0D5C4A;cursor:pointer;">
@@ -8696,7 +8697,7 @@ function renderFolderJamaahSection(folderId) {
     <div id="jumlahDipilihFolder" style="font-size:12px;color:#0D5C4A;margin-top:6px;font-weight:bold;"></div>
     <button class="btn btn-primary btn-small mt-2" onclick="addJamaahToFolderMulti('${folderId}')">➕ Tambahkan ke Folder</button>
     </div>
-    <div class="section-title">📋 Daftar Jamaah dalam Folder (${jamaahInFolder.length})</div>
+    <div class="section-title">📋 Daftar Peserta dalam Folder (${jamaahInFolder.length})</div>
     <div style="display:flex;gap:6px;margin-bottom:10px;overflow-x:auto;padding-bottom:2px;">
         ${sortBtn('default','📋 Asli')}${sortBtn('az','A → Z')}${sortBtn('za','Z → A')}${sortBtn('terlama','📅 Lama')}${sortBtn('terbaru','🆕 Baru')}
     </div>
@@ -8719,15 +8720,15 @@ function pilihSemuaFolderList(folderId) {
 
 function hapusPilihanFolder(folderId) {
     const checked = document.querySelectorAll('#folderJamaahList input[type=checkbox]:checked');
-    if (checked.length === 0) return showToast('Pilih jamaah yang mau dihapus dulu!');
-    if (!confirm(`Hapus ${checked.length} jamaah dari folder ini?`)) return;
+    if (checked.length === 0) return showToast('Pilih peserta yang mau dihapus dulu!');
+    if (!confirm(`Hapus ${checked.length} peserta dari folder ini?`)) return;
     const ids = Array.from(checked).map(cb => parseInt(cb.value));
     const folder = folderList.find(f => f.id == folderId);
     if (!folder) return;
     folder.jamaahIds = folder.jamaahIds.filter(id => !ids.includes(id));
     saveFolderDataSilent();
     renderFolderJamaahSection(folderId);
-    showToast(`🗑️ ${ids.length} jamaah berhasil dihapus dari folder!`);
+    showToast(`🗑️ ${ids.length} peserta berhasil dihapus dari folder!`);
 }
 
 function filterFolderJamaahSelect() {
@@ -8755,7 +8756,7 @@ function hapusPilihanFolderJamaah() {
 function updateJumlahDipilihFolder() {
     const checked = document.querySelectorAll('#multiFolderJamaahSelect input[type=checkbox]:checked');
     const el = document.getElementById('jumlahDipilihFolder');
-    if (el) el.textContent = checked.length > 0 ? `${checked.length} jamaah dipilih` : '';
+    if (el) el.textContent = checked.length > 0 ? `${checked.length} peserta dipilih` : '';
 }
 
 function addJamaahToFolderMulti(folderId) {
@@ -8773,11 +8774,11 @@ function addJamaahToFolderMulti(folderId) {
     if (berhasil > 0) {
         saveFolderDataSilent();
         renderFolderJamaahSection(folderId);
-        let msg = `✅ ${berhasil} jamaah ditambahkan ke folder!`;
+        let msg = `✅ ${berhasil} peserta ditambahkan ke folder!`;
         if (duplikat > 0) msg += ` (${duplikat} sudah ada, dilewati)`;
         showToast(msg);
     } else {
-        showToast(`⚠️ Semua jamaah sudah ada di folder ini.`);
+        showToast(`⚠️ Semua peserta sudah ada di folder ini.`);
     }
 }
 
@@ -8785,26 +8786,26 @@ function addJamaahToFolder(folderId) {
     const select = document.getElementById('addJamaahToFolderSelect'); 
     if (!select) return;
     const jamaahId = parseInt(select.value); 
-    if(!jamaahId) return showToast('Pilih jamaah!'); 
+    if(!jamaahId) return showToast('Pilih peserta!'); 
     const folder = folderList.find(f => f.id == folderId); 
     if(folder && !folder.jamaahIds.includes(jamaahId)) { 
         folder.jamaahIds.push(jamaahId); 
         saveFolderDataSilent();
         renderFolderJamaahSection(folderId);
-        showToast('Jamaah ditambahkan ke folder'); 
+        showToast('Peserta ditambahkan ke folder'); 
     } else { 
-        showToast('Jamaah sudah ada di folder ini'); 
+        showToast('Peserta sudah ada di folder ini'); 
     } 
 }
 
 function removeJamaahFromFolder(folderId, jamaahId) { 
-    if(confirm('Hapus jamaah dari folder ini?')) { 
+    if(confirm('Hapus peserta dari folder ini?')) { 
         const folder = folderList.find(f => f.id == folderId); 
         if(folder) { 
             folder.jamaahIds = folder.jamaahIds.filter(id => id != jamaahId); 
             saveFolderDataSilent();
             renderFolderJamaahSection(folderId);
-            showToast('Jamaah dihapus dari folder'); 
+            showToast('Peserta dihapus dari folder'); 
         } 
     } 
 }
@@ -8821,7 +8822,7 @@ function editFolder(folderId) {
 }
 
 function confirmDeleteFolder(folderId) { 
-    if(confirm('Hapus folder ini? Data jamaah di dalam folder tidak akan hilang.')) { 
+    if(confirm('Hapus folder ini? Data peserta di dalam folder tidak akan hilang.')) { 
         folderList = folderList.filter(f => f.id != folderId); 
         saveFolderData(); 
         showToast('Folder dihapus'); 
@@ -8923,7 +8924,7 @@ function renderFolderFieldSelector(folderId) {
     if (!container) return;
     const folder = folderList.find(f => f.id == folderId);
     if (!folder) return;
-    const allDynFields = dynamicFieldsJamaah.length > 0 ? dynamicFieldsJamaah : [];
+    const allDynFields = dynamicFieldsJamaah.length > 0 ? dynamicFieldsPeserta : [];
     const selectedFields = folder.selectedFields || [];
     if (!folder.fieldOrder || folder.fieldOrder.length === 0) {
         folder.fieldOrder = allDynFields.map(f => f.name);
@@ -8939,7 +8940,7 @@ function renderFolderFieldSelector(folderId) {
             <button onclick="event.stopPropagation();hapusPilihanFolderField('${folderId}')" style="flex:1;padding:8px;background:#e2e8f0;color:#333;border:none;border-radius:8px;font-size:12px;cursor:pointer;">❌ Hapus Pilihan</button>
         </div>`;
     if (allDynFields.length === 0) {
-        html += `<p style="color:#999;font-size:13px;">Belum ada field dinamis jamaah.</p>`;
+        html += `<p style="color:#999;font-size:13px;">Belum ada field dinamis peserta.</p>`;
     } else {
         orderedFields.forEach((fd, idx) => {
             const checked = selectedFields.includes(fd.name) ? 'checked' : '';
@@ -8969,12 +8970,12 @@ async function exportFolderToPDF(folderId) {
     if(!folder) return;
     const allJamaah = jamaahList;
     const jamaahInFolder = getSortedFolderJamaah(folder.jamaahIds.map(id => allJamaah.find(j => j.id == id)).filter(j => j));
-    if(jamaahInFolder.length === 0) { showToast('Tidak ada jamaah dalam folder ini'); return; }
+    if(jamaahInFolder.length === 0) { showToast('Tidak ada peserta dalam folder ini'); return; }
     const cfgFolder = getKonfigurasiProData();
     const namaInstansi = cfgFolder.instansi1.nama || 'EduKu';
     const watermarkHtmlFolder = buildPrintWatermark(cfgFolder);
     const tanggal = new Date().toLocaleDateString('id-ID', {day:'2-digit', month:'long', year:'numeric'});
-    const allDynFields = dynamicFieldsJamaah.length > 0 ? dynamicFieldsJamaah : [];
+    const allDynFields = dynamicFieldsJamaah.length > 0 ? dynamicFieldsPeserta : [];
     const selectedFields = folder.selectedFields || [];
     // Gunakan fieldOrder untuk urutan kolom, filter yang diceklis saja
     const orderedNames = folder.fieldOrder || allDynFields.map(f => f.name);
@@ -9039,7 +9040,7 @@ function exportFolderToExcel(folderId) {
     if(!folder) return; 
     const allJamaah = jamaahList;
     const jamaahInFolder = getSortedFolderJamaah(folder.jamaahIds.map(id => allJamaah.find(j => j.id == id)).filter(j => j));
-    if(jamaahInFolder.length === 0) { showToast('Tidak ada jamaah dalam folder ini'); return; } 
+    if(jamaahInFolder.length === 0) { showToast('Tidak ada peserta dalam folder ini'); return; } 
     const fields = folder.fields || [];
     // Baris info folder dulu
     const wsData = [];
@@ -9050,7 +9051,7 @@ function exportFolderToExcel(folderId) {
         wsData.push({ 'Folder': '', '': '' });
     }
     // Pakai selectedFields dari folder, dengan urutan dari fieldOrder
-    const allDynFieldsXLS = dynamicFieldsJamaah.length > 0 ? dynamicFieldsJamaah : [];
+    const allDynFieldsXLS = dynamicFieldsJamaah.length > 0 ? dynamicFieldsPeserta : [];
     const selectedFieldsXLS = folder.selectedFields || [];
     const orderedNamesXLS = folder.fieldOrder || allDynFieldsXLS.map(f => f.name);
     const chosenFieldsXLS = orderedNamesXLS.map(name => allDynFieldsXLS.find(f => f.name === name)).filter(fd => fd && selectedFieldsXLS.includes(fd.name));
@@ -9285,8 +9286,8 @@ function renderDokumenList() {
         container.innerHTML = `
             <div class="card-premium" style="margin:0; padding: 40px; text-align: center;">
                 <div style="font-size: 48px; margin-bottom: 16px;">📋</div>
-                <h3 style="color: var(--primary); margin-bottom: 12px;">Belum Ada Data Jamaah</h3>
-                <p style="color: var(--gray); margin-bottom: 20px;">Silakan tambah jamaah terlebih dahulu di menu Jamaah</p>
+                <h3 style="color: var(--primary); margin-bottom: 12px;">Belum Ada Data Peserta</h3>
+                <p style="color: var(--gray); margin-bottom: 20px;">Silakan tambah peserta terlebih dahulu di menu Data Peserta</p>
                 <button onclick="showPage('jamaah')" style="padding: 12px 24px; background: var(--primary); color: white; border: none; border-radius: 24px; font-weight: 600; cursor: pointer;">
                     ➕ Tambah Peserta
                 </button>
@@ -9307,7 +9308,7 @@ function renderDokumenList() {
     }); 
     
     if(filtered.length === 0) { 
-        container.innerHTML = '<div class="card-premium" style="margin:0;"><p class="text-center">Tidak ada jamaah</p></div>'; 
+        container.innerHTML = '<div class="card-premium" style="margin:0;"><p class="text-center">Tidak ada peserta</p></div>'; 
         return; 
     } 
     
@@ -9421,7 +9422,7 @@ function previewDokumen(jamaahId, jenisId) {
 function closePreviewDokumenModal() { document.getElementById('previewDokumenModal').classList.remove('show'); }
 
 async function confirmDeleteDokumen(jamaahId, jenisId, jenisNama) { 
-    if(confirm(`Hapus dokumen ${jenisNama} untuk jamaah ini?`)) { 
+    if(confirm(`Hapus dokumen ${jenisNama} untuk peserta ini?`)) { 
         if (dokumenData[jamaahId] && dokumenData[jamaahId][jenisId]) delete dokumenData[jamaahId][jenisId]; 
         await saveDokumenToIndexedDB(jamaahId, null, null); 
         renderDokumenList(); 
@@ -9432,15 +9433,15 @@ async function confirmDeleteDokumen(jamaahId, jenisId, jenisNama) {
 
 function remindAllKurangDokumen() { 
     const kurang = jamaahList.filter(j => !getStatusKelengkapanDokumen(j.id).lengkap); 
-    if(kurang.length === 0) { showToast('✅ Semua jamaah sudah lengkap dokumennya!'); return; } 
-    let text = `📋 *PENGINGAT DOKUMEN*\n\nBerikut jamaah yang dokumennya belum lengkap:\n\n`; 
+    if(kurang.length === 0) { showToast('✅ Semua peserta sudah lengkap dokumennya!'); return; } 
+    let text = `📋 *PENGINGAT DOKUMEN*\n\nBerikut peserta yang dokumennya belum lengkap:\n\n`; 
     kurang.forEach((j, i) => { 
         const status = getStatusKelengkapanDokumen(j.id); 
         text += `${i+1}. ${j.nama_lengkap} (${status.ada}/${status.total} dokumen)\n`; 
     }); 
     text += `\n📌 Mohon segera melengkapi dokumen.\n#${getKonfigurasiProData().instansi1.nama || 'EduKu'}`; 
     navigator.clipboard.writeText(text); 
-    showToast(`📋 Teks reminder untuk ${kurang.length} jamaah tersalin! Bisa paste ke WA`); 
+    showToast(`📋 Teks reminder untuk ${kurang.length} peserta tersalin! Bisa paste ke WA`); 
 }
 
 function openDokumenFieldModal() { 
@@ -9532,7 +9533,7 @@ async function confirmDeleteDokumenField(idx) {
 }
 
 async function downloadAllDokumenZip() { 
-    if(jamaahList.length === 0) { showToast('Tidak ada data jamaah!'); return; } 
+    if(jamaahList.length === 0) { showToast('Tidak ada data peserta!'); return; } 
     showToast('Membuat ZIP...'); 
     const zip = new JSZip(); 
     let totalFiles = 0; 
@@ -9591,7 +9592,7 @@ async function uploadDokumen(jamaahId, jenisId, jenisNama) {
     if (!jamaah) return; 
     const modal = document.createElement('div'); 
     modal.style.cssText = `position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 100000; display: flex; align-items: center; justify-content: center; padding: 20px;`; 
-    modal.innerHTML = `<div style="background: var(--white); border-radius: 28px; max-width: 400px; width: 100%; max-height: 90vh; overflow: auto; padding: 24px;"><h3 style="color: var(--primary); margin-bottom: 16px;">📤 Upload ${jenisNama}</h3><p style="font-size: 13px; color: var(--gray); margin-bottom: 16px;">Jamaah: <strong>${escapeHtml(jamaah.nama_lengkap)}</strong></p><div id="previewArea" style="background: var(--gray-light); border-radius: 16px; padding: 20px; text-align: center; margin-bottom: 16px; min-height: 200px; display: flex; align-items: center; justify-content: center;"><div style="color: var(--gray);"><i class="fas fa-image" style="font-size: 48px; margin-bottom: 12px; display: block;"></i><span>Belum ada gambar dipilih</span></div></div><div id="fileInfo" style="font-size: 12px; color: var(--gray); margin-bottom: 16px; text-align: center;"></div><input type="file" id="previewFileInput" accept="image/*" style="display: none;"><button id="pilihFileBtn" style="width: 100%; padding: 12px; background: var(--gray-light); border: none; border-radius: 40px; font-weight: 600; margin-bottom: 12px; cursor: pointer; color: var(--primary);">📁 Pilih Gambar</button><div style="display: flex; gap: 12px;"><button id="batalBtn" style="flex: 1; padding: 12px; background: var(--gray-light); border: none; border-radius: 40px; font-weight: 600; cursor: pointer; color: var(--red);">BATAL</button><button id="uploadBtn" style="flex: 1; padding: 12px; background: var(--primary); border: none; border-radius: 40px; font-weight: 600; cursor: pointer; color: white;" disabled>UPLOAD</button></div></div>`; 
+    modal.innerHTML = `<div style="background: var(--white); border-radius: 28px; max-width: 400px; width: 100%; max-height: 90vh; overflow: auto; padding: 24px;"><h3 style="color: var(--primary); margin-bottom: 16px;">📤 Upload ${jenisNama}</h3><p style="font-size: 13px; color: var(--gray); margin-bottom: 16px;">Peserta: <strong>${escapeHtml(jamaah.nama_lengkap)}</strong></p><div id="previewArea" style="background: var(--gray-light); border-radius: 16px; padding: 20px; text-align: center; margin-bottom: 16px; min-height: 200px; display: flex; align-items: center; justify-content: center;"><div style="color: var(--gray);"><i class="fas fa-image" style="font-size: 48px; margin-bottom: 12px; display: block;"></i><span>Belum ada gambar dipilih</span></div></div><div id="fileInfo" style="font-size: 12px; color: var(--gray); margin-bottom: 16px; text-align: center;"></div><input type="file" id="previewFileInput" accept="image/*" style="display: none;"><button id="pilihFileBtn" style="width: 100%; padding: 12px; background: var(--gray-light); border: none; border-radius: 40px; font-weight: 600; margin-bottom: 12px; cursor: pointer; color: var(--primary);">📁 Pilih Gambar</button><div style="display: flex; gap: 12px;"><button id="batalBtn" style="flex: 1; padding: 12px; background: var(--gray-light); border: none; border-radius: 40px; font-weight: 600; cursor: pointer; color: var(--red);">BATAL</button><button id="uploadBtn" style="flex: 1; padding: 12px; background: var(--primary); border: none; border-radius: 40px; font-weight: 600; cursor: pointer; color: white;" disabled>UPLOAD</button></div></div>`; 
     document.body.appendChild(modal); 
     let selectedFile = null, originalSizeKB = 0; 
     function showPreview(file) { 
@@ -9979,7 +9980,7 @@ function hapusPilihanLabel() {
 function updateJumlahDipilihLabel() {
     const n = document.querySelectorAll('#multiLabelJamaahSelect input:checked').length;
     const el = document.getElementById('jumlahDipilihLabel');
-    if(el) el.textContent = n > 0 ? `${n} jamaah dipilih` : '';
+    if(el) el.textContent = n > 0 ? `${n} peserta dipilih` : '';
 }
 
 // ==================== E-TIKET ====================
@@ -10037,7 +10038,7 @@ function hapusPilihanPengingat() {
 function updateJumlahDipilihPengingat() {
     const n = document.querySelectorAll('#multiPengingatJamaahSelect input:checked').length;
     const el = document.getElementById('jumlahDipilihPengingat');
-    if(el) el.textContent = n > 0 ? `${n} jamaah dipilih` : '';
+    if(el) el.textContent = n > 0 ? `${n} peserta dipilih` : '';
 }
 
 function filterTiketJamaah() {
@@ -10062,7 +10063,7 @@ function hapusPilihanTiket() {
 function updateJumlahDipilihTiket() {
     const n = document.querySelectorAll('#multiTiketJamaahSelect input:checked').length;
     const el = document.getElementById('jumlahDipilihTiket');
-    if(el) el.textContent = n > 0 ? `${n} jamaah dipilih` : '';
+    if(el) el.textContent = n > 0 ? `${n} peserta dipilih` : '';
 }
 
 async function cetakTiketMulti() {
@@ -10123,7 +10124,7 @@ async function cetakTiketMulti() {
 async function shareTiketWAMulti() {
     const checked = document.querySelectorAll('#multiTiketJamaahSelect input:checked');
     if(checked.length === 0) return showToast('Pilih minimal 1 peserta!');
-    showToast(`Mengirim tiket untuk ${checked.length} jamaah...`);
+    showToast(`Mengirim tiket untuk ${checked.length} peserta...`);
     for(const cb of checked) {
         const jamaah = jamaahList.find(j => j.id == cb.value);
         if(!jamaah) continue;
@@ -10243,7 +10244,7 @@ function openCustomizeNameTagModal() {
                         ${isNew ? '<span style="font-size:10px;background:#f59e0b;color:white;padding:2px 6px;border-radius:10px;white-space:nowrap;">BARU</span>' : ''}
                     </div>
                     <div style="font-size:11px;color:#888;">
-                        Sumber: ${field.source === 'jamaah' ? 'Data Jamaah' : 'Data Jamaah Kita'} 
+                        Sumber: ${field.source === 'jamaah' ? 'Data Peserta' : 'Data Pendaftaran Baru'} 
                         (${field.fieldNames.join(', ')})
                     </div>
                 </div>
@@ -10342,7 +10343,7 @@ function getFieldValue(jamaah, jamaahKita, field) {
 
 function cetakLabel() { 
     const checked = document.querySelectorAll('#multiLabelJamaahSelect input:checked');
-    if(checked.length === 0) return showToast('Pilih jamaah terlebih dahulu!'); 
+    if(checked.length === 0) return showToast('Pilih peserta terlebih dahulu!'); 
     const eventName = document.getElementById('labelEvent').value.trim() || 'Acara'; 
     const template = document.getElementById('labelTemplate').value;
     const customFields = getNameTagFields();
@@ -10487,7 +10488,7 @@ function kirimPengingatWA() {
     const message = document.getElementById('reminderMessage').value; 
     if(!message) return showToast('Isi pesan pengingat!'); 
     const checked = document.querySelectorAll('#multiPengingatJamaahSelect input:checked');
-    if(checked.length === 0) return showToast('Pilih jamaah terlebih dahulu!');
+    if(checked.length === 0) return showToast('Pilih peserta terlebih dahulu!');
     const jamaahToSend = Array.from(checked).map(cb => jamaahList.find(j => j.id == cb.value)).filter(j => j);
     if(jamaahToSend.length === 0) return showToast('Peserta tidak ditemukan!'); 
     for(const j of jamaahToSend) { 
@@ -10502,7 +10503,7 @@ function kirimPengingatWA() {
         } 
         window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(msg)}`, '_blank'); 
     } 
-    showToast(`📱 Membuka chat untuk ${jamaahToSend.length} jamaah`); 
+    showToast(`📱 Membuka chat untuk ${jamaahToSend.length} peserta`); 
 }
 
 function aturPengingatOtomatis() { 
@@ -10514,7 +10515,7 @@ function aturPengingatOtomatis() {
     let jamaahIds = []; 
     if(selectedOptions.some(opt => opt.value === 'all')) jamaahIds = ['all']; 
     else jamaahIds = selectedOptions.map(opt => parseInt(opt.value)); 
-    if(jamaahIds.length === 0) return showToast('Pilih jamaah!'); 
+    if(jamaahIds.length === 0) return showToast('Pilih peserta!'); 
     scheduledReminders.push({ id: Date.now(), schedule: new Date(schedule).getTime(), message, jamaahIds, created_at: new Date().toLocaleDateString('id-ID') }); 
     saveScheduledReminders(); 
     showToast('⏰ Pengingat otomatis diatur'); 
@@ -10526,7 +10527,7 @@ function renderScheduledReminders() {
     if(scheduledReminders.length === 0) { container.innerHTML = '<h4>📅 Pengingat Terjadwal</h4><p class="text-center">Belum ada pengingat terjadwal</p>'; return; } 
     let html = '<h4>📅 Pengingat Terjadwal</h4>'; 
     scheduledReminders.forEach(r => { 
-        html += `<div class="reminder-card"><div class="reminder-jamaah">⏰ ${new Date(r.schedule).toLocaleString('id-ID')}</div><div class="reminder-jamaah">👥 ${r.jamaahIds.length === 1 && r.jamaahIds[0] === 'all' ? 'Semua Jamaah' : r.jamaahIds.length + ' jamaah'}</div><div style="font-size:12px;">${r.message.substring(0, 50)}${r.message.length > 50 ? '...' : ''}</div><div><button class="btn-danger-small" onclick="hapusPengingat(${r.id})">Hapus</button></div></div>`; 
+        html += `<div class="reminder-card"><div class="reminder-peserta">⏰ ${new Date(r.schedule).toLocaleString('id-ID')}</div><div class="reminder-jamaah">👥 ${r.jamaahIds.length === 1 && r.jamaahIds[0] === 'all' ? 'Semua Jamaah' : r.jamaahIds.length + ' jamaah'}</div><div style="font-size:12px;">${r.message.substring(0, 50)}${r.message.length > 50 ? '...' : ''}</div><div><button class="btn-danger-small" onclick="hapusPengingat(${r.id})">Hapus</button></div></div>`; 
     }); 
     container.innerHTML = html; 
 }
@@ -10541,7 +10542,7 @@ function hapusPengingat(id) {
 
 // ==================== RESET ALL DATA ====================
 async function confirmResetAllData() { 
-    if(!confirm('⚠️ RESET SEMUA DATA?\n\nSEMUA data akan dihapus permanen:\n- Jamaah & dokumen\n- Kas & pembayaran\n- On Proses & Folder\n- Konfigurasi instansi\n- Absensi\n- Foto profil\n\nAplikasi kembali seperti pertama kali diinstall!\n\nCatatan: Lisensi & Device ID TETAP tersimpan.\n\nLanjutkan?')) return;
+    if(!confirm('⚠️ RESET SEMUA DATA?\n\nSEMUA data akan dihapus permanen:\n- Data Peserta & dokumen\n- Kas & pembayaran\n- On Proses & Folder\n- Konfigurasi instansi\n- Absensi\n- Foto profil\n\nAplikasi kembali seperti pertama kali diinstall!\n\nCatatan: Lisensi & Device ID TETAP tersimpan.\n\nLanjutkan?')) return;
     if(!confirm('Yakin? Tindakan ini TIDAK BISA dibatalkan!')) return;
 
     // Selamatkan lisensi & device ID sebelum reset
@@ -10825,7 +10826,7 @@ function getKonfigurasiProData() {
 function populateTiketDropdown() {
     const select = document.getElementById('tiketJamaahSelect');
     if(!select) return;
-    select.innerHTML = '<option value="">-- Pilih Jamaah --</option>';
+    select.innerHTML = '<option value="">-- Pilih Peserta --</option>';
     jamaahList.forEach(j => { select.innerHTML += `<option value="${j.id}">${escapeHtml(j.nama_lengkap)}</option>`; });
 }
 
@@ -10926,7 +10927,7 @@ function shareTiketWA() {
 function cetakTiketLangsung() {
     const tiketCard = document.querySelector('.tiket-card');
     if (!tiketCard || tiketCard.style.display === 'none') {
-        showToast('Pilih jamaah dulu untuk mencetak tiket');
+        showToast('Pilih peserta dulu untuk mencetak tiket');
         return;
     }
     // Clone dan konversi canvas QR ke image dulu
@@ -11232,11 +11233,11 @@ function confirmDeleteAllMasterData() {
 
 function showPindahModeModal() {
     const checked = document.querySelectorAll('.master-checkbox:checked');
-    if(checked.length === 0) return showToast('Pilih jamaah dulu!');
+    if(checked.length === 0) return showToast('Pilih peserta dulu!');
     const modeOptions = activeModes.filter(m => m !== 'Semua')
         .map(m => `<option value="${m}">${m}</option>`).join('');
     document.getElementById('pindahModeSelect').innerHTML = '<option value="">-- Pilih Mode --</option>' + modeOptions;
-    document.getElementById('pindahModeInfo').textContent = `${checked.length} jamaah akan dipindahkan ke mode:`;
+    document.getElementById('pindahModeInfo').textContent = `${checked.length} peserta akan dipindahkan ke mode:`;
     document.getElementById('pindahModeModal').style.display = 'flex';
 }
 
@@ -11265,7 +11266,7 @@ function executePindahMode() {
     }
     document.getElementById('pindahModeModal').style.display = 'none';
     clearBatchSelection();
-    let msg = `✅ ${dipindah} jamaah dipindah ke ${modeTujuan}`;
+    let msg = `✅ ${dipindah} peserta dipindah ke ${modeTujuan}`;
     if(dilewati > 0) msg += `, ${dilewati} dilewati (sudah ada di ${modeTujuan})`;
     showToast(msg);
 }
@@ -11545,8 +11546,8 @@ function executeCopyFromJamaah() {
     renderMasterForm();
     closeCopyModal();
     if(ditambah > 0 && dilewati > 0) showToast(`✅ ${ditambah} ditambahkan, ${dilewati} sudah ada (dilewati)`);
-    else if(ditambah > 0) showToast(`✅ ${ditambah} jamaah berhasil disalin!`);
-    else showToast(`ℹ️ Semua jamaah sudah ada (${dilewati} dilewati)`);
+    else if(ditambah > 0) showToast(`✅ ${ditambah} peserta berhasil disalin!`);
+    else showToast(`ℹ️ Semua peserta sudah ada (${dilewati} dilewati)`);
 }
 
 function loadModesFromStorage() {
@@ -12242,7 +12243,7 @@ async function generatePaymentPDFBlob(outputType) {
     doc.setFontSize(16); doc.setTextColor(26,93,74);
     doc.text('LAPORAN PEMBAYARAN JAMAAH', 148.5, 65, { align: 'center' });
     const tableData = paymentTransaksiList.map((t,i)=>[i+1, t.tanggal, t.nama_jamaah, t.keterangan, t.metode, formatRupiah(t.nominal)]);
-    doc.autoTable({startY:80, head:[['No','Tanggal','Jamaah','Keterangan','Metode','Nominal']], body:tableData, theme:'striped', headStyles:{fillColor:[26,93,74]}, styles:{fontSize:8, lineWidth:0.1}});
+    doc.autoTable({startY:80, head:[['No','Tanggal','Peserta','Keterangan','Metode','Nominal']], body:tableData, theme:'striped', headStyles:{fillColor:[26,93,74]}, styles:{fontSize:8, lineWidth:0.1}});
     let finalY = doc.lastAutoTable.finalY + 10;
     doc.text('TOTAL PEMASUKAN: '+formatRupiah(totalMasuk), 14, finalY);
     if (outputType === 'datauri') return doc.output('datauristring');
@@ -12342,7 +12343,7 @@ async function downloadPembayaranPDF() {
         doc.setFontSize(16); doc.setTextColor(26,93,74);
         doc.text('LAPORAN PEMBAYARAN JAMAAH', 148.5, 65, { align: 'center' });
         const tableData = paymentTransaksiList.map((t,i)=>[i+1, t.tanggal, t.nama_jamaah, t.keterangan, t.metode, formatRupiah(t.nominal)]);
-        doc.autoTable({startY:80, head:[['No','Tanggal','Jamaah','Keterangan','Metode','Nominal']], body:tableData, theme:'striped', headStyles:{fillColor:[26,93,74]}, styles:{fontSize:8, lineWidth:0.1}});
+        doc.autoTable({startY:80, head:[['No','Tanggal','Peserta','Keterangan','Metode','Nominal']], body:tableData, theme:'striped', headStyles:{fillColor:[26,93,74]}, styles:{fontSize:8, lineWidth:0.1}});
         let finalY = doc.lastAutoTable.finalY + 10;
         doc.text('TOTAL PEMASUKAN: '+formatRupiah(totalMasuk), 14, finalY);
         doc.save(`Laporan_Pembayaran_${new Date().toLocaleDateString('id-ID').replace(/\//g,'-')}.pdf`);
@@ -12413,7 +12414,7 @@ async function sharePembayaranPDF() {
         
         doc.autoTable({
             startY: y,
-            head: [['No', 'Tanggal', 'Jamaah', 'Keterangan', 'Metode', 'Nominal']],
+            head: [['No', 'Tanggal', 'Peserta', 'Keterangan', 'Metode', 'Nominal']],
             body: tableData,
             theme: 'striped',
             headStyles: {
@@ -13049,6 +13050,17 @@ async function printPDFDirect(pdfDoc, filename = 'document.pdf') {
           <div style="font-size:12px;color:#64748b;margin-top:2px;">Catat pelanggaran santri & poin</div>
         </div>
         <button onclick="bukaInputPelanggaran()" style="background:#ef4444;color:white;border:none;border-radius:10px;padding:10px 16px;font-weight:700;cursor:pointer;font-size:13px;">+ Catat</button>
+      </div>
+    </div>
+
+    <!-- Scan QR Kegiatan -->
+    <div style="background:white;border-radius:14px;padding:16px;margin-top:14px;box-shadow:0 2px 8px rgba(0,0,0,0.06);border-left:4px solid #3b82f6;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <div style="font-weight:700;font-size:15px;color:#3b82f6;">&#128247; Scan QR Kegiatan</div>
+          <div style="font-size:12px;color:#64748b;margin-top:2px;">Absensi acara/kegiatan non-harian</div>
+        </div>
+        <button onclick="showPage('scanqr')" style="background:#3b82f6;color:white;border:none;border-radius:10px;padding:10px 16px;font-weight:700;cursor:pointer;font-size:13px;">Buka</button>
       </div>
     </div>
 
@@ -15437,7 +15449,7 @@ function applySessionGuard() {
         var pageId = activePage ? (activePage.id || '').replace('page-', '') : '';
 
         // Semua halaman KECUALI guru diblok
-        var guruAllowed = ['guru', 'wali']; // hanya halaman guru
+        var guruAllowed = ['guru', 'wali', 'scanqr']; // halaman guru + scan QR untuk kegiatan
         var isAllowed = false;
         for (var j = 0; j < guruAllowed.length; j++) {
             if (pageId === guruAllowed[j]) { isAllowed = true; break; }
@@ -16996,6 +17008,7 @@ function kalcPilihSantri() {
         kalcKomponen = JSON.parse(JSON.stringify(savedTemplates[String(santriId)]));
         kalcNextId = kalcKomponen.reduce(function(mx,k){return Math.max(mx,k.id||0);},0) + 1;
     }
+
     renderKomponenKalc();
     hitungKalkulator();
     renderTagihanSummary(santriId);
