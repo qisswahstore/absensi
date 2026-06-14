@@ -15490,7 +15490,7 @@ function applySessionGuard() {
         if (session.role === 'guru') {
             var blocked = ['kas','konfigurasi','lisensi','datamaster',
                           'setting','estimasi','catatan','jamaah',
-                          'jamaahkita','pembayaran','scanqr','surat'];
+                          'jamaahkita','pembayaran','surat'];
             for (var i = 0; i < blocked.length; i++) {
                 if (pageId === blocked[i]) {
                     showToast('Akses terbatas - Mode Guru');
