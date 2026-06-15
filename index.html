@@ -6232,16 +6232,15 @@ function shareAllJamaahToWA(){
 }
 
 function downloadTemplateExcel() {
-    // Header = Nama Lengkap + semua field dinamis
-    const headers = ['Nama Lengkap'];
-    const fieldKeys = ['nama_lengkap'];
+    // Header = Nama Lengkap + Kelas + semua field dinamis
+    const headers = ['Nama Lengkap', 'Kelas'];
     dynamicFieldsJamaah.forEach(f => {
         headers.push(f.label);
-        fieldKeys.push(f.name);
     });
 
     // Baris contoh agar user tahu format isian
-    const contohRow = ['MOHAMMAD SUPRIYADI'];
+    const contohKelas = (typeof kelasList !== 'undefined' && kelasList.length > 0) ? kelasList[0].nama : '7A';
+    const contohRow = ['MOHAMMAD SUPRIYADI', contohKelas];
     dynamicFieldsJamaah.forEach(f => {
         if (f.name === 'tgl_lahir') contohRow.push('1980-10-08');
         else if (f.name === 'jenis_kelamin') contohRow.push('L / P');
@@ -6264,17 +6263,34 @@ function downloadTemplateExcel() {
 
     XLSX.utils.book_append_sheet(wb, ws, 'Data Peserta');
 
+    // Sheet daftar kelas yang sudah ada (referensi)
+    var daftarKelas = [['DAFTAR KELAS YANG SUDAH DIBUAT'], ['']];
+    if (typeof kelasList !== 'undefined' && kelasList.length > 0) {
+        daftarKelas.push(['Nama Kelas (salin persis ke kolom "Kelas")']);
+        kelasList.forEach(function(k){ daftarKelas.push([k.nama]); });
+    } else {
+        daftarKelas.push(['⚠️ Belum ada kelas dibuat!']);
+        daftarKelas.push(['Buat kelas dulu di menu "Kelas" sebelum import,']);
+        daftarKelas.push(['agar santri bisa otomatis masuk ke kelasnya.']);
+    }
+    const wsKelas = XLSX.utils.aoa_to_sheet(daftarKelas);
+    wsKelas['!cols'] = [{wch: 40}];
+    XLSX.utils.book_append_sheet(wb, wsKelas, 'Daftar Kelas');
+
     // Sheet petunjuk
     const petunjuk = [
-        ['PETUNJUK PENGISIAN TEMPLATE IMPORT JAMAAH'],
+        ['PETUNJUK PENGISIAN TEMPLATE IMPORT PESERTA'],
         [''],
         ['1. Isi data peserta mulai dari baris ke-3 (baris 2 adalah contoh, boleh dihapus)'],
         ['2. Kolom "Nama Lengkap" wajib diisi'],
-        ['3. Format Tanggal Lahir: YYYY-MM-DD (contoh: 1980-10-08)'],
-        ['4. Jenis Kelamin: isi L atau P'],
-        ['5. WhatsApp: awali dengan 08 atau 628'],
-        ['6. Jangan ubah nama kolom di baris pertama'],
-        ['7. Simpan dalam format .xlsx sebelum diupload'],
+        ['3. Kolom "Kelas" diisi sesuai nama kelas yang SUDAH DIBUAT'],
+        ['   di menu Kelas (lihat sheet "Daftar Kelas"). Tulis persis sama.'],
+        ['   Kalau dikosongkan, santri akan masuk tanpa kelas (assign manual nanti).'],
+        ['4. Format Tanggal Lahir: YYYY-MM-DD (contoh: 1980-10-08)'],
+        ['5. Jenis Kelamin: isi L atau P'],
+        ['6. WhatsApp: awali dengan 08 atau 628'],
+        ['7. Jangan ubah nama kolom di baris pertama'],
+        ['8. Simpan dalam format .xlsx sebelum diupload'],
         [''],
         ['Kolom yang tersedia:'],
         ...headers.map((h, i) => [i + 1 + '. ' + h])
@@ -6497,6 +6513,7 @@ function importJamaahFromExcel(input){
                 input.value=''; 
                 return; 
             }
+            const kelasIndex=headers.findIndex(h=>h&&h.toLowerCase()==='kelas');
             // Fungsi konversi angka serial Excel ke tanggal YYYY-MM-DD
             function excelSerialToDate(val) {
                 if (!val) return val;
@@ -6517,6 +6534,9 @@ function importJamaahFromExcel(input){
                 return str;
             }
             let added=0; 
+            let assignedKelas=0;
+            let kelasTidakDitemukan={};
+            const mapping = (typeof getKelasMapping==='function') ? getKelasMapping() : {};
             const now=new Date().toLocaleDateString('id-ID')+' '+new Date().toLocaleTimeString('id-ID'); 
             for(let i=1;i<rows.length;i++){ 
                 const row=rows[i]; 
@@ -6539,12 +6559,41 @@ function importJamaahFromExcel(input){
                         additional[field.name]=val; 
                     } 
                 } 
-                jamaahList.push({id:Date.now()+i, nama_lengkap:nama, additional_fields:additional, created_at:now}); 
+                const newId = Date.now()+i;
+                jamaahList.push({id:newId, nama_lengkap:nama, additional_fields:additional, created_at:now}); 
                 added++; 
+
+                // Auto-assign ke kelas berdasarkan kolom "Kelas"
+                if (kelasIndex !== -1) {
+                    const namaKelas = row[kelasIndex] ? row[kelasIndex].toString().trim() : '';
+                    if (namaKelas) {
+                        const kelasObj = (typeof kelasList!=='undefined') ? kelasList.find(function(k){
+                            return k.nama.toLowerCase() === namaKelas.toLowerCase();
+                        }) : null;
+                        if (kelasObj) {
+                            const kId = String(kelasObj.id);
+                            if (!mapping[kId]) mapping[kId] = [];
+                            mapping[kId].push(String(newId));
+                            assignedKelas++;
+                        } else {
+                            kelasTidakDitemukan[namaKelas] = (kelasTidakDitemukan[namaKelas]||0) + 1;
+                        }
+                    }
+                }
             } 
             saveJamaahData(); 
+            if (kelasIndex !== -1 && typeof saveKelasMapping==='function') saveKelasMapping(mapping);
             renderJamaahList();
-            showToast(`✅ Import selesai! ${added} peserta ditambahkan`); 
+            let msg = `✅ Import selesai! ${added} peserta ditambahkan`;
+            if (assignedKelas > 0) msg += `, ${assignedKelas} masuk kelas otomatis`;
+            showToast(msg);
+            const notFoundNames = Object.keys(kelasTidakDitemukan);
+            if (notFoundNames.length > 0) {
+                let detail = notFoundNames.map(function(n){ return '- "' + n + '" (' + kelasTidakDitemukan[n] + ' santri)'; }).join('\n');
+                setTimeout(function(){
+                    alert('⚠️ Beberapa nama kelas di Excel tidak ditemukan, santri tetap ditambahkan tanpa kelas:\n\n' + detail + '\n\nSilakan buat kelas tersebut di menu Kelas, lalu assign manual.');
+                }, 500);
+            }
             input.value=''; 
         }; 
         reader.readAsArrayBuffer(file); 
