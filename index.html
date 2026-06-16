@@ -2129,11 +2129,11 @@
                 <label style="font-size:12px;color:var(--gray);margin-bottom:4px;display:block;">Pilih Icon:</label>
                 <select id="iconSelectKita" style="width:100%;padding:10px;border-radius:10px;border:1px solid #ddd;font-size:16px;margin-bottom:8px;">
                     <option value="📌">📌 Pin (default)</option>
-                    <option value="🛏️">🛏️ Kamar</option>
-                    <option value="🚌">🚌 Bus</option>
-                    <option value="🏨">🏨 Hotel</option>
-                    <option value="📘">📘 Paspor/Dokumen</option>
-                    <option value="✈️">✈️ Penerbangan</option>
+                    <option value="🛏️">🛏️ Kamar/Asrama</option>
+                    <option value="🎒">🎒 Perlengkapan</option>
+                    <option value="🏫">🏫 Kelas/Sekolah</option>
+                    <option value="📄">📄 Dokumen</option>
+                    <option value="📚">📚 Kitab/Pelajaran</option>
                     <option value="🗓️">🗓️ Tanggal</option>
                     <option value="👤">👤 Orang/Peserta</option>
                     <option value="📞">📞 Telepon</option>
@@ -2147,7 +2147,7 @@
                     <option value="⭐">⭐ Bintang</option>
                     <option value="📍">📍 Lokasi</option>
                     <option value="🗺️">🗺️ Peta</option>
-                    <option value="💼">💼 Koper</option>
+                    <option value="💼">💼 Koper/Barang</option>
                 </select>
             </div>
             <button class="btn btn-primary btn-small mt-2" onclick="addJamaahKitaDynamicField()" style="width:100%;">+ Tambah Field</button>
@@ -2611,7 +2611,7 @@
             </div>
             <div class="input-group">
                 <label>Pilih Peserta</label>
-                <input type="text" id="searchPengingatJamaah" placeholder="🔍 Cari nama jamaah..." oninput="filterPengingatJamaah()" style="margin-bottom:8px;">
+                <input type="text" id="searchPengingatJamaah" placeholder="🔍 Cari nama peserta..." oninput="filterPengingatJamaah()" style="margin-bottom:8px;">
                 <div style="display:flex;gap:8px;margin-bottom:8px;">
                     <button onclick="pilihSemuaPengingat()" style="flex:1;padding:8px;background:#0D5C4A;color:white;border:none;border-radius:8px;font-size:12px;cursor:pointer;">✅ Pilih Semua</button>
                     <button onclick="hapusPilihanPengingat()" style="flex:1;padding:8px;background:#e2e8f0;color:#333;border:none;border-radius:8px;font-size:12px;cursor:pointer;">❌ Hapus Pilihan</button>
@@ -2651,7 +2651,7 @@
             </div>
             <div class="input-group" style="margin-bottom:10px;">
                 <label style="font-size:12px;">Pilih Peserta</label>
-                <input type="text" id="searchSuratJamaah" placeholder="🔍 Cari nama jamaah..." oninput="filterSuratJamaah()" style="width:100%;padding:10px;border-radius:8px;border:1px solid #ddd;background:var(--input-bg);color:var(--text);font-size:13px;margin-bottom:6px;">
+                <input type="text" id="searchSuratJamaah" placeholder="🔍 Cari nama peserta..." oninput="filterSuratJamaah()" style="width:100%;padding:10px;border-radius:8px;border:1px solid #ddd;background:var(--input-bg);color:var(--text);font-size:13px;margin-bottom:6px;">
                 <select id="suratJamaahSelect" onchange="previewSurat()" style="width:100%;padding:10px;border-radius:8px;border:1px solid #ddd;background:var(--input-bg);color:var(--text);font-size:13px;max-height:160px;" size="5"></select>
             </div>
             <div class="input-group" style="margin-bottom:10px;">
@@ -2778,7 +2778,7 @@
         <div class="card-premium">
             <div class="input-group">
                 <label>Pilih Peserta</label>
-                <input type="text" id="searchTiketJamaah" placeholder="🔍 Cari nama jamaah..." oninput="filterTiketJamaah()" style="margin-bottom:8px;">
+                <input type="text" id="searchTiketJamaah" placeholder="🔍 Cari nama peserta..." oninput="filterTiketJamaah()" style="margin-bottom:8px;">
                 <div style="display:flex;gap:8px;margin-bottom:8px;">
                     <button onclick="pilihSemuaTiket()" style="flex:1;padding:8px;background:#0D5C4A;color:white;border:none;border-radius:8px;font-size:12px;cursor:pointer;">✅ Pilih Semua</button>
                     <button onclick="hapusPilihanTiket()" style="flex:1;padding:8px;background:#e2e8f0;color:#333;border:none;border-radius:8px;font-size:12px;cursor:pointer;">❌ Hapus Pilihan</button>
@@ -2800,7 +2800,7 @@
             <div class="input-group"><label>Nama Acara / Kegiatan</label><input type="text" id="labelEvent" placeholder="Wisuda Tahfidz 2026"></div>
             <div class="input-group">
                 <label>Pilih Peserta</label>
-                <input type="text" id="searchLabelJamaah" placeholder="🔍 Cari nama jamaah..." oninput="filterLabelJamaah()" style="margin-bottom:8px;">
+                <input type="text" id="searchLabelJamaah" placeholder="🔍 Cari nama peserta..." oninput="filterLabelJamaah()" style="margin-bottom:8px;">
                 <div style="display:flex;gap:8px;margin-bottom:8px;">
                     <button onclick="pilihSemuaLabel()" style="flex:1;padding:8px;background:#0D5C4A;color:white;border:none;border-radius:8px;font-size:12px;cursor:pointer;">✅ Pilih Semua</button>
                     <button onclick="hapusPilihanLabel()" style="flex:1;padding:8px;background:#e2e8f0;color:#333;border:none;border-radius:8px;font-size:12px;cursor:pointer;">❌ Hapus Pilihan</button>
@@ -6160,7 +6160,7 @@ function confirmDeleteJamaahById(id){
 function renderJamaahForm(){ 
     const container=document.getElementById('jamaahFormContainer'); 
     if(!container) return; 
-    let html=`<div class="dynamic-field"><label>Nama Lengkap <span style="color:red;">*</span></label><input type="text" id="jamaahNamaLengkap" placeholder="Nama lengkap jamaah"></div>`; 
+    let html=`<div class="dynamic-field"><label>Nama Lengkap <span style="color:red;">*</span></label><input type="text" id="jamaahNamaLengkap" placeholder="Nama lengkap peserta"></div>`; 
     for(const field of dynamicFieldsJamaah){ 
         html+=`<div class="dynamic-field"><label>${escapeHtml(field.label)}</label>${field.type==='textarea'?`<textarea id="jamaahField_${field.name}" rows="3"></textarea>`:`<input type="${field.type}" id="jamaahField_${field.name}">`}</div>`; 
     } 
@@ -8618,7 +8618,7 @@ function openFolderDetail(folderId) {
     let html = `<div class="card-premium"><div class="back-header" style="margin-bottom:15px;"><i class="fas fa-arrow-left" onclick="renderFolderList()" style="cursor:pointer;"></i><h3 style="flex:1; text-align:center;">📁 ${escapeHtml(folder.nama)}</h3><div style="width:30px;"></div></div>
     <div id="folderJamaahSection">
     <div class="input-group"><label>➕ Tambah Peserta ke Folder</label>
-    <input type="text" id="searchFolderJamaah" placeholder="🔍 Cari nama jamaah..." oninput="filterFolderJamaahSelect()" style="margin-bottom:8px;">
+    <input type="text" id="searchFolderJamaah" placeholder="🔍 Cari nama peserta..." oninput="filterFolderJamaahSelect()" style="margin-bottom:8px;">
     <div style="display:flex;gap:8px;margin-bottom:8px;">
         <button onclick="pilihSemuaFolderJamaah()" style="flex:1;padding:8px;background:#0D5C4A;color:white;border:none;border-radius:8px;font-size:12px;cursor:pointer;">✅ Pilih Semua</button>
         <button onclick="hapusPilihanFolderJamaah()" style="flex:1;padding:8px;background:#e2e8f0;color:#333;border:none;border-radius:8px;font-size:12px;cursor:pointer;">❌ Hapus Pilihan</button>
@@ -8729,7 +8729,7 @@ function renderFolderJamaahSection(folderId) {
     };
     let html = `
     <div class="input-group"><label>➕ Tambah Peserta ke Folder</label>
-    <input type="text" id="searchFolderJamaah" placeholder="🔍 Cari nama jamaah..." oninput="filterFolderJamaahSelect()" style="margin-bottom:8px;">
+    <input type="text" id="searchFolderJamaah" placeholder="🔍 Cari nama peserta..." oninput="filterFolderJamaahSelect()" style="margin-bottom:8px;">
     <div style="display:flex;gap:8px;margin-bottom:8px;">
         <button onclick="pilihSemuaFolderJamaah()" style="flex:1;padding:8px;background:#0D5C4A;color:white;border:none;border-radius:8px;font-size:12px;cursor:pointer;">✅ Pilih Semua</button>
         <button onclick="hapusPilihanFolderJamaah()" style="flex:1;padding:8px;background:#e2e8f0;color:#333;border:none;border-radius:8px;font-size:12px;cursor:pointer;">❌ Hapus Pilihan</button>
@@ -9215,13 +9215,14 @@ async function loadDokumenJenisFromIndexedDB() {
             request.onsuccess = () => { 
                 if (request.result && request.result.data && request.result.data.length > 0) dokumenJenisList = request.result.data; 
                 else dokumenJenisList = [ 
-                    { id: 'ktp',       nama: 'KTP',       icon: '🪪' }, 
-                    { id: 'kk',        nama: 'KK',        icon: '📋' }, 
-                    { id: 'spph',      nama: 'SPPH',      icon: '📄' }, 
-                    { id: 'bpih',      nama: 'BPIH',      icon: '📄' }, 
-                    { id: 'foto_pas',  nama: 'Foto Pas',  icon: '📷' }, 
-                    { id: 'paspor',    nama: 'Paspor',    icon: '📘' }, 
-                    { id: 'biometrik', nama: 'Biometrik', icon: '🔏' } 
+                    { id: 'ktp',         nama: 'KTP',          icon: '🪪' }, 
+                    { id: 'kk',          nama: 'KK',           icon: '📋' }, 
+                    { id: 'akta_lahir',  nama: 'Akta Lahir',   icon: '📜' }, 
+                    { id: 'ijazah',      nama: 'Ijazah',       icon: '🎓' }, 
+                    { id: 'surat_sehat', nama: 'Surat Sehat',  icon: '🏥' }, 
+                    { id: 'foto_pas',    nama: 'Foto Pas',     icon: '📷' }, 
+                    { id: 'kartu_bpjs',  nama: 'Kartu BPJS',   icon: '💳' }, 
+                    { id: 'rapor',       nama: 'Rapor Asal',   icon: '📕' } 
                 ]; 
                 resolve(); 
             }; 
@@ -9229,13 +9230,14 @@ async function loadDokumenJenisFromIndexedDB() {
         }); 
     } catch(e) { 
         dokumenJenisList = [ 
-            { id: 'ktp',       nama: 'KTP',       icon: '🪪' }, 
-            { id: 'kk',        nama: 'KK',        icon: '📋' }, 
-            { id: 'spph',      nama: 'SPPH',      icon: '📄' }, 
-            { id: 'bpih',      nama: 'BPIH',      icon: '📄' }, 
-            { id: 'foto_pas',  nama: 'Foto Pas',  icon: '📷' }, 
-            { id: 'paspor',    nama: 'Paspor',    icon: '📘' }, 
-            { id: 'biometrik', nama: 'Biometrik', icon: '🔏' } 
+            { id: 'ktp',         nama: 'KTP',          icon: '🪪' }, 
+            { id: 'kk',          nama: 'KK',           icon: '📋' }, 
+            { id: 'akta_lahir',  nama: 'Akta Lahir',   icon: '📜' }, 
+            { id: 'ijazah',      nama: 'Ijazah',       icon: '🎓' }, 
+            { id: 'surat_sehat', nama: 'Surat Sehat',  icon: '🏥' }, 
+            { id: 'foto_pas',    nama: 'Foto Pas',     icon: '📷' }, 
+            { id: 'kartu_bpjs',  nama: 'Kartu BPJS',   icon: '💳' }, 
+            { id: 'rapor',       nama: 'Rapor Asal',   icon: '📕' } 
         ]; 
         return Promise.resolve(); 
     } 
@@ -10576,7 +10578,7 @@ function renderScheduledReminders() {
     if(scheduledReminders.length === 0) { container.innerHTML = '<h4>📅 Pengingat Terjadwal</h4><p class="text-center">Belum ada pengingat terjadwal</p>'; return; } 
     let html = '<h4>📅 Pengingat Terjadwal</h4>'; 
     scheduledReminders.forEach(r => { 
-        html += `<div class="reminder-card"><div class="reminder-peserta">⏰ ${new Date(r.schedule).toLocaleString('id-ID')}</div><div class="reminder-jamaah">👥 ${r.jamaahIds.length === 1 && r.jamaahIds[0] === 'all' ? 'Semua Jamaah' : r.jamaahIds.length + ' jamaah'}</div><div style="font-size:12px;">${r.message.substring(0, 50)}${r.message.length > 50 ? '...' : ''}</div><div><button class="btn-danger-small" onclick="hapusPengingat(${r.id})">Hapus</button></div></div>`; 
+        html += `<div class="reminder-card"><div class="reminder-peserta">⏰ ${new Date(r.schedule).toLocaleString('id-ID')}</div><div class="reminder-jamaah">👥 ${r.jamaahIds.length === 1 && r.jamaahIds[0] === 'all' ? 'Semua Peserta' : r.jamaahIds.length + ' peserta'}</div><div style="font-size:12px;">${r.message.substring(0, 50)}${r.message.length > 50 ? '...' : ''}</div><div><button class="btn-danger-small" onclick="hapusPengingat(${r.id})">Hapus</button></div></div>`; 
     }); 
     container.innerHTML = html; 
 }
