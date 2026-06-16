@@ -12830,6 +12830,7 @@ async function printPDFDirect(pdfDoc, filename = 'document.pdf') {
 <!-- ===== PAGE MODE WALI ===== -->
 <div id="page-wali" class="page">
   <div style="padding:16px;padding-bottom:80px;">
+    <div id="waliHomeWrap">
     <div style="background:linear-gradient(135deg,var(--primary),#0a4a3a);color:white;padding:20px;border-radius:16px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:flex-start;">
       <div style="display:flex;align-items:center;gap:12px;">
         <div id="waliSantriFotoWrap" style="width:54px;height:54px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;font-size:22px;font-weight:700;">&#128100;</div>
@@ -12871,6 +12872,9 @@ async function printPDFDirect(pdfDoc, filename = 'document.pdf') {
       <div style="font-weight:700;font-size:15px;color:var(--primary);margin-bottom:12px;">&#9888;&#65039; Catatan Pelanggaran</div>
       <div id="waliPelanggaranInfo"></div>
     </div>
+    </div>
+    <!-- Detail view (Absensi/Nilai lengkap) - awalnya tersembunyi -->
+    <div id="waliDetailWrap" style="display:none;"></div>
   </div>
 </div>
 
@@ -16395,6 +16399,12 @@ function masukModeWali(santri) {
     var pageWali = document.getElementById('page-wali');
     if (pageWali) pageWali.classList.add('active');
 
+    // Pastikan tampilan home (bukan detail) yang aktif
+    var homeWrap = document.getElementById('waliHomeWrap');
+    var detailWrap = document.getElementById('waliDetailWrap');
+    if (homeWrap) homeWrap.style.display = '';
+    if (detailWrap) { detailWrap.style.display = 'none'; detailWrap.innerHTML = ''; }
+
     // Init content
     setTimeout(function() { initWaliMode(santri); }, 100);
 }
@@ -16998,13 +17008,6 @@ function simpanPelanggaran() {
         if (guru) inputOleh = guru.nama;
     }
 
-    var inputOleh = 'Admin';
-    var gs = getEkSession();
-    if (gs && gs.role === 'guru') {
-        var guru = getCurrentGuru();
-        if (guru) inputOleh = guru.nama;
-    }
-
     var record = {
         id: Date.now(),
         santriId: String(santriId),
@@ -17319,9 +17322,8 @@ function bukaAbsensiWali() {
     }
 
     var bln = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agt','Sep','Okt','Nov','Des'];
-    var html = '<div style="padding:16px;padding-bottom:80px;">'
-        + '<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">'
-        + '<button onclick="initWaliMode()" style="background:none;border:none;font-size:20px;cursor:pointer;">&#8592;</button>'
+    var html = '<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">'
+        + '<button onclick="tutupWaliDetail()" style="background:none;border:none;font-size:20px;cursor:pointer;">&#8592;</button>'
         + '<h3 style="margin:0;color:var(--primary);">&#128197; Rekap Absensi</h3></div>';
 
     var bulanKeys = Object.keys(byBulan).sort().reverse();
@@ -17348,10 +17350,29 @@ function bukaAbsensiWali() {
                   + '</div></div>';
         }
     }
-    html += '</div>';
 
-    var pw = document.getElementById('page-wali');
-    if (pw) { pw.innerHTML = html; pw.scrollTop = 0; }
+    bukaWaliDetail(html);
+}
+
+// Tampilkan wrapper detail, sembunyikan home (tidak menghapus struktur asli)
+function bukaWaliDetail(html) {
+    var homeWrap = document.getElementById('waliHomeWrap');
+    var detailWrap = document.getElementById('waliDetailWrap');
+    if (homeWrap) homeWrap.style.display = 'none';
+    if (detailWrap) {
+        detailWrap.innerHTML = html;
+        detailWrap.style.display = 'block';
+        detailWrap.scrollTop = 0;
+    }
+}
+
+// Tutup detail, kembali ke home Mode Wali (data direfresh)
+function tutupWaliDetail() {
+    var homeWrap = document.getElementById('waliHomeWrap');
+    var detailWrap = document.getElementById('waliDetailWrap');
+    if (detailWrap) { detailWrap.style.display = 'none'; detailWrap.innerHTML = ''; }
+    if (homeWrap) homeWrap.style.display = '';
+    initWaliMode();
 }
 
 // ─── MODE WALI: DETAIL NILAI ───
@@ -17374,9 +17395,8 @@ function bukaNilaiWali() {
     var gradeColor = function(v){ return v>=90?'#10b981':v>=75?'#3b82f6':v>=60?'#f59e0b':'#ef4444'; };
     var gradeLabel = function(v){ return v>=90?'A':v>=75?'B':v>=60?'C':'D'; };
 
-    var html = '<div style="padding:16px;padding-bottom:80px;">'
-        + '<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">'
-        + '<button onclick="initWaliMode()" style="background:none;border:none;font-size:20px;cursor:pointer;">&#8592;</button>'
+    var html = '<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">'
+        + '<button onclick="tutupWaliDetail()" style="background:none;border:none;font-size:20px;cursor:pointer;">&#8592;</button>'
         + '<h3 style="margin:0;color:var(--primary);">&#128221; Nilai Lengkap</h3></div>';
 
     var mapelKeys = Object.keys(byMapel);
@@ -17404,10 +17424,8 @@ function bukaNilaiWali() {
             html += '</div>';
         }
     }
-    html += '</div>';
 
-    var pw = document.getElementById('page-wali');
-    if (pw) { pw.innerHTML = html; pw.scrollTop = 0; }
+    bukaWaliDetail(html);
 }
 
 
@@ -18122,3 +18140,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 </html>
+ 
