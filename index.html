@@ -2114,7 +2114,7 @@
     <div class="header-premium header-premium-small">
         <div class="back-header">
             <i class="fas fa-arrow-left" onclick="showPage('home')"></i>
-            <h2>📝 Pendaftaran Baru (PPDB)</h2>
+            <h2>📍 Mapping Laporan</h2>
             <div style="width:30px;"></div>
         </div>
     </div>
@@ -2160,7 +2160,7 @@
         <div class="section-title"><span>📋 TAMBAH DATA</span></div>
         <div class="input-group">
             <label>Pilih Peserta dari database</label>
-            <input type="text" id="searchJamaahKitaAdd" placeholder="🔍 Cari nama jamaah..." oninput="filterPilihJamaahKita()" style="margin-bottom:8px;">
+            <input type="text" id="searchJamaahKitaAdd" placeholder="🔍 Cari nama peserta..." oninput="filterPilihJamaahKita()" style="margin-bottom:8px;">
             <div style="display:flex;gap:8px;margin-bottom:8px;">
                 <button onclick="pilihSemuaJamaahKita()" style="flex:1;padding:8px;background:#0D5C4A;color:white;border:none;border-radius:8px;font-size:12px;cursor:pointer;">✅ Pilih Semua</button>
                 <button onclick="hapusPilihanJamaahKita()" style="flex:1;padding:8px;background:#e2e8f0;color:#333;border:none;border-radius:8px;font-size:12px;cursor:pointer;">❌ Hapus Pilihan</button>
@@ -2170,9 +2170,9 @@
         </div>
         <div id="jamaahKitaDynamicFields"></div>
         <button class="btn btn-accent" onclick="tambahJamaahKitaMulti()" style="margin-top:16px;">
-            <i class="fas fa-plus-circle"></i> TAMBAHKAN KE ON PROSES
+            <i class="fas fa-plus-circle"></i> TAMBAHKAN KE KELOMPOK
         </button>
-        <div class="section-title" style="margin-top:24px;"><span id="hdrDaftarOnProses">📋 DAFTAR PESERTA AKTIF</span></div>
+        <div class="section-title" style="margin-top:24px;"><span id="hdrDaftarOnProses">📋 DAFTAR DALAM KELOMPOK</span></div>
         <div class="search-box">
             <input type="text" id="searchJamaahKitaInput" placeholder="Cari nama peserta..." onkeyup="filterJamaahKitaList()">
             <button onclick="resetJamaahKitaFilter()" style="width:auto; padding:0 16px; background:var(--gray);">Reset</button>
@@ -3267,7 +3267,7 @@ function initDarkMode() {
 // Menu Grid
 const menuItemsPremium = [
     { id: 'jamaah',     icon: '🗂️', label: 'Data Peserta',   badge: 'Peserta' },
-    { id: 'jamaahkita', icon: '📝', label: 'Pendaftaran Baru', badge: 'PPDB' },
+    { id: 'jamaahkita', icon: '📍', label: 'Mapping Laporan', badge: 'Kelompok' },
     { id: 'kelas',      icon: '🏛️', label: 'Kelas',          badge: 'Kelas', idKey:'kelas' },
     { id: 'absensi_harian', icon: '📋', label: 'Absensi Harian',  badge: 'Absensi' },
     { id: 'pengajar',   icon: '📋', label: 'Pengajar',       badge: 'Guru', idKey:'pengajar' },
@@ -6629,7 +6629,7 @@ async function loadJamaahKitaData() {
     dynamicFieldsJamaahKita = savedFields || defaultJamaahKitaFields;
 
     // Sinkronkan urutan + icon + label field On Proses mengikuti Database Jamaah
-    const dbFields = dynamicFieldsJamaah.length > 0 ? dynamicFieldsPeserta : 
+    const dbFields = dynamicFieldsJamaah.length > 0 ? dynamicFieldsJamaah : 
         JSON.parse(localStorage.getItem('navara_jamaah_fields') || '[]');
     if (dbFields.length > 0) {
         const dbOrder = dbFields.map(f => f.name);
@@ -8651,7 +8651,7 @@ function openFolderDetail(folderId) {
     });
     html += `</div><div class="card-premium" style="padding:12px;margin-bottom:12px;"><div style="font-weight:bold;margin-bottom:8px;color:#0D5C4A;">+ Tambah Field Baru</div><input type="text" id="newFieldLabel" placeholder="Nama field (contoh: Hotel, Maskapai)" style="width:100%;padding:8px;border-radius:8px;border:1px solid #ddd;margin-bottom:8px;"><input type="text" id="newFieldValue" placeholder="Isi/nilai field" style="width:100%;padding:8px;border-radius:8px;border:1px solid #ddd;margin-bottom:8px;"><button class="btn btn-primary btn-small" onclick="addFolderField('${folderId}')">+ Tambah Field</button></div>`;
     // Section pilih field untuk PDF/Excel
-    const allDynFields = dynamicFieldsJamaah.length > 0 ? dynamicFieldsPeserta : [];
+    const allDynFields = dynamicFieldsJamaah.length > 0 ? dynamicFieldsJamaah : [];
     const selectedFields = folder.selectedFields || [];
     // Gunakan fieldOrder jika ada, atau default dari dynamicFieldsJamaah
     if (!folder.fieldOrder || folder.fieldOrder.length === 0) {
@@ -8973,7 +8973,7 @@ function renderFolderFieldSelector(folderId) {
     if (!container) return;
     const folder = folderList.find(f => f.id == folderId);
     if (!folder) return;
-    const allDynFields = dynamicFieldsJamaah.length > 0 ? dynamicFieldsPeserta : [];
+    const allDynFields = dynamicFieldsJamaah.length > 0 ? dynamicFieldsJamaah : [];
     const selectedFields = folder.selectedFields || [];
     if (!folder.fieldOrder || folder.fieldOrder.length === 0) {
         folder.fieldOrder = allDynFields.map(f => f.name);
@@ -9024,7 +9024,7 @@ async function exportFolderToPDF(folderId) {
     const namaInstansi = cfgFolder.instansi1.nama || 'EduKu';
     const watermarkHtmlFolder = buildPrintWatermark(cfgFolder);
     const tanggal = new Date().toLocaleDateString('id-ID', {day:'2-digit', month:'long', year:'numeric'});
-    const allDynFields = dynamicFieldsJamaah.length > 0 ? dynamicFieldsPeserta : [];
+    const allDynFields = dynamicFieldsJamaah.length > 0 ? dynamicFieldsJamaah : [];
     const selectedFields = folder.selectedFields || [];
     // Gunakan fieldOrder untuk urutan kolom, filter yang diceklis saja
     const orderedNames = folder.fieldOrder || allDynFields.map(f => f.name);
@@ -9100,7 +9100,7 @@ function exportFolderToExcel(folderId) {
         wsData.push({ 'Folder': '', '': '' });
     }
     // Pakai selectedFields dari folder, dengan urutan dari fieldOrder
-    const allDynFieldsXLS = dynamicFieldsJamaah.length > 0 ? dynamicFieldsPeserta : [];
+    const allDynFieldsXLS = dynamicFieldsJamaah.length > 0 ? dynamicFieldsJamaah : [];
     const selectedFieldsXLS = folder.selectedFields || [];
     const orderedNamesXLS = folder.fieldOrder || allDynFieldsXLS.map(f => f.name);
     const chosenFieldsXLS = orderedNamesXLS.map(name => allDynFieldsXLS.find(f => f.name === name)).filter(fd => fd && selectedFieldsXLS.includes(fd.name));
@@ -15750,6 +15750,21 @@ function initGuruRekap() {
     renderGuruRekap();
 }
 
+// ─── NOTIFIKASI WA ALPHA: status terkirim per (jenis|santriId|tanggal) ───
+function getAlphaNotifStatus() {
+    try { return JSON.parse(localStorage.getItem('eduku_alpha_notif_status') || '{}'); } catch(e) { return {}; }
+}
+function saveAlphaNotifStatus(data) {
+    localStorage.setItem('eduku_alpha_notif_status', JSON.stringify(data));
+}
+function formatTglIndo(tglStr) {
+    try {
+        var d = new Date(tglStr);
+        if (isNaN(d.getTime())) return tglStr;
+        return d.toLocaleDateString('id-ID', { day:'2-digit', month:'long', year:'numeric' });
+    } catch(e) { return tglStr; }
+}
+
 function renderGuruRekap() {
     var guru = getCurrentGuru();
     if (!guru || !guru.kelasWaliId) return;
@@ -15788,10 +15803,10 @@ function renderGuruRekap() {
         return;
     }
 
-    // Hitung per santri
+    // Hitung per santri (termasuk daftar tanggal Alpha)
     var stats = {};
     for (var j = 0; j < santri.length; j++) {
-        stats[String(santri[j].id)] = { hadir:0, sakit:0, izin:0, alpha:0, total:0 };
+        stats[String(santri[j].id)] = { hadir:0, sakit:0, izin:0, alpha:0, total:0, alphaDates:[] };
     }
 
     for (var k = 0; k < filtered.length; k++) {
@@ -15799,17 +15814,38 @@ function renderGuruRekap() {
         for (var m = 0; m < rec.data.length; m++) {
             var entry = rec.data[m];
             var sId = String(entry.santriId);
-            if (!stats[sId]) stats[sId] = { hadir:0, sakit:0, izin:0, alpha:0, total:0 };
+            if (!stats[sId]) stats[sId] = { hadir:0, sakit:0, izin:0, alpha:0, total:0, alphaDates:[] };
             stats[sId][entry.status] = (stats[sId][entry.status]||0) + 1;
             stats[sId].total++;
+            if (entry.status === 'alpha' && rec.tanggal) stats[sId].alphaDates.push(rec.tanggal);
         }
     }
 
     // Total pertemuan
     var totalPertemuan = filtered.length;
 
+    // Hitung status kirim notifikasi
+    var notifStatus = getAlphaNotifStatus();
+    var totalSantriBelumKirim = 0;
+    for (var sk in stats) {
+        var unsent = stats[sk].alphaDates.filter(function(tgl){
+            return !notifStatus[jenis + '|' + sk + '|' + tgl];
+        });
+        stats[sk].unsentDates = unsent;
+        if (unsent.length > 0) totalSantriBelumKirim++;
+    }
+
     // Build tampilan
-    var html = '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:8px;background:#f1f5f9;border-radius:8px;margin-bottom:10px;text-align:center;">'
+    var html = '';
+
+    if (totalSantriBelumKirim > 0) {
+        html += '<div style="background:#fef2f2;border:1.5px solid #fecaca;border-radius:10px;padding:12px;margin-bottom:12px;">'
+              + '<div style="font-size:13px;color:#ef4444;font-weight:700;margin-bottom:8px;">&#9888;&#65039; ' + totalSantriBelumKirim + ' santri Alpha belum dikirim notifikasi</div>'
+              + '<button onclick="kirimNotifikasiAlphaWaliKelas(\'' + jenis + '\',\'' + bulan + '\')" style="width:100%;padding:10px;background:#ef4444;color:white;border:none;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;">&#128241; Kirim Notifikasi ke Wali</button>'
+              + '</div>';
+    }
+
+    html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:8px;background:#f1f5f9;border-radius:8px;margin-bottom:10px;text-align:center;">'
              + '<div style="font-size:10px;font-weight:700;color:#64748b;">NAMA</div>'
              + '<div style="font-size:10px;font-weight:700;color:#10b981;">H</div>'
              + '<div style="font-size:10px;font-weight:700;color:#ef4444;">A</div>'
@@ -15819,19 +15855,30 @@ function renderGuruRekap() {
     for (var n = 0; n < santri.length; n++) {
         var s = santri[n];
         var sId2 = String(s.id);
-        var st = stats[sId2] || { hadir:0, sakit:0, izin:0, alpha:0, total:0 };
+        var st = stats[sId2] || { hadir:0, sakit:0, izin:0, alpha:0, total:0, alphaDates:[], unsentDates:[] };
         var pct = st.total > 0 ? Math.round((st.hadir / st.total) * 100) : 0;
         var pctColor = pct >= 80 ? '#10b981' : pct >= 60 ? '#f59e0b' : '#ef4444';
         var nama = (s.nama_lengkap || s.nama || '?');
         // Truncate nama panjang
         var namaShort = nama.length > 15 ? nama.substr(0,14)+'...' : nama;
 
-        html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:8px;background:#f8fafc;border-radius:8px;margin-bottom:4px;align-items:center;">'
+        html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:8px;background:#f8fafc;border-radius:8px;margin-bottom:'+(st.alpha>0?'0':'4px')+';align-items:center;">'
               + '<div style="font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="'+nama+'">'+namaShort+'</div>'
               + '<div style="text-align:center;font-size:13px;font-weight:700;color:#10b981;">'+st.hadir+'</div>'
               + '<div style="text-align:center;font-size:13px;font-weight:700;color:#ef4444;">'+st.alpha+'</div>'
               + '<div style="text-align:center;font-size:13px;font-weight:700;color:'+pctColor+';">'+pct+'%</div>'
               + '</div>';
+
+        if (st.alpha > 0 && st.alphaDates.length) {
+            var statusText = st.unsentDates.length > 0
+                ? '&#9744; ' + st.unsentDates.length + ' belum dikirim'
+                : '&#9989; Semua terkirim';
+            var statusColor = st.unsentDates.length > 0 ? '#ef4444' : '#10b981';
+            html += '<div style="font-size:11px;color:#94a3b8;padding:2px 8px 8px 8px;margin-bottom:4px;">'
+                  + '&#8627; Alpha: ' + st.alphaDates.join(', ') + ' &nbsp;|&nbsp; '
+                  + '<span style="color:'+statusColor+';font-weight:600;">' + statusText + '</span>'
+                  + '</div>';
+        }
     }
 
     // Summary
@@ -15841,6 +15888,80 @@ function renderGuruRekap() {
           + '</div>';
 
     ct.innerHTML = html;
+}
+
+// ─── GURU: KIRIM NOTIFIKASI WA UNTUK SANTRI ALPHA (per Wali Kelas) ───
+function kirimNotifikasiAlphaWaliKelas(jenis, bulan) {
+    var guru = getCurrentGuru();
+    if (!guru || !guru.kelasWaliId) return;
+
+    var santri = getSantriByKelas(guru.kelasWaliId);
+    if (!santri.length) return;
+
+    var absensiData = jenis === 'harian' ? getAbsensiHarianData() : getAbsensiPelajaranData();
+    var filtered = [];
+    for (var i = 0; i < absensiData.length; i++) {
+        var a = absensiData[i];
+        if (String(a.kelasId) !== String(guru.kelasWaliId)) continue;
+        if (bulan && a.tanggal && a.tanggal.substr(0,7) !== bulan) continue;
+        filtered.push(a);
+    }
+
+    // Kumpulkan tanggal alpha per santri
+    var alphaDatesMap = {};
+    for (var k = 0; k < filtered.length; k++) {
+        var rec = filtered[k];
+        for (var m = 0; m < rec.data.length; m++) {
+            var entry = rec.data[m];
+            if (entry.status !== 'alpha') continue;
+            var sId = String(entry.santriId);
+            if (!alphaDatesMap[sId]) alphaDatesMap[sId] = [];
+            if (rec.tanggal) alphaDatesMap[sId].push(rec.tanggal);
+        }
+    }
+
+    var notifStatus = getAlphaNotifStatus();
+    var cfg = getKonfigurasiProData();
+    var namaInstansi = cfg.instansi1?.nama || 'EduKu';
+    var jenisLabel = jenis === 'harian' ? 'Absensi Harian' : 'Pelajaran';
+
+    var terkirim = 0, tanpaNomor = [], nl = '\n';
+
+    santri.forEach(function(s){
+        var sId2 = String(s.id);
+        var allDates = alphaDatesMap[sId2] || [];
+        var unsentDates = allDates.filter(function(tgl){ return !notifStatus[jenis+'|'+sId2+'|'+tgl]; });
+        if (!unsentDates.length) return;
+
+        var f = s.additional_fields || {};
+        var nomorRaw = f.hp_wali || f.whatsapp || '';
+        var num = nomorRaw.replace(/\D/g, '');
+        if (num.startsWith('0')) num = '62' + num.substring(1);
+        if (num.length < 10) { tanpaNomor.push(s.nama_lengkap || s.nama || '?'); return; }
+
+        var daftarTgl = unsentDates.map(function(tgl){ return '- ' + formatTglIndo(tgl); }).join(nl);
+        var msg = 'Assalamu\'alaikum, Bapak/Ibu Wali Ananda ' + (s.nama_lengkap || s.nama || '-') + '.' + nl + nl
+                + 'Tercatat tidak hadir (Alpha) pada ' + jenisLabel + ':' + nl
+                + daftarTgl + nl + nl
+                + 'Mohon perhatian dan informasinya. Terima kasih.' + nl + nl
+                + namaInstansi;
+
+        window.open('https://wa.me/' + num + '?text=' + encodeURIComponent(msg), '_blank');
+
+        unsentDates.forEach(function(tgl){
+            notifStatus[jenis+'|'+sId2+'|'+tgl] = new Date().toISOString();
+        });
+        terkirim++;
+    });
+
+    saveAlphaNotifStatus(notifStatus);
+
+    var resultMsg = terkirim > 0 ? ('&#128241; ' + terkirim + ' chat WA dibuka & ditandai terkirim') : 'Tidak ada yang dikirim';
+    if (tanpaNomor.length > 0) {
+        resultMsg += '. ' + tanpaNomor.length + ' santri tidak ada No HP Wali';
+    }
+    showToast(resultMsg);
+    renderGuruRekap();
 }
 
 // ─── GURU: DAFTAR SANTRI KELAS ───
