@@ -4742,7 +4742,7 @@ function renderSesiAktifInfo() {
         const jmlHadir = sesi.absensi.length;
         el.innerHTML = `
             <div style="font-weight:bold;color:var(--primary);font-size:14px;">📅 ${escapeHtml(sesi.nama)}</div>
-            <div style="color:#888;font-size:12px;margin-top:2px;">${sesi.tanggal} | ${jmlHadir} jamaah hadir</div>
+            <div style="color:#888;font-size:12px;margin-top:2px;">${sesi.tanggal} | ${jmlHadir} peserta hadir</div>
             <button onclick="tutupSesiAktif()" style="margin-top:8px;padding:6px 12px;background:#EF4444;color:white;border:none;border-radius:8px;font-size:12px;cursor:pointer;">⏹ Tutup Sesi</button>`;
     }
 }
@@ -5776,7 +5776,7 @@ function eksporAbsensi() {
     @page{size:A4 portrait;margin:10mm 12mm;}@media print{*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}html{width:210mm;}body{margin:0;width:210mm;}.no-print{display:none!important;}}
     </style></head><body>
     <h2>📋 REKAP ABSENSI — ${escapeHtml(sesi.nama)}</h2>
-    <div class="sub">${namaInstansi} | ${sesi.tanggal} | Total Hadir: ${sesi.absensi.length} jamaah</div>
+    <div class="sub">${namaInstansi} | ${sesi.tanggal} | Total Hadir: ${sesi.absensi.length} peserta</div>
     <table><thead><tr>`;
     
     // Build table headers dynamically
@@ -12831,10 +12831,13 @@ async function printPDFDirect(pdfDoc, filename = 'document.pdf') {
 <div id="page-wali" class="page">
   <div style="padding:16px;padding-bottom:80px;">
     <div style="background:linear-gradient(135deg,var(--primary),#0a4a3a);color:white;padding:20px;border-radius:16px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:flex-start;">
-      <div>
-        <div style="font-size:13px;opacity:0.8;">Assalamu'alaikum,</div>
-        <div style="font-size:18px;font-weight:700;margin:4px 0;" id="waliSantriNama">Wali Santri</div>
-        <div style="font-size:12px;opacity:0.8;" id="waliKelasInfo"></div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div id="waliSantriFotoWrap" style="width:54px;height:54px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;font-size:22px;font-weight:700;">&#128100;</div>
+        <div>
+          <div style="font-size:13px;opacity:0.8;">Assalamu'alaikum,</div>
+          <div style="font-size:18px;font-weight:700;margin:4px 0;" id="waliSantriNama">Wali Santri</div>
+          <div style="font-size:12px;opacity:0.8;" id="waliKelasInfo"></div>
+        </div>
       </div>
       <button onclick="logoutWali()" style="background:rgba(255,255,255,0.2);color:white;border:none;border-radius:8px;padding:8px 14px;font-size:12px;cursor:pointer;font-weight:600;">Keluar &#x2192;</button>
     </div>
@@ -16007,13 +16010,22 @@ function renderGuruSantriList() {
         var nama2 = s.nama_lengkap || s.nama || '?';
         var nis2 = getNIS(s);
         html += '<div style="display:flex;align-items:center;gap:10px;padding:10px;background:#f8fafc;border-radius:10px;margin-bottom:6px;">'
-              + '<div style="width:32px;height:32px;background:var(--primary);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;">'+(j+1)+'</div>'
+              + '<div id="guruSantriFoto_'+s.id+'" style="width:32px;height:32px;background:var(--primary);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;overflow:hidden;">'+(j+1)+'</div>'
               + '<div style="flex:1;min-width:0;">'
               + '<div style="font-weight:600;font-size:14px;">'+nama2+'</div>'
               + '<div style="font-size:12px;color:#64748b;">NIS: '+nis2+'</div>'
               + '</div></div>';
     }
     ct.innerHTML = html;
+
+    // Load foto profil tiap santri (async, isi setelah render)
+    fl.forEach(function(s){
+        idbGet(STORE_FOTO, 'foto_' + s.id).then(function(dataUrl){
+            if (!dataUrl) return;
+            var el = document.getElementById('guruSantriFoto_' + s.id);
+            if (el) el.innerHTML = '<img src="' + dataUrl + '" style="width:100%;height:100%;object-fit:cover;">';
+        }).catch(function(){});
+    });
 }
 
 // ─── ABSENSI PELAJARAN ───
@@ -16079,7 +16091,8 @@ function loadSantriUntukAbsensi() {
     for(var i=0;i<santri.length;i++){
         var s=santri[i];var sId=String(s.id);
         h += '<div style="display:flex;align-items:center;gap:8px;padding:9px;border-bottom:1px solid #f1f5f9;" id="absRow_'+sId+'">'
-           + '<div style="flex:1;font-size:13px;font-weight:600;">'+(i+1)+'. '+(s.nama_lengkap||s.nama||'?')+'</div>'
+           + '<div id="absFoto_'+sId+'" style="width:26px;height:26px;border-radius:50%;background:#e2e8f0;color:#64748b;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;overflow:hidden;">'+(i+1)+'</div>'
+           + '<div style="flex:1;font-size:13px;font-weight:600;">'+(s.nama_lengkap||s.nama||'?')+'</div>'
            + '<div style="display:flex;gap:4px;">'
            + '<button data-sid="'+sId+'" data-sts="hadir" onclick="ekAbsClick(this)" class="abx-btn abx-hadir" style="padding:6px 10px;border:2px solid #10b981;border-radius:7px;background:#10b981;color:white;font-size:11px;font-weight:700;cursor:pointer;">H</button>'
            + '<button data-sid="'+sId+'" data-sts="sakit" onclick="ekAbsClick(this)" class="abx-btn abx-sakit" style="padding:6px 10px;border:2px solid #f59e0b;border-radius:7px;background:white;color:#f59e0b;font-size:11px;font-weight:700;cursor:pointer;">S</button>'
@@ -16088,6 +16101,15 @@ function loadSantriUntukAbsensi() {
            + '</div></div>';
     }
     ct.innerHTML=h;
+
+    // Load foto profil tiap santri (async)
+    santri.forEach(function(s){
+        idbGet(STORE_FOTO, 'foto_' + s.id).then(function(dataUrl){
+            if (!dataUrl) return;
+            var el = document.getElementById('absFoto_' + s.id);
+            if (el) el.innerHTML = '<img src="' + dataUrl + '" style="width:100%;height:100%;object-fit:cover;">';
+        }).catch(function(){});
+    });
 }
 
 function ekAbsClick(btn){
@@ -16194,7 +16216,8 @@ function loadSantriAbsensiHarian(){
         var bgI=cur==='izin'?'#3b82f6':'white',  clI=cur==='izin'?'white':'#3b82f6';
         var bgA=cur==='alpha'?'#ef4444':'white', clA=cur==='alpha'?'white':'#ef4444';
         h += '<div style="display:flex;align-items:center;gap:8px;padding:9px;border-bottom:1px solid #f1f5f9;" id="absHRow_'+sId+'">'
-           + '<div style="flex:1;font-size:13px;font-weight:600;">'+(k+1)+'. '+(s.nama_lengkap||s.nama||'?')+'</div>'
+           + '<div id="absHFoto_'+sId+'" style="width:26px;height:26px;border-radius:50%;background:#e2e8f0;color:#64748b;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;overflow:hidden;">'+(k+1)+'</div>'
+           + '<div style="flex:1;font-size:13px;font-weight:600;">'+(s.nama_lengkap||s.nama||'?')+'</div>'
            + '<div style="display:flex;gap:4px;">'
            + '<button data-sid="'+sId+'" data-sts="hadir" onclick="ekHarianClick(this)" class="abh-btn abh-hadir" style="padding:6px 10px;border:2px solid #10b981;border-radius:7px;background:'+bgH+';color:'+clH+';font-size:11px;font-weight:700;cursor:pointer;">H</button>'
            + '<button data-sid="'+sId+'" data-sts="sakit" onclick="ekHarianClick(this)" class="abh-btn abh-sakit" style="padding:6px 10px;border:2px solid #f59e0b;border-radius:7px;background:'+bgS+';color:'+clS+';font-size:11px;font-weight:700;cursor:pointer;">S</button>'
@@ -16203,6 +16226,15 @@ function loadSantriAbsensiHarian(){
            + '</div></div>';
     }
     ct.innerHTML=h;
+
+    // Load foto profil tiap santri (async)
+    santri.forEach(function(s){
+        idbGet(STORE_FOTO, 'foto_' + s.id).then(function(dataUrl){
+            if (!dataUrl) return;
+            var el = document.getElementById('absHFoto_' + s.id);
+            if (el) el.innerHTML = '<img src="' + dataUrl + '" style="width:100%;height:100%;object-fit:cover;">';
+        }).catch(function(){});
+    });
 }
 
 function ekHarianClick(btn){
@@ -16375,6 +16407,17 @@ function initWaliMode(santri) {
     var nama = santri.nama_lengkap || santri.nama || '?';
     var wn = document.getElementById('waliSantriNama');
     if (wn) wn.textContent = nama;
+
+    // Foto profil
+    var fotoWrap = document.getElementById('waliSantriFotoWrap');
+    if (fotoWrap) {
+        fotoWrap.innerHTML = '&#128100;'; // default sambil loading
+        idbGet(STORE_FOTO, 'foto_' + santri.id).then(function(dataUrl){
+            if (dataUrl && fotoWrap) {
+                fotoWrap.innerHTML = '<img src="' + dataUrl + '" style="width:100%;height:100%;object-fit:cover;">';
+            }
+        }).catch(function(){});
+    }
 
     // Info kelas
     var kelasId = getKelasIdBySantri(santri.id);
@@ -16946,6 +16989,13 @@ function simpanPelanggaran() {
     var katNama = '';
     for (var i = 0; i < katList.length; i++) {
         if (String(katList[i].id) === String(katId)) { katNama = katList[i].nama; break; }
+    }
+
+    var inputOleh = 'Admin';
+    var gs = getEkSession();
+    if (gs && gs.role === 'guru') {
+        var guru = getCurrentGuru();
+        if (guru) inputOleh = guru.nama;
     }
 
     var inputOleh = 'Admin';
