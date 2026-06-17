@@ -9372,7 +9372,6 @@ function renderDokumenList() {
             <div class="dokumen-header">
                 <div>
                     <div class="dokumen-jamaah">👤 ${escapeHtml(j.nama_lengkap)}</div>
-                    <div style="font-size:11px; color:var(--gray);">${j.paket || '-'}</div>
                 </div>
                 <div style="display: flex; gap: 8px; align-items: center;">
                     <div class="dokumen-status-badge ${statusClass}">${statusText}</div>
@@ -10121,20 +10120,22 @@ async function cetakTiketMulti() {
     const checked = document.querySelectorAll('#multiTiketJamaahSelect input:checked');
     if(checked.length === 0) return showToast('Pilih minimal 1 peserta!');
     showToast('Menyiapkan tiket...');
-    const namaInstansi = getKonfigurasiProData().instansi1.nama || 'EduKu';
+    const cfg = getKonfigurasiProData();
+    const namaInstansi = cfg.instansi1?.nama || 'EduKu';
+    const logoInstansi = cfg.instansi1?.logo || '';
+    const logoHtml = logoInstansi ? '<img src="' + logoInstansi + '" class="tiket-logo">' : '';
     let cardsHtml = '';
     for(const cb of checked) {
         const jamaah = jamaahList.find(j => j.id == cb.value);
         if(!jamaah) continue;
-        const paket = jamaah.paket || '-';
         const canvas = document.createElement('canvas');
         const noPorsiQR = jamaah.additional_fields?.no_porsi || jamaah.id.toString();
         const qrText = noPorsiQR;
         await QRCode.toCanvas(canvas, qrText, { width: 120, height: 120 });
         const qrDataUrl = canvas.toDataURL('image/png');
         cardsHtml += '<div class="tiket-card">'
+            + logoHtml
             + '<div class="tiket-nama">' + escapeHtml(jamaah.nama_lengkap) + '</div>'
-            + '<div class="tiket-paket">\uD83D\uDCE6 Paket: ' + paket + '</div>'
             + '<div class="tiket-qr"><img src="' + qrDataUrl + '" width="120" height="120"></div>'
             + '<div class="tiket-footer">' + namaInstansi + '</div>'
             + '</div>';
@@ -10147,8 +10148,8 @@ async function cetakTiketMulti() {
         + 'body{font-family:Arial,sans-serif;background:#f0f0f0;padding:10px;}'
         + '.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;max-width:190mm;margin:0 auto;}'
         + '.tiket-card{background:white;border:2px solid #0D5C4A;border-radius:8px;padding:10px;text-align:center;page-break-inside:avoid;break-inside:avoid;}'
+        + '.tiket-logo{width:28px;height:28px;object-fit:contain;margin-bottom:4px;}'
         + '.tiket-nama{font-size:11px;font-weight:bold;color:#0D5C4A;text-transform:uppercase;margin-bottom:4px;}'
-        + '.tiket-paket{font-size:9.5px;color:#888;border-bottom:1px dashed #ccc;padding-bottom:6px;margin-bottom:6px;}'
         + '.tiket-qr img{display:block;margin:0 auto;}'
         + '.tiket-footer{margin-top:6px;font-size:8px;color:#999;}'
         + '.no-print{text-align:center;margin-top:16px;padding:12px;}'
@@ -10874,66 +10875,9 @@ function getKonfigurasiProData() {
 }
 
 // ==================== E-TIKET & QR ====================
-function populateTiketDropdown() {
-    const select = document.getElementById('tiketJamaahSelect');
-    if(!select) return;
-    select.innerHTML = '<option value="">-- Pilih Peserta --</option>';
-    jamaahList.forEach(j => { select.innerHTML += `<option value="${j.id}">${escapeHtml(j.nama_lengkap)}</option>`; });
-}
-
-async function generateTiketQR() {
-    const jamaahId = document.getElementById('tiketJamaahSelect').value;
-    if(!jamaahId) return;
-    const jamaah = jamaahList.find(j => j.id == jamaahId);
-    if(!jamaah) return;
-    const paket = jamaah.paket || '-';
-    document.getElementById('tiketNama').innerText = jamaah.nama_lengkap;
-    document.getElementById('tiketPaket').innerText = `📦 Paket: ${paket}`;
-    const qrContainer = document.getElementById('tiketQR');
-    qrContainer.innerHTML = '';
-    const canvas = document.createElement('canvas');
-    const noPorsiQR = jamaah.additional_fields?.no_porsi || jamaah.id.toString();
-    await QRCode.toCanvas(canvas, noPorsiQR, { width: 150, height: 150 });
-    qrContainer.appendChild(canvas);
-    document.getElementById('tiketPreview').style.display = 'block';
-}
-
-async function generateAndCetakTiket(jamaah) {
-    const paket = jamaah.paket || '-';
-    const canvas = document.createElement('canvas');
-    const noPorsiQR = jamaah.additional_fields?.no_porsi || jamaah.id.toString();
-    await QRCode.toCanvas(canvas, noPorsiQR, { width: 150, height: 150 });
-    const qrDataUrl = canvas.toDataURL('image/png');
-    const namaInstansi = getKonfigurasiProData().instansi1.nama || 'EduKu';
-    const win = window.open('', '_blank');
-    if(!win) { showToast('Izinkan popup untuk cetak!'); return; }
-    const htmlTiket = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Tiket - ' + escapeHtml(jamaah.nama_lengkap) + '</title>'
-        + '<style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:Arial,sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;background:white;padding:20px;}'
-        + '.card{max-width:360px;width:100%;border:2px solid #0D5C4A;border-radius:24px;padding:24px;text-align:center;}'
-        + '.nama{font-size:20px;font-weight:bold;color:#0D5C4A;margin-bottom:8px;}'
-        + '.paket{font-size:13px;color:#888;border-bottom:2px dashed #ccc;padding-bottom:12px;margin-bottom:16px;}'
-        + '.qr img{width:150px;height:150px;}'
-        + '.footer{margin-top:16px;font-size:11px;color:#999;}'
-        + '.no-print{text-align:center;margin-top:20px;}'
-        + '.no-print button{padding:10px 28px;margin:0 6px;border:none;border-radius:10px;font-size:14px;font-weight:bold;cursor:pointer;}'
-        + '@media print{.no-print{display:none!important;}}'
-        + '</style></head><body>'
-        + '<div class="card">'
-        + '<div class="nama">' + escapeHtml(jamaah.nama_lengkap) + '</div>'
-        + '<div class="paket">\uD83D\uDCE6 Paket: ' + paket + '</div>'
-        + '<div class="qr"><img src="' + qrDataUrl + '"></div>'
-        + '<div class="footer">' + namaInstansi + ' | ' + new Date().toLocaleDateString('id-ID') + '</div>'
-        + '</div>'
-        + '<div class="no-print">'
-        + '<button onclick="window.print()" style="background:#0D5C4A;color:white;">\uD83D\uDDA8\uFE0F CETAK</button>'
-        + '<button onclick="window.close()" style="background:#e2e8f0;color:#333;">\u2715 TUTUP</button>'
-        + '</div>'
-        + '<scr' + 'ipt>// Auto-print removed;</scr' + 'ipt>'
-        + '</body></html>';
-    win.document.write(htmlTiket);
-    injectWatermarkToPrintWin(win);
-    win.document.close();
-}
+// (populateTiketDropdown, generateTiketQR, generateAndCetakTiket,
+//  downloadTiketAsImage, shareTiketWA, cetakTiketLangsung dihapus -
+//  fungsi mati, referensi elemen HTML yang sudah tidak ada di UI)
 
 async function generateAndShareTiketWA(jamaah) {
     let waNumber = '';
@@ -10943,112 +10887,9 @@ async function generateAndShareTiketWA(jamaah) {
         if(num.length >= 10) waNumber = num;
     }
     if(!waNumber) { showToast(`${jamaah.nama_lengkap}: No WA tidak ada, dilewati`); return; }
-    const text = `🎫 *E-TIKET ${jamaah.nama_lengkap}*\n\n👤 Nama: ${jamaah.nama_lengkap}\n📦 Paket: ${jamaah.paket || '-'}\n📅 Tanggal: ${new Date().toLocaleDateString('id-ID')}\n\n#${getKonfigurasiProData().instansi1.nama || 'EduKu'}`;
+    const text = `🎫 *E-TIKET ${jamaah.nama_lengkap}*\n\n👤 Nama: ${jamaah.nama_lengkap}\n📅 Tanggal: ${new Date().toLocaleDateString('id-ID')}\n\n#${getKonfigurasiProData().instansi1.nama || 'EduKu'}`;
     window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(text)}`, '_blank');
     await new Promise(r => setTimeout(r, 1000));
-}
-
-function downloadTiketAsImage() {
-    const qrContainer = document.getElementById('tiketQR');
-    if(!qrContainer) return;
-    html2canvas(qrContainer).then(canvas => {
-        const link = document.createElement('a');
-        link.download = 'tiket.png';
-        link.href = canvas.toDataURL();
-        link.click();
-    }).catch(() => showToast('Gagal membuat gambar'));
-}
-
-function shareTiketWA() {
-    const jamaahId = document.getElementById('tiketJamaahSelect').value;
-    if(!jamaahId) return;
-    const jamaah = jamaahList.find(j => j.id == jamaahId);
-    if(!jamaah) return;
-    let waNumber = '628123456789';
-    if(jamaah.additional_fields && jamaah.additional_fields.whatsapp) {
-        let num = jamaah.additional_fields.whatsapp.replace(/\D/g, '');
-        if(num.startsWith('0')) num = '62' + num.substring(1);
-        if(num.length >= 10) waNumber = num;
-    }
-    const text = `🎫 *E-TIKET ${jamaah.nama_lengkap}*\n\n👤 Nama: ${jamaah.nama_lengkap}\n📦 Paket: ${jamaah.paket || '-'}\n📅 Tanggal: ${new Date().toLocaleDateString('id-ID')}\n\n#${getKonfigurasiProData().instansi1.nama || 'EduKu'}`;
-    window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(text)}`, '_blank');
-}
-
-// PERBAIKAN POIN 1: CETAK TIKET - Hanya mencetak area tiket, bersih tanpa menu/footer
-function cetakTiketLangsung() {
-    const tiketCard = document.querySelector('.tiket-card');
-    if (!tiketCard || tiketCard.style.display === 'none') {
-        showToast('Pilih peserta dulu untuk mencetak tiket');
-        return;
-    }
-    // Clone dan konversi canvas QR ke image dulu
-    const printContent = tiketCard.cloneNode(true);
-    // Salin isi canvas (QR) dari asli ke clone sebagai <img>
-    const oriCanvases = tiketCard.querySelectorAll('canvas');
-    const cloneCanvases = printContent.querySelectorAll('canvas');
-    oriCanvases.forEach((oriCanvas, i) => {
-        if (cloneCanvases[i]) {
-            const img = document.createElement('img');
-            img.src = oriCanvas.toDataURL('image/png');
-            img.style.width = '150px';
-            img.style.height = '150px';
-            cloneCanvases[i].parentNode.replaceChild(img, cloneCanvases[i]);
-        }
-    });
-    const style = `
-        <style>
-            * { margin: 0; padding: 0; box-sizing: border-box; }
-            body { 
-                font-family: 'Inter', Arial, sans-serif; 
-                display: flex; 
-                justify-content: center; 
-                align-items: center; 
-                min-height: 100vh; 
-                background: white;
-                padding: 20px;
-            }
-            .tiket-card-print {
-                max-width: 360px;
-                width: 100%;
-                margin: 0 auto;
-                padding: 20px;
-                border: 2px solid #0D5C4A;
-                border-radius: 24px;
-                background: white;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            }
-            .tiket-header {
-                text-align: center;
-                border-bottom: 2px dashed #ccc;
-                padding-bottom: 12px;
-                margin-bottom: 12px;
-            }
-            .tiket-title {
-                font-size: 20px;
-                font-weight: bold;
-                color: #0D5C4A;
-            }
-            .tiket-qr {
-                text-align: center;
-                margin: 15px 0;
-            }
-            .tiket-qr img {
-                width: 150px;
-                height: 150px;
-            }
-            .btn { display: none !important; }
-            .no-print { display: block; }
-            @media print {
-                body { padding: 0; }
-                .no-print { display: none !important; }
-            }
-        </style>
-    `;
-    printContent.classList.add('tiket-card-print');
-    printContent.classList.remove('tiket-card');
-    const printWindow = window.open('', '_blank');
-    printWindow.document.write(`<!DOCTYPE html><html><head><title>Cetak Tiket - EduKu</title>${style}</head><body>${printContent.outerHTML}<div class="no-print" style="text-align:center; margin-top:20px;"><button onclick="window.print()" style="padding:10px 20px; background:#0D5C4A; color:white; border:none; border-radius:8px; cursor:pointer;">PRINT</button><button onclick="window.close()" style="padding:10px 20px; background:#ccc; border:none; border-radius:8px; cursor:pointer; margin-left:10px;">TUTUP</button></div></body></html>`);
-    printWindow.document.close();
 }
 
 // ==================== MULTI EVENT (SINGKAT) ====================
@@ -18140,4 +17981,3 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 </html>
- 
