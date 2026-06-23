@@ -4845,50 +4845,7 @@ async function tutupSesiAktif() {
     showToast('Sesi ditutup!');
 }
 
-async function startScanner() {
-    if (!sesiAktifId) return showToast('Pilih atau buat sesi absensi dulu!');
-    const video = document.getElementById('scannerVideo');
-    const statusEl = document.getElementById('scannerStatus');
-    if (!video) return;
-    try {
-        scannerStream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }
-        });
-        video.srcObject = scannerStream;
-        video.play();
-        document.getElementById('btnStartScan').style.display = 'none';
-        document.getElementById('btnStopScan').style.display = 'block';
-        statusEl.textContent = '🔍 Arahkan ke QR Code...';
-        statusEl.style.color = '#0D5C4A';
-        scanFrames();
-    } catch(e) {
-        statusEl.textContent = '❌ Izinkan akses kamera!';
-        statusEl.style.color = '#EF4444';
-    }
-}
-
-// stopScanner defined below
-
-// scanFrames defined below
-
-async function prosesHasilScan(qrData) {
-    stopScanner();
-    const statusEl = document.getElementById('scannerStatus');
-    statusEl.textContent = '✅ QR terbaca! Mencari data...';
-    statusEl.style.color = '#10B981';
-    const noPorsi = qrData.trim();
-    const jamaah = jamaahList.find(j =>
-        (j.additional_fields?.no_porsi || '').trim().toLowerCase() === noPorsi.toLowerCase()
-    );
-    if (!jamaah) {
-        statusEl.textContent = '❌ Peserta tidak ditemukan! NIS: ' + noPorsi;
-        statusEl.style.color = '#EF4444';
-        document.getElementById('hasilScanCard').style.display = 'none';
-        return;
-    }
-    lastScannedResult = jamaah;
-    await tampilHasilScan(jamaah);
-}
+// (startScanner & prosesHasilScan versi lama dihapus - digantikan implementasi lengkap di bawah)
 
 async function tampilHasilScan(jamaah) {
     const fotoEl = document.getElementById('hasilFotoProfil');
@@ -6147,11 +6104,13 @@ function editJamaahById(id){
 }
 
 function confirmDeleteJamaahById(id){ 
-    if(confirm('Hapus database ini?')){ 
+    if(confirm('Hapus peserta ini?')){ 
         const index=jamaahList.findIndex(j=>j.id==id); 
         if(index!==-1){ 
             jamaahList.splice(index,1); 
-            saveJamaahData(); 
+            saveJamaahData();
+            // Hapus dari kelasMapping supaya tidak ada ID hantu
+            if(typeof removeSantriFromAllKelas === 'function') removeSantriFromAllKelas(id);
             showToast('Data dihapus'); 
         } 
     } 
@@ -6483,6 +6442,9 @@ async function confirmDeleteAllJamaah(){
 
         // Hapus dari localStorage (fallback lama)
         ['navara_jamaah_list','navara_jamaah_kita_list','navara_folder_list'].forEach(k => localStorage.removeItem(k));
+
+        // Hapus kelasMapping - semua ID santri sudah tidak ada
+        localStorage.removeItem('eduku_kelas_mapping');
 
         showToast('✅ Semua data peserta telah dihapus');
         renderJamaahListWithPagination();
