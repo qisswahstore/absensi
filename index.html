@@ -3392,7 +3392,7 @@ function internalShowPage(pageId) {
     if (pageId === 'cetaklabel') { renderMultiLabelJamaah(); updateNametagnBadge(); }
     if (pageId === 'cetaklabel') { if(window.populateLabelDropdown) window.populateLabelDropdown(); }
     if (pageId === 'cloudstorage') { if(window.updateStorageInfo) window.updateStorageInfo(); }
-    if (pageId === 'dashboard') { if(window.renderDashboard) window.renderDashboard(); }
+    if (pageId === 'dashboard') { if(window.renderDetailDashboard) window.renderDetailDashboard(); }
     window.scrollTo(0,0);
 }
 
@@ -4012,10 +4012,7 @@ function updateHeaderFromConfig() {
 // ==================== DASHBOARD (ringkasan) ====================
 let kasChart = null, paymentChart = null;
 
-function renderDashboard() {
-    const kasData = dataKas;
-    const totalKas = kasData.reduce((s,i) => s + (i.tipe === 'masuk' ? i.nom : -i.nom), 0);
-    document.getElementById('dashTotalKas').innerHTML = 'Rp ' + formatAngka(totalKas);
+function renderDetailDashboard() {
     const jamaahData = pesertaList;
     document.getElementById('dashTotalJamaah').innerHTML = jamaahData.length;
     const paymentData = paymentTransaksiList;
@@ -12817,7 +12814,7 @@ async function initPremium() {
     try { loadSumberHartaList(); } catch(e) { console.warn('loadSumberHartaList:', e.message); }
     
     // UPDATE STATS - selalu jalan walau ada error loading
-    try { updateHomeStats(); } catch(e) { console.warn('updateHomeStats:', e.message); }
+    try { renderDashboard(); } catch(e) { console.warn('renderDashboard:', e.message); }
     
     // Event listeners - selalu terpasang
     // adminModeToggleBtn sudah pakai onclick langsung di HTML
@@ -15005,7 +15002,7 @@ function bukaModalPilihSantri(kelasId) {
     var flt = document.getElementById('filterPilihSantri');
     if (flt) flt.value = 'all';
     
-    // Tutup modal detail dulu
+     // Tutup modal detail dulu
     var detailModal = document.getElementById('modalDetailKelas');
     if (detailModal) detailModal.style.display = 'none';
     
@@ -15371,7 +15368,7 @@ function doLoginAdmin() {
         if (typeof pilihTanpaLogin==='function') pilihTanpaLogin();
         try { applyTermsToDOM(); } catch(e) {}
         showToast('Selamat datang, Admin!');
-    try { updateHomeStats(); } catch(e) {}
+    try { renderDashboard(); } catch(e) {}
     }
 }
 
