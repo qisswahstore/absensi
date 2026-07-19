@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#0D5C4A">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1869,7 +1869,138 @@
     justify-content: flex-end;
 }
 
-/* ===== UTILITY CLASSES - Gantikan inline style yang berulang ===== */
+/* ===== DASHBOARD CONTROL CENTER ===== */
+.db-root { background:var(--bg); min-height:100vh; padding-bottom:80px; }
+
+/* Header */
+.db-header {
+    background:linear-gradient(135deg, var(--primary) 0%, #0a4035 100%);
+    padding:20px 16px 24px;
+    position:relative; overflow:hidden;
+}
+.db-header::after {
+    content:''; position:absolute; right:-30px; top:-30px;
+    width:160px; height:160px; border-radius:50%;
+    background:rgba(255,255,255,0.05);
+}
+.db-header-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; }
+.db-logo-row { display:flex; align-items:center; gap:10px; }
+.db-logo-img { width:38px; height:38px; border-radius:10px; background:rgba(255,255,255,0.15); display:flex; align-items:center; justify-content:center; overflow:hidden; }
+.db-instansi h1 { color:white; font-size:16px; font-weight:700; margin:0; line-height:1.2; }
+.db-instansi p  { color:rgba(255,255,255,0.7); font-size:11px; margin:0; }
+.db-actions { display:flex; gap:8px; align-items:center; }
+.db-btn-icon { background:rgba(255,255,255,0.15); color:white; border:none; width:34px; height:34px; border-radius:50%; font-size:15px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.db-greeting { color:rgba(255,255,255,0.85); font-size:12px; margin-bottom:4px; }
+.db-date     { color:white; font-size:14px; font-weight:600; }
+.db-admin-row { display:flex; align-items:center; gap:8px; margin-top:10px; flex-wrap:wrap; }
+.db-badge { background:rgba(255,255,255,0.15); color:white; font-size:10px; font-weight:600; padding:3px 8px; border-radius:20px; cursor:pointer; border:1px solid rgba(255,255,255,0.2); }
+.db-badge.active { background:var(--accent); color:#1a1a1a; border-color:var(--accent); }
+.db-badge-red { background:rgba(239,68,68,0.25); color:#fca5a5; border-color:rgba(239,68,68,0.3); }
+
+/* Section headers */
+.db-section { padding:0 16px; margin-bottom:6px; }
+.db-section-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; margin-top:18px; }
+.db-section-title { font-size:13px; font-weight:700; color:var(--dark); display:flex; align-items:center; gap:6px; }
+.db-section-dot { width:4px; height:16px; background:var(--primary); border-radius:2px; }
+.db-section-link { font-size:12px; color:var(--primary); font-weight:600; cursor:pointer; }
+
+/* Stat cards - baris 1 */
+.db-stats-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+.db-stat-card {
+    background:white; border-radius:14px; padding:14px;
+    box-shadow:0 1px 8px rgba(0,0,0,0.07);
+    display:flex; align-items:center; gap:12px;
+    transition:transform 0.15s;
+}
+.db-stat-card:active { transform:scale(0.97); }
+.db-stat-icon { width:42px; height:42px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+.db-stat-label { font-size:11px; color:var(--gray); font-weight:500; margin-bottom:2px; }
+.db-stat-value { font-size:17px; font-weight:800; color:var(--dark); line-height:1.1; }
+.db-stat-sub { font-size:10px; color:var(--gray-400); margin-top:1px; }
+
+/* Perlu Perhatian */
+.db-alert-card {
+    background:white; border-radius:14px; padding:12px 14px;
+    box-shadow:0 1px 8px rgba(0,0,0,0.07);
+    display:flex; align-items:center; gap:12px;
+    margin-bottom:8px; cursor:pointer;
+    border-left:4px solid transparent;
+    transition:transform 0.15s;
+}
+.db-alert-card:active { transform:scale(0.98); }
+.db-alert-icon { width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+.db-alert-label { font-size:13px; font-weight:600; color:var(--dark); }
+.db-alert-sub   { font-size:11px; color:var(--gray); margin-top:1px; }
+.db-alert-badge { margin-left:auto; background:var(--red); color:white; font-size:10px; font-weight:700; padding:3px 8px; border-radius:20px; flex-shrink:0; }
+.db-alert-badge-ok { background:#dcfce7; color:#166534; }
+
+/* Quick Actions */
+.db-quick-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+.db-quick-btn {
+    background:white; border-radius:14px; padding:12px 6px;
+    box-shadow:0 1px 8px rgba(0,0,0,0.07);
+    display:flex; flex-direction:column; align-items:center; gap:6px;
+    cursor:pointer; border:none; transition:transform 0.15s;
+}
+.db-quick-btn:active { transform:scale(0.95); }
+.db-quick-icon { width:38px; height:38px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; }
+.db-quick-label { font-size:10px; font-weight:600; color:var(--dark); text-align:center; line-height:1.2; }
+
+/* Agenda */
+.db-agenda-item {
+    background:white; border-radius:12px; padding:11px 14px;
+    margin-bottom:8px; display:flex; align-items:center; gap:12px;
+    box-shadow:0 1px 6px rgba(0,0,0,0.06);
+}
+.db-agenda-time { text-align:center; min-width:38px; }
+.db-agenda-time span:first-child { display:block; font-size:13px; font-weight:800; color:var(--primary); }
+.db-agenda-time span:last-child  { display:block; font-size:9px; color:var(--gray); }
+.db-agenda-divider { width:2px; height:32px; border-radius:2px; flex-shrink:0; }
+.db-agenda-nama { font-size:13px; font-weight:600; color:var(--dark); }
+.db-agenda-sub  { font-size:11px; color:var(--gray); margin-top:1px; }
+
+/* Aktivitas */
+.db-activity-item { display:flex; align-items:flex-start; gap:10px; padding:10px 0; border-bottom:1px solid var(--border); }
+.db-activity-item:last-child { border-bottom:none; }
+.db-activity-dot { width:8px; height:8px; border-radius:50%; margin-top:5px; flex-shrink:0; }
+.db-activity-text { font-size:13px; color:var(--dark); flex:1; }
+.db-activity-time { font-size:10px; color:var(--gray-400); flex-shrink:0; margin-top:2px; }
+
+/* Statistik Chart */
+.db-chart-card { background:white; border-radius:14px; padding:14px; box-shadow:0 1px 8px rgba(0,0,0,0.07); margin-bottom:10px; }
+.db-chart-title { font-size:12px; font-weight:700; color:var(--gray); margin-bottom:10px; }
+
+/* Menu Lengkap */
+.db-menu-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+.db-menu-item {
+    background:white; border-radius:14px; padding:14px 8px;
+    text-align:center; cursor:pointer;
+    box-shadow:0 1px 6px rgba(0,0,0,0.06);
+    transition:transform 0.15s;
+}
+.db-menu-item:active { transform:scale(0.95); }
+.db-menu-emoji { font-size:28px; margin-bottom:6px; display:block; }
+.db-menu-name  { font-size:11px; font-weight:600; color:var(--dark); display:block; line-height:1.3; }
+.db-menu-badge { font-size:9px; color:var(--gray); display:block; margin-top:2px; }
+
+/* Empty state dalam card */
+.db-empty { text-align:center; padding:16px; color:var(--gray-400); font-size:12px; }
+
+/* Dark mode */
+body.dark-mode .db-stat-card,
+body.dark-mode .db-alert-card,
+body.dark-mode .db-quick-btn,
+body.dark-mode .db-agenda-item,
+body.dark-mode .db-chart-card,
+body.dark-mode .db-menu-item { background:var(--card-bg); }
+body.dark-mode .db-stat-value,
+body.dark-mode .db-alert-label,
+body.dark-mode .db-quick-label,
+body.dark-mode .db-agenda-nama,
+body.dark-mode .db-activity-text,
+body.dark-mode .db-menu-name,
+body.dark-mode .db-section-title { color:var(--dark); }
+
 
 /* Teks */
 .txt-label    { display:block; font-weight:600; font-size:13px; margin-bottom:4px; }
@@ -1968,33 +2099,8 @@
 
 <!-- HOME PAGE -->
 <div id="page-home" class="page active">
-    <div class="header-premium">
-        <div class="logo-area">
-            <div class="logo-icon" id="headerLogo"><i class="fas fa-kaaba"></i></div>
-            <div class="logo-text"><h1 id="headerInstansi1">EduKu</h1><p id="headerInstansi2">EduKu</p></div>
-        </div>
-        <div class="greeting">
-            <div><h2>Selamat datang, Admin</h2><p id="homeDate">Memuat...</p></div>
-            <div class="greeting-actions">
-                <button id="darkModeToggle" class="dark-mode-toggle">🌙</button>
-                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
-                    <span id="adminModeToggleBtn" class="admin-toggle-link" onclick="if(typeof toggleAdminMode==='function')toggleAdminMode();" style="cursor:pointer;"><i class="fas fa-shield-alt"></i> Mode Admin</span>
-                    <span onclick="logoutAdmin()" style="cursor:pointer;font-size:11px;color:var(--red);font-weight:600;text-decoration:none;">&#x2192; Keluar Admin</span>
-                    <a href="#" id="perpanjangBtn" onclick="showPage('lisensi');return false;" style="display:none;font-size:11px;color:var(--orange);font-weight:bold;text-decoration:none;">&#x23F0; Perpanjang</a>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="stats-row">
-        <div class="stat-mini-card"><i class="fas fa-coins"></i><div class="stat-label">Total Kas</div><div class="stat-number" id="homeStatKas">Rp 0</div></div>
-        <div class="stat-mini-card"><i class="fas fa-users"></i><div class="stat-label" id="statLabelJamaah">Peserta</div><div class="stat-number" id="homeStatJamaah">0</div></div>
-        <div class="stat-mini-card"><i class="fas fa-money-bill-wave"></i><div class="stat-label">Total Piutang</div><div class="stat-number" id="homeStatPiutang">Rp 0</div></div>
-        <div class="stat-mini-card"><i class="fas fa-user-check"></i><div class="stat-label" id="statLabelLunas">Peserta Lunas</div><div class="stat-number" id="homeStatLunas">0</div></div>
-    </div>
-    <div class="menu-container">
-        <div class="section-title"><span><i class="fas fa-th-large"></i> Menu Utama</span></div>
-        <div class="menu-grid-premium" id="menuGridPremium"></div>
-    </div>
+    <!-- DASHBOARD CONTENT: diisi oleh renderDashboard() -->
+    <div id="dashboardRoot"></div>
 </div>
 
 <!-- DASHBOARD PAGE -->
@@ -2776,7 +2882,7 @@
             </div>
             <div style="background:var(--bg);border-radius:8px;padding:10px;font-size:11px;color:var(--gray-700);margin-bottom:10px;">
                 <b>Variabel yang bisa dipakai:</b><br>
-                {nama} {nik} {alamat} {no_paspor} {no_porsi} {tgl_lahir} {tempat_lahir} {jenis_kelamin} {whatsapp} {kamar} {bus} {rombongan} {hotel_makkah} {hotel_madinah} {warna} {nomor_surat} {tanggal} {nama_instansi} {keperluan}
+                {nama} {nis} {nik} {tgl_lahir} {tempat_lahir} {jenis_kelamin} {alamat} {whatsapp} {kelas} {wali} {hp_wali} {asal_sekolah} {tahun_masuk} {total_poin_pelanggaran} {rincian_pelanggaran} {nomor_surat} {tanggal} {kota_tanggal} {nama_instansi} {alamat_instansi} {keperluan}
             </div>
             <textarea id="suratKustomTemplate" rows="6" placeholder="Tulis template surat Anda di sini menggunakan variabel di atas..." style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--gray-300);background:var(--input-bg);color:var(--text);font-size:12px;resize:vertical;"></textarea>
             <button onclick="simpanTemplateSuratKustom()" style="width:100%;padding:10px;background:var(--green);color:white;border:none;border-radius:8px;margin-top:8px;cursor:pointer;font-weight:bold;">💾 Simpan Template Kustom</button>
@@ -3071,7 +3177,18 @@
     <button onclick="closeDetailModal()" style="width:100%;margin-top:8px;padding:10px;background:var(--gray-200);color:var(--gray-800);border:none;border-radius:20px;font-size:14px;cursor:pointer;">Tutup</button>
 </div></div>
 <div id="dokumenFieldModal" class="modal"><div class="modal-content"><h3>Tambah Jenis Dokumen</h3><div class="dynamic-field"><label>Nama Dokumen</label><input type="text" id="newDokumenName" placeholder="Contoh: Visa, Tiket, Sertifikat"></div><div class="dynamic-field"><label>Icon</label><select id="newDokumenIcon"><option value="🪪"> KTP</option><option value="📘"> Paspor</option><option value="📷"> Foto</option><option value="💉"> Vaksin</option><option value="🛂"> Visa</option><option value="🎫"> Tiket</option><option value="📄"> Dokumen</option></select></div><button class="btn btn-primary" onclick="addDokumenField()"> TAMBAH</button><button class="btn btn-danger mt-2" onclick="closeDokumenFieldModal()">BATAL</button></div></div>
-<div id="previewDokumenModal" class="modal"><div class="modal-content"><h3 id="previewDokumenTitle">Preview Dokumen</h3><img id="previewDokumenImage" class="preview-img" style="max-width:100%; border-radius:16px; margin:15px 0;"><button class="btn btn-primary" onclick="closePreviewDokumenModal()">Tutup</button></div></div>
+<div id="previewDokumenModal" class="modal"><div class="modal-content" style="padding:16px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <h3 id="previewDokumenTitle" style="margin:0;font-size:15px;flex:1;">Preview Dokumen</h3>
+        <button onclick="closePreviewDokumenModal()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--gray);">✕</button>
+    </div>
+    <img id="previewDokumenImage" class="preview-img" style="max-width:100%;border-radius:10px;margin-bottom:12px;display:block;">
+    <div style="display:flex;gap:8px;">
+        <button onclick="bukaDocPenuh()" style="flex:1;padding:11px;background:var(--primary);color:white;border:none;border-radius:10px;font-size:13px;font-weight:bold;cursor:pointer;">🔍 Buka & Zoom</button>
+        <button onclick="closePreviewDokumenModal()" style="flex:1;padding:11px;background:var(--gray-200);color:var(--gray-800);border:none;border-radius:10px;font-size:13px;cursor:pointer;">Tutup</button>
+    </div>
+    <div style="font-size:11px;color:var(--gray-500);text-align:center;margin-top:8px;">Tap "Buka & Zoom" untuk melihat dokumen penuh dengan zoom</div>
+</div></div>
 <div id="batchFloatingBar" class="batch-floating-bar" style="position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:white; padding:12px 20px; border-radius:50px; box-shadow:0 4px 15px rgba(0,0,0,0.2); display:none; align-items:center; gap:10px; border:2px solid var(--primary); z-index:9999;">
     <span id="batchCount" class="batch-count">0 dipilih</span>
     <button onclick="showPindahModeModal()" style="background:var(--primary);color:white;border:none;padding:8px 14px;border-radius:30px;font-size:12px;cursor:pointer;">🔀 Pindah Mode</button>
@@ -3232,7 +3349,7 @@ function internalShowPage(pageId) {
     if (pageId === 'zakat') { if(window.renderSumberHartaList) window.renderSumberHartaList(); }
     if (pageId === 'pembayaran') { if(window.renderPaymentDashboard) window.renderPaymentDashboard(); if(window.renderPaymentJamaahList) window.renderPaymentJamaahList(); if(window.populatePaymentJamaahDropdown) window.populatePaymentJamaahDropdown(); }
     if (pageId === 'datamaster') { if(window.loadMasterData) window.loadMasterData(); if(window.renderDynamicModeSwitcher) window.renderDynamicModeSwitcher(); }
-    if (pageId === 'home') { updateLicenseBanner(); updateLicenseSummary(); try { updateHomeStats(); } catch(e) {} }
+    if (pageId === 'home') { updateLicenseBanner(); updateLicenseSummary(); try { renderDashboard(); } catch(e) { console.warn('Dashboard:', e); } }
     if (pageId === 'lisensi') { renderLicenseStatus(); }
     if (pageId === 'setting') { updateLicenseSummary(); }
     if (pageId === 'konfigurasi') { if(window.loadKonfigurasiPro) window.loadKonfigurasiPro(); setTimeout(applyKonfigurasiLock, 400); }
@@ -3304,54 +3421,409 @@ function showToast(msg) {
     setTimeout(() => toast.classList.remove('show'), 3000); 
 }
 
-function updateHomeStats() {
-    document.getElementById('homeDate').innerHTML = new Date().toLocaleDateString('id-ID', { weekday: 'long', year:'numeric', month:'long', day:'numeric' });
-    
-    // Total Kas
-    const kasData = dataKas;
-    const totalKas = kasData.reduce((s,i) => s + (i.tipe === 'masuk' ? i.nom : -i.nom), 0);
-    document.getElementById('homeStatKas').innerHTML = 'Rp ' + totalKas.toLocaleString('id-ID');
-    
-    // Total Jamaah
-    const jamaahData = pesertaList;
-    document.getElementById('homeStatJamaah').innerHTML = jamaahData.length;
-    
-    // Hitung Total Piutang dan Jamaah Lunas
-    const paymentData = paymentTransaksiList;
-    let lunasCount = 0, totalPiutang = 0;
-    
-    jamaahData.forEach(j => {
-        const totalBayar = paymentData.filter(t => t.id_jamaah == j.id).reduce((s,t) => s + t.nominal, 0);
-        let totalHargaPaket = null;
-        
-        // Cari field harga/paket di additional_fields
-        if (j.additional_fields) { 
-            for (const key in j.additional_fields) { 
-                if (key.toLowerCase().includes('harga') || key.toLowerCase().includes('paket') || key.toLowerCase().includes('biaya')) { 
-                    const val = j.additional_fields[key]; 
-                    if (val) { 
-                        const cleaned = val.toString().replace(/\./g, '').replace(/[^0-9]/g, ''); 
-                        totalHargaPaket = parseInt(cleaned); 
-                        if (!isNaN(totalHargaPaket) && totalHargaPaket > 0) break; 
-                    } 
-                } 
-            } 
-        }
-        
-        // Hitung lunas dan piutang
-        if (totalHargaPaket && totalHargaPaket > 0) { 
-            if (totalBayar >= totalHargaPaket) {
-                lunasCount++; // Jamaah sudah lunas
-            } else {
-                totalPiutang += (totalHargaPaket - totalBayar); // Masih ada piutang
-            }
-        }
-    });
-    
-    // Update tampilan
-    document.getElementById('homeStatPiutang').innerHTML = 'Rp ' + formatAngka(totalPiutang);
-    document.getElementById('homeStatLunas').innerHTML = lunasCount;
+// ==================== DASHBOARD CONTROL CENTER ====================
+
+function renderDashboard() {
+    const root = document.getElementById('dashboardRoot');
+    if(!root) return;
+    root.className = 'db-root';
+    root.innerHTML =
+        renderDB_Header() +
+        '<div class="db-section">' +
+            renderDB_Ringkasan() +
+            renderDB_PerluPerhatian() +
+            renderDB_QuickAction() +
+            renderDB_Agenda() +
+            renderDB_Aktivitas() +
+            renderDB_Statistik() +
+            renderDB_MenuLengkap() +
+        '</div>';
+
+    // Pasang event listener dark mode setelah render
+    const dmBtn = document.getElementById('dashDarkBtn');
+    if(dmBtn) dmBtn.onclick = function() {
+        document.body.classList.toggle('dark-mode');
+        const isDark = document.body.classList.contains('dark-mode');
+        localStorage.setItem('eduku_dark_mode', isDark);
+        this.innerHTML = isDark ? '☀️' : '🌙';
+    };
+
+    // Render chart setelah DOM siap
+    setTimeout(renderDB_Charts, 100);
 }
+
+// ── 1. HEADER ──────────────────────────────────────────────
+function renderDB_Header() {
+    const cfg = getKonfigurasiProData();
+    const i1 = cfg.instansi1 || {};
+    const now = new Date();
+    const hari = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'][now.getDay()];
+    const tgl = now.toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
+    const jam = now.toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'});
+    const isDark = document.body.classList.contains('dark-mode');
+    const logoHtml = i1.logo
+        ? `<img src="${i1.logo}" style="width:100%;height:100%;object-fit:cover;">`
+        : `<i class="fas fa-graduation-cap" style="color:white;font-size:18px;"></i>`;
+
+    const isLicensed_ = typeof isLicensed === 'function' && isLicensed();
+    const lisensiHtml = !isLicensed_
+        ? `<span class="db-badge db-badge-red" onclick="showPage('lisensi')">⏰ Aktivasi</span>`
+        : `<span class="db-badge">✅ Pro</span>`;
+
+    return `<div class="db-header">
+        <div class="db-header-top">
+            <div class="db-logo-row">
+                <div class="db-logo-img">${logoHtml}</div>
+                <div class="db-instansi">
+                    <h1>${escapeHtml(i1.nama || 'EduKu')}</h1>
+                    <p>${escapeHtml(i1.alamat || 'Sistem Manajemen Pesantren')}</p>
+                </div>
+            </div>
+            <div class="db-actions">
+                <button class="db-btn-icon" id="dashDarkBtn">${isDark?'☀️':'🌙'}</button>
+                <button class="db-btn-icon" onclick="logoutAdmin()" title="Keluar">
+                    <i class="fas fa-sign-out-alt" style="font-size:14px;"></i>
+                </button>
+            </div>
+        </div>
+        <div class="db-greeting">Selamat datang, <strong>Admin</strong></div>
+        <div class="db-date">${hari}, ${tgl} · ${jam}</div>
+        <div class="db-admin-row">
+            <span id="adminModeToggleBtn" class="db-badge" onclick="if(typeof toggleAdminMode==='function')toggleAdminMode();">
+                <i class="fas fa-shield-alt"></i> Mode Admin
+            </span>
+            ${lisensiHtml}
+            <a href="#" id="perpanjangBtn" onclick="showPage('lisensi');return false;" style="display:none;font-size:11px;color:var(--orange);font-weight:bold;text-decoration:none;">⏰ Perpanjang</a>
+        </div>
+    </div>`;
+}
+
+// ── 2. RINGKASAN HARI INI ──────────────────────────────────
+function renderDB_Ringkasan() {
+    const totalSantri = pesertaList.length;
+    const totalPengajar = pengajarList.length;
+
+    // Hadir hari ini
+    const today = new Date().toISOString().split('T')[0];
+    const absensiHarian = getAbsensiHarianData();
+    const absensiHariIni = absensiHarian.filter(a => a.tanggal === today);
+    let hadirHariIni = 0;
+    absensiHariIni.forEach(sesi => {
+        sesi.data?.forEach(e => { if(e.status === 'hadir') hadirHariIni++; });
+    });
+    const sudahAbsen = absensiHariIni.length > 0;
+
+    // Keuangan
+    const totalKas = dataKas.reduce((s,i) => s + (i.tipe==='masuk' ? i.nom : -i.nom), 0);
+    let totalPiutang = 0;
+    pesertaList.forEach(j => {
+        const totalBayar = paymentTransaksiList.filter(t => t.id_jamaah == j.id).reduce((s,t) => s + t.nominal, 0);
+        const harga = getTotalHargaPaket(j) || 0;
+        if(harga > 0 && totalBayar < harga) totalPiutang += (harga - totalBayar);
+    });
+
+    return `<div class="db-section-header">
+        <div class="db-section-title"><div class="db-section-dot"></div>Ringkasan Hari Ini</div>
+    </div>
+    <div class="db-stats-grid">
+        <div class="db-stat-card" onclick="showPage('jamaah')">
+            <div class="db-stat-icon" style="background:#e8f5f0;">👨‍🎓</div>
+            <div>
+                <div class="db-stat-label">Total Santri</div>
+                <div class="db-stat-value">${totalSantri}</div>
+                <div class="db-stat-sub">peserta terdaftar</div>
+            </div>
+        </div>
+        <div class="db-stat-card" onclick="showPage('absensi_harian')">
+            <div class="db-stat-icon" style="background:${sudahAbsen?'#e8f5f0':'#fef3c7'};">${sudahAbsen?'✅':'📋'}</div>
+            <div>
+                <div class="db-stat-label">Hadir Hari Ini</div>
+                <div class="db-stat-value" style="color:${sudahAbsen?'var(--green)':'var(--orange)'};">${hadirHariIni}</div>
+                <div class="db-stat-sub">${sudahAbsen?'sudah diinput':'belum ada input'}</div>
+            </div>
+        </div>
+        <div class="db-stat-card" onclick="showPage('pengajar')">
+            <div class="db-stat-icon" style="background:#eff6ff;">👨‍🏫</div>
+            <div>
+                <div class="db-stat-label">Pengajar</div>
+                <div class="db-stat-value">${totalPengajar}</div>
+                <div class="db-stat-sub">guru terdaftar</div>
+            </div>
+        </div>
+        <div class="db-stat-card" onclick="showPage('kas')">
+            <div class="db-stat-icon" style="background:#fefce8;">💰</div>
+            <div>
+                <div class="db-stat-label">Saldo Kas</div>
+                <div class="db-stat-value" style="font-size:13px;">Rp ${formatAngka(totalKas)}</div>
+                <div class="db-stat-sub" style="color:${totalPiutang>0?'var(--red)':'var(--green)'};">Piutang: Rp ${formatAngka(totalPiutang)}</div>
+            </div>
+        </div>
+    </div>`;
+}
+
+// ── 3. PERLU PERHATIAN ─────────────────────────────────────
+function renderDB_PerluPerhatian() {
+    const today = new Date().toISOString().split('T')[0];
+    const absensiHariIni = getAbsensiHarianData().filter(a => a.tanggal === today);
+    const belumAbsen = absensiHariIni.length === 0;
+
+    // Santri belum absen
+    let santriAlpha = 0;
+    absensiHariIni.forEach(s => { s.data?.forEach(e => { if(e.status==='alpha') santriAlpha++; }); });
+
+    // Tunggakan
+    let santriBelumLunas = 0;
+    pesertaList.forEach(j => {
+        const bayar = paymentTransaksiList.filter(t=>t.id_jamaah==j.id).reduce((s,t)=>s+t.nominal,0);
+        const harga = getTotalHargaPaket(j)||0;
+        if(harga>0 && bayar<harga) santriBelumLunas++;
+    });
+
+    // Jadwal hari ini
+    const hariIni = ['Ahad','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'][new Date().getDay()];
+    const jadwalHariIni = jadwalList.filter(j => j.hari === hariIni);
+
+    const items = [
+        belumAbsen ? {
+            icon:'📋', bg:'#fef3c7', border:'var(--orange)',
+            label:'Absensi Hari Ini Belum Diinput',
+            sub:'Belum ada data kehadiran hari ini',
+            badge:'Segera', badgeColor:'var(--orange)',
+            action:"showPage('absensi_harian')"
+        } : santriAlpha > 0 ? {
+            icon:'⚠️', bg:'#fef2f2', border:'var(--red)',
+            label:`${santriAlpha} Santri Alpha Hari Ini`,
+            sub:'Perlu dihubungi atau dicatat keterangannya',
+            badge:santriAlpha, badgeColor:'var(--red)',
+            action:"showPage('absensi_harian')"
+        } : {
+            icon:'✅', bg:'#f0fdf4', border:'var(--green)',
+            label:'Absensi Hari Ini Sudah Lengkap',
+            sub:'Semua santri sudah terabsen hari ini',
+            badge:'OK', badgeColor:'var(--green)',
+            action:null
+        },
+        santriBelumLunas > 0 ? {
+            icon:'💸', bg:'#fef2f2', border:'var(--red)',
+            label:`${santriBelumLunas} Santri Masih Menunggak`,
+            sub:'Belum melunasi pembayaran',
+            badge:santriBelumLunas, badgeColor:'var(--red)',
+            action:"showPage('pembayaran')"
+        } : null,
+        jadwalHariIni.length > 0 ? {
+            icon:'📅', bg:'#eff6ff', border:'var(--blue)',
+            label:`${jadwalHariIni.length} Jadwal Aktif Hari Ini`,
+            sub: jadwalHariIni.slice(0,2).map(j=>`${j.jam||'?'} ${j.mapel||j.nama||'?'}`).join(' · '),
+            badge:jadwalHariIni.length, badgeColor:'var(--blue)',
+            action:"showPage('jadwal')"
+        } : null,
+    ].filter(Boolean);
+
+    const itemsHtml = items.map(item => `
+        <div class="db-alert-card" style="border-left-color:${item.border};" ${item.action?`onclick="${item.action}"`:''}> 
+            <div class="db-alert-icon" style="background:${item.bg};">${item.icon}</div>
+            <div style="flex:1;">
+                <div class="db-alert-label">${item.label}</div>
+                <div class="db-alert-sub">${item.sub}</div>
+            </div>
+            <span class="db-alert-badge" style="background:${item.badgeColor};">${item.badge}</span>
+        </div>`).join('');
+
+    return `<div class="db-section-header">
+        <div class="db-section-title"><div class="db-section-dot" style="background:var(--red);"></div>Perlu Perhatian</div>
+    </div>
+    ${itemsHtml || '<div class="db-empty">Tidak ada item yang perlu perhatian 🎉</div>'}`;
+}
+
+// ── 4. QUICK ACTION ────────────────────────────────────────
+function renderDB_QuickAction() {
+    const actions = [
+        { icon:'👨‍🎓', bg:'#e8f5f0', label:'Tambah Santri', action:"openTambahJamaahModal()" },
+        { icon:'📋', bg:'#fef3c7', label:'Input Absensi', action:"showPage('absensi_harian')" },
+        { icon:'💳', bg:'#eff6ff', label:'Pembayaran', action:"showPage('pembayaran')" },
+        { icon:'📊', bg:'#f5f3ff', label:'Laporan', action:"showPage('dashboard')" },
+        { icon:'📝', bg:'#fef2f2', label:'Nilai', action:"showPage('nilai')" },
+        { icon:'⚠️', bg:'#fff7ed', label:'Pelanggaran', action:"showPage('pelanggaran')" },
+        { icon:'📅', bg:'#ecfdf5', label:'Jadwal', action:"showPage('jadwal')" },
+        { icon:'🧮', bg:'#fefce8', label:'Kalkulator', action:"showPage('estimasi')" },
+    ];
+    const btns = actions.map(a => `
+        <button class="db-quick-btn" onclick="${a.action}">
+            <div class="db-quick-icon" style="background:${a.bg};">${a.icon}</div>
+            <span class="db-quick-label">${a.label}</span>
+        </button>`).join('');
+    return `<div class="db-section-header">
+        <div class="db-section-title"><div class="db-section-dot" style="background:var(--blue);"></div>Aksi Cepat</div>
+    </div>
+    <div class="db-quick-grid">${btns}</div>`;
+}
+
+// ── 5. AGENDA HARI INI ─────────────────────────────────────
+function renderDB_Agenda() {
+    const hariIni = ['Ahad','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'][new Date().getDay()];
+    const jadwalHariIni = jadwalList.filter(j => j.hari === hariIni)
+        .sort((a,b) => (a.jam||'').localeCompare(b.jam||''));
+
+    let html = `<div class="db-section-header">
+        <div class="db-section-title"><div class="db-section-dot" style="background:var(--teal);"></div>Agenda Hari Ini · ${hariIni}</div>
+        <span class="db-section-link" onclick="showPage('jadwal')">Lihat Semua ›</span>
+    </div>`;
+
+    if(!jadwalHariIni.length) {
+        html += `<div class="db-empty" style="background:white;border-radius:14px;padding:20px;box-shadow:0 1px 8px rgba(0,0,0,0.07);">Tidak ada jadwal hari ini 📅</div>`;
+        return html;
+    }
+
+    jadwalHariIni.slice(0,5).forEach(j => {
+        const color = JH_CLR[j.hari] || 'var(--primary)';
+        const jam = j.jam || '--:--';
+        const selesai = j.jamSelesai || '';
+        html += `<div class="db-agenda-item" onclick="showPage('jadwal')">
+            <div class="db-agenda-time">
+                <span>${jam}</span>
+                ${selesai?`<span>${selesai}</span>`:''}
+            </div>
+            <div class="db-agenda-divider" style="background:${color};"></div>
+            <div style="flex:1;">
+                <div class="db-agenda-nama">${escapeHtml(j.mapel || j.nama || 'Kegiatan')}</div>
+                <div class="db-agenda-sub">${escapeHtml(j.kelas||'')}${j.kelas&&j.pengajar?' · ':''}${escapeHtml(j.pengajar||'')}</div>
+            </div>
+        </div>`;
+    });
+    if(jadwalHariIni.length > 5) {
+        html += `<div class="db-empty" onclick="showPage('jadwal')" style="cursor:pointer;color:var(--primary);">+${jadwalHariIni.length-5} jadwal lainnya › </div>`;
+    }
+    return html;
+}
+
+// ── 6. AKTIVITAS TERBARU ───────────────────────────────────
+function renderDB_Aktivitas() {
+    const activities = [];
+    const fmt = (tgl) => {
+        if(!tgl) return '-';
+        try { return new Date(tgl).toLocaleDateString('id-ID',{day:'numeric',month:'short'}); }
+        catch(e) { return tgl; }
+    };
+
+    // Dari pembayaran terbaru
+    const sortedPay = [...paymentTransaksiList].sort((a,b)=>new Date(b.tanggal)-new Date(a.tanggal)).slice(0,3);
+    sortedPay.forEach(t => {
+        const j = pesertaList.find(p=>p.id==t.id_jamaah);
+        if(j) activities.push({ dot:'var(--green)', text:`💳 Pembayaran Rp ${formatAngka(t.nominal)} dari <b>${escapeHtml(j.nama_lengkap)}</b>`, time:fmt(t.tanggal) });
+    });
+
+    // Dari absensi terbaru
+    const sortedAbs = [...getAbsensiHarianData()].sort((a,b)=>(b.tanggal||'').localeCompare(a.tanggal||'')).slice(0,2);
+    sortedAbs.forEach(a => {
+        const hadir = a.data?.filter(e=>e.status==='hadir').length||0;
+        activities.push({ dot:'var(--blue)', text:`📋 Absensi ${a.tanggal}: <b>${hadir} hadir</b>`, time:fmt(a.tanggal) });
+    });
+
+    // Peserta terbaru
+    const sortedPeserta = [...pesertaList].sort((a,b)=>(b.id||0)-(a.id||0)).slice(0,2);
+    sortedPeserta.forEach(p => {
+        activities.push({ dot:'var(--orange)', text:`👨‍🎓 Santri baru: <b>${escapeHtml(p.nama_lengkap)}</b>`, time:p.created_at || '-' });
+    });
+
+    activities.sort((a,b)=>(b.time||'').localeCompare(a.time||''));
+    const items = activities.slice(0,6);
+
+    return `<div class="db-section-header">
+        <div class="db-section-title"><div class="db-section-dot" style="background:var(--purple);"></div>Aktivitas Terbaru</div>
+    </div>
+    <div style="background:white;border-radius:14px;padding:14px;box-shadow:0 1px 8px rgba(0,0,0,0.07);">
+        ${items.length ? items.map(a=>`
+            <div class="db-activity-item">
+                <div class="db-activity-dot" style="background:${a.dot};"></div>
+                <div class="db-activity-text">${a.text}</div>
+                <div class="db-activity-time">${a.time}</div>
+            </div>`).join('') : '<div class="db-empty">Belum ada aktivitas tercatat</div>'}
+    </div>`;
+}
+
+// ── 7. STATISTIK ───────────────────────────────────────────
+function renderDB_Statistik() {
+    return `<div class="db-section-header">
+        <div class="db-section-title"><div class="db-section-dot" style="background:var(--accent);"></div>Statistik</div>
+        <span class="db-section-link" onclick="showPage('dashboard')">Detail ›</span>
+    </div>
+    <div class="db-chart-card">
+        <div class="db-chart-title">📊 KEHADIRAN 6 BULAN TERAKHIR</div>
+        <canvas id="dbChartAbsensi" height="120"></canvas>
+    </div>
+    <div class="db-chart-card">
+        <div class="db-chart-title">💰 PEMASUKAN KAS 6 BULAN TERAKHIR</div>
+        <canvas id="dbChartKas" height="120"></canvas>
+    </div>`;
+}
+
+// ── 8. MENU LENGKAP ────────────────────────────────────────
+function renderDB_MenuLengkap() {
+    const visible = menuItemsPremium.filter(m => {
+        const isVisible = (m.id==='pelanggaran'||m.id==='absensi_harian'||m.id==='estimasi'||m.id==='datamaster')
+            ? true : localStorage.getItem(`menu_${m.id}_visible`) !== 'false';
+        return isVisible;
+    });
+
+    const menuHtml = visible.map(m => `
+        <div class="db-menu-item" onclick="showPage('${m.id}')">
+            <span class="db-menu-emoji">${m.icon}</span>
+            <span class="db-menu-name">${m.label}</span>
+            <span class="db-menu-badge">${m.badge||''}</span>
+        </div>`).join('');
+
+    return `<div class="db-section-header" style="margin-top:24px;">
+        <div class="db-section-title"><div class="db-section-dot"></div>Menu Lengkap</div>
+    </div>
+    <div class="db-menu-grid" id="menuGridPremium">${menuHtml}</div>`;
+}
+
+// ── CHARTS ─────────────────────────────────────────────────
+function renderDB_Charts() {
+    // Chart Absensi 6 bulan
+    const ctx1 = document.getElementById('dbChartAbsensi');
+    if(ctx1 && typeof Chart !== 'undefined') {
+        const bulan = [], hadirData = [];
+        for(let i=5; i>=0; i--) {
+            const d = new Date(); d.setMonth(d.getMonth()-i);
+            const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+            bulan.push(d.toLocaleDateString('id-ID',{month:'short'}));
+            const absData = getAbsensiHarianData().filter(a=>(a.tanggal||'').startsWith(key));
+            let h=0; absData.forEach(s=>s.data?.forEach(e=>{ if(e.status==='hadir') h++; }));
+            hadirData.push(h);
+        }
+        if(window._dbChartAbsensi) window._dbChartAbsensi.destroy();
+        window._dbChartAbsensi = new Chart(ctx1, {
+            type:'bar',
+            data:{ labels:bulan, datasets:[{ label:'Hadir', data:hadirData, backgroundColor:'rgba(13,92,74,0.7)', borderRadius:6 }] },
+            options:{ plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true, ticks:{stepSize:1}}}, responsive:true, maintainAspectRatio:false }
+        });
+    }
+
+    // Chart Kas 6 bulan
+    const ctx2 = document.getElementById('dbChartKas');
+    if(ctx2 && typeof Chart !== 'undefined') {
+        const bulan2 = [], kasData2 = [];
+        for(let i=5; i>=0; i--) {
+            const d = new Date(); d.setMonth(d.getMonth()-i);
+            const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+            bulan2.push(d.toLocaleDateString('id-ID',{month:'short'}));
+            const total = dataKas.filter(k=>k.tipe==='masuk'&&(k.tanggal||'').startsWith(key)).reduce((s,k)=>s+k.nom,0);
+            kasData2.push(total);
+        }
+        if(window._dbChartKas) window._dbChartKas.destroy();
+        window._dbChartKas = new Chart(ctx2, {
+            type:'line',
+            data:{ labels:bulan2, datasets:[{ label:'Pemasukan', data:kasData2, borderColor:'var(--primary)', backgroundColor:'rgba(13,92,74,0.1)', fill:true, tension:0.4, pointRadius:4 }] },
+            options:{ plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true, ticks:{callback:v=>'Rp '+formatAngka(v)}}}, responsive:true, maintainAspectRatio:false }
+        });
+    }
+}
+
+// Alias updateHomeStats untuk backward compat
+function updateHomeStats() { if(document.getElementById('dashboardRoot')) renderDashboard(); }
+
+
 
 function escapeHtml(text) { 
     if(!text) return ''; 
@@ -9737,6 +10209,40 @@ function previewDokumen(jamaahId, jenisId) {
 }
 
 function closePreviewDokumenModal() { document.getElementById('previewDokumenModal').classList.remove('show'); }
+
+function bukaDocPenuh() {
+    const img = document.getElementById('previewDokumenImage');
+    const judul = document.getElementById('previewDokumenTitle')?.innerText || 'Dokumen';
+    if(!img?.src) return;
+    const win = window.open('', '_blank');
+    if(!win) return showToast('Izinkan popup untuk membuka dokumen penuh');
+    win.document.write(`<!DOCTYPE html><html><head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+        <title>${judul}</title>
+        <style>
+            * { margin:0; padding:0; box-sizing:border-box; }
+            body { background:#111; display:flex; flex-direction:column; min-height:100vh; }
+            .topbar { background:#0D5C4A; color:white; padding:12px 16px; display:flex;
+                      align-items:center; justify-content:space-between; position:sticky; top:0; z-index:9; }
+            .topbar h3 { font-size:14px; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+            .topbar button { background:rgba(255,255,255,0.2); color:white; border:none;
+                             padding:6px 14px; border-radius:20px; font-size:13px; cursor:pointer; margin-left:10px; }
+            .img-wrap { flex:1; display:flex; align-items:center; justify-content:center; padding:16px; }
+            img { max-width:100%; height:auto; border-radius:8px; touch-action:pinch-zoom; }
+            .hint { color:#666; font-size:12px; text-align:center; padding:8px 0 16px; }
+        </style>
+    </head><body>
+        <div class="topbar">
+            <h3>${judul}</h3>
+            <button onclick="window.close()">✕ Tutup</button>
+        </div>
+        <div class="img-wrap"><img src="${img.src}" alt="${judul}"></div>
+        <div class="hint">Cubit (pinch) untuk zoom &bull; Geser untuk pindah</div>
+    </body></html>`);
+    win.document.close();
+}
+
 
 async function confirmDeleteDokumen(jamaahId, jenisId, jenisNama) { 
     if(confirm(`Hapus dokumen ${jenisNama} untuk peserta ini?`)) { 
