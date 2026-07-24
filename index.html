@@ -3445,7 +3445,13 @@ function renderDashboard() {
         document.body.classList.toggle('dark-mode');
         const isDark = document.body.classList.contains('dark-mode');
         localStorage.setItem('eduku_dark_mode', isDark);
-        this.innerHTML = isDark ? '☀️' : '🌙';
+        // Re-render header saja supaya warna dan icon ikut berubah
+        const headerEl = document.querySelector('.db-header');
+        if(headerEl) {
+            this.innerHTML = isDark ? '☀️' : '🌙';
+        }
+        // Re-render full dashboard supaya semua konsisten
+        renderDashboard();
     };
 
     // Render chart setelah DOM siap
@@ -3487,7 +3493,7 @@ function renderDB_Header() {
             </div>
         </div>
         <div class="db-greeting">Selamat datang, <strong>Admin</strong></div>
-        <div class="db-date">${hari}, ${tgl} · ${jam}</div>
+        <div class="db-date">${hari}, ${tgl} · <span id="dbJam">${jam}</span></div>
         <div class="db-admin-row">
             <span id="adminModeToggleBtn" class="db-badge" onclick="if(typeof toggleAdminMode==='function')toggleAdminMode();">
                 <i class="fas fa-shield-alt"></i> Mode Admin
@@ -3638,18 +3644,20 @@ function renderDB_PerluPerhatian() {
 // ── 4. QUICK ACTION ────────────────────────────────────────
 function renderDB_QuickAction() {
     const actions = [
-        { icon:'👨‍🎓', bg:'#e8f5f0', label:'Tambah Santri', action:"openTambahJamaahModal()" },
-        { icon:'📋', bg:'#fef3c7', label:'Input Absensi', action:"showPage('absensi_harian')" },
-        { icon:'💳', bg:'#eff6ff', label:'Pembayaran', action:"showPage('pembayaran')" },
-        { icon:'📊', bg:'#f5f3ff', label:'Laporan', action:"showPage('dashboard')" },
-        { icon:'📝', bg:'#fef2f2', label:'Nilai', action:"showPage('nilai')" },
-        { icon:'⚠️', bg:'#fff7ed', label:'Pelanggaran', action:"showPage('pelanggaran')" },
-        { icon:'📅', bg:'#ecfdf5', label:'Jadwal', action:"showPage('jadwal')" },
-        { icon:'🧮', bg:'#fefce8', label:'Kalkulator', action:"showPage('estimasi')" },
+        { fa:'fa-user-plus',    bg:'#e8f5f0', color:'var(--primary)', label:'Tambah Santri',  action:"openTambahJamaahModal()" },
+        { fa:'fa-clipboard-check', bg:'#fef3c7', color:'var(--orange)',  label:'Input Absensi', action:"showPage('absensi_harian')" },
+        { fa:'fa-credit-card',  bg:'#eff6ff', color:'var(--blue)',    label:'Pembayaran',    action:"showPage('pembayaran')" },
+        { fa:'fa-chart-bar',    bg:'#f5f3ff', color:'var(--purple)',  label:'Laporan',       action:"showPage('dashboard')" },
+        { fa:'fa-star',         bg:'#fef2f2', color:'var(--red)',     label:'Nilai',         action:"showPage('nilai')" },
+        { fa:'fa-exclamation-triangle', bg:'#fff7ed', color:'var(--orange)', label:'Pelanggaran', action:"showPage('pelanggaran')" },
+        { fa:'fa-calendar-alt', bg:'#ecfdf5', color:'var(--green)',   label:'Jadwal',        action:"showPage('jadwal')" },
+        { fa:'fa-calculator',   bg:'#fefce8', color:'#b45309',       label:'Kalkulator',    action:"showPage('estimasi')" },
     ];
     const btns = actions.map(a => `
         <button class="db-quick-btn" onclick="${a.action}">
-            <div class="db-quick-icon" style="background:${a.bg};">${a.icon}</div>
+            <div class="db-quick-icon" style="background:${a.bg};color:${a.color};">
+                <i class="fas ${a.fa}" style="font-size:16px;"></i>
+            </div>
             <span class="db-quick-label">${a.label}</span>
         </button>`).join('');
     return `<div class="db-section-header">
@@ -3699,33 +3707,72 @@ function renderDB_Agenda() {
 // ── 6. AKTIVITAS TERBARU ───────────────────────────────────
 function renderDB_Aktivitas() {
     const activities = [];
-    const fmt = (tgl) => {
+    const fmtTgl = (tgl) => {
         if(!tgl) return '-';
-        try { return new Date(tgl).toLocaleDateString('id-ID',{day:'numeric',month:'short'}); }
-        catch(e) { return tgl; }
+        try {
+            const d = new Date(tgl.includes('T') ? tgl : tgl.replace(' ','T'));
+            if(isNaN(d.getTime())) return tgl;
+            const bln = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+            const selisihHari = Math.floor((Date.now() - d.getTime()) / 86400000);
+            if(selisihHari === 0) return 'Hari ini';
+            if(selisihHari === 1) return 'Kemarin';
+            if(selisihHari < 7) return `${selisihHari} hari lalu`;
+            return `${d.getDate()} ${bln[d.getMonth()]}`;
+        } catch(e) { return tgl; }
     };
 
     // Dari pembayaran terbaru
-    const sortedPay = [...paymentTransaksiList].sort((a,b)=>new Date(b.tanggal)-new Date(a.tanggal)).slice(0,3);
+    const sortedPay = [...paymentTransaksiList]
+        .sort((a,b) => new Date(b.tanggal||0) - new Date(a.tanggal||0))
+        .slice(0,3);
     sortedPay.forEach(t => {
-        const j = pesertaList.find(p=>p.id==t.id_jamaah);
-        if(j) activities.push({ dot:'var(--green)', text:`💳 Pembayaran Rp ${formatAngka(t.nominal)} dari <b>${escapeHtml(j.nama_lengkap)}</b>`, time:fmt(t.tanggal) });
+        const j = pesertaList.find(p => p.id == t.id_jamaah);
+        if(j) activities.push({
+            dot:'var(--green)',
+            icon:'💳',
+            text:`Pembayaran <b>Rp ${formatAngka(t.nominal)}</b> dari ${escapeHtml(j.nama_lengkap)}`,
+            time: fmtTgl(t.tanggal),
+            sort: new Date(t.tanggal||0).getTime()
+        });
     });
 
-    // Dari absensi terbaru
-    const sortedAbs = [...getAbsensiHarianData()].sort((a,b)=>(b.tanggal||'').localeCompare(a.tanggal||'')).slice(0,2);
+    // Dari absensi - hanya yang ada data hadir > 0
+    const sortedAbs = [...getAbsensiHarianData()]
+        .sort((a,b) => (b.tanggal||'').localeCompare(a.tanggal||''))
+        .filter(a => {
+            const hadir = a.data?.filter(e => e.status==='hadir').length || 0;
+            return hadir > 0; // Filter yang 0 hadir
+        })
+        .slice(0,2);
     sortedAbs.forEach(a => {
-        const hadir = a.data?.filter(e=>e.status==='hadir').length||0;
-        activities.push({ dot:'var(--blue)', text:`📋 Absensi ${a.tanggal}: <b>${hadir} hadir</b>`, time:fmt(a.tanggal) });
+        const hadir = a.data?.filter(e => e.status==='hadir').length || 0;
+        const alpha = a.data?.filter(e => e.status==='alpha').length || 0;
+        const tglFmt = fmtTgl(a.tanggal);
+        activities.push({
+            dot:'var(--blue)',
+            icon:'📋',
+            text:`Absensi ${tglFmt}: <b>${hadir} hadir</b>${alpha > 0 ? `, ${alpha} alpha` : ''}`,
+            time: tglFmt,
+            sort: new Date(a.tanggal||0).getTime()
+        });
     });
 
-    // Peserta terbaru
-    const sortedPeserta = [...pesertaList].sort((a,b)=>(b.id||0)-(a.id||0)).slice(0,2);
+    // Peserta terbaru (3 terbaru)
+    const sortedPeserta = [...pesertaList]
+        .sort((a,b) => (b.id||0) - (a.id||0))
+        .slice(0,2);
     sortedPeserta.forEach(p => {
-        activities.push({ dot:'var(--orange)', text:`👨‍🎓 Santri baru: <b>${escapeHtml(p.nama_lengkap)}</b>`, time:p.created_at || '-' });
+        activities.push({
+            dot:'var(--orange)',
+            icon:'👨‍🎓',
+            text:`Santri baru: <b>${escapeHtml(p.nama_lengkap)}</b>`,
+            time: fmtTgl(p.created_at),
+            sort: p.id || 0
+        });
     });
 
-    activities.sort((a,b)=>(b.time||'').localeCompare(a.time||''));
+    // Sort by waktu terbaru
+    activities.sort((a,b) => (b.sort||0) - (a.sort||0));
     const items = activities.slice(0,6);
 
     return `<div class="db-section-header">
@@ -3735,9 +3782,9 @@ function renderDB_Aktivitas() {
         ${items.length ? items.map(a=>`
             <div class="db-activity-item">
                 <div class="db-activity-dot" style="background:${a.dot};"></div>
-                <div class="db-activity-text">${a.text}</div>
+                <div class="db-activity-text">${a.icon} ${a.text}</div>
                 <div class="db-activity-time">${a.time}</div>
-            </div>`).join('') : '<div class="db-empty">Belum ada aktivitas tercatat</div>'}
+            </div>`).join('') : `<div class="db-empty">Belum ada aktivitas tercatat<br><span style="font-size:11px;">Mulai tambah santri & input absensi</span></div>`}
     </div>`;
 }
 
@@ -3849,19 +3896,21 @@ function parseRupiah(str) {
 
 // Dark Mode
 function initDarkMode() {
+    // Apply dark mode dari localStorage (toggle sekarang ada di dashboard header)
     const darkMode = localStorage.getItem('eduku_dark_mode') === 'true';
-    if (darkMode) { 
-        document.body.classList.add('dark-mode'); 
-        const toggleBtn = document.getElementById('darkModeToggle'); 
-        if (toggleBtn) toggleBtn.innerHTML = '☀️'; 
-    }
+    if (darkMode) document.body.classList.add('dark-mode');
+    // Fallback: kalau masih ada elemen darkModeToggle lama
     const toggleBtn = document.getElementById('darkModeToggle');
-    if (toggleBtn) toggleBtn.addEventListener('click', function() { 
-        document.body.classList.toggle('dark-mode'); 
-        const isDark = document.body.classList.contains('dark-mode'); 
-        localStorage.setItem('eduku_dark_mode', isDark); 
-        this.innerHTML = isDark ? '☀️' : '🌙'; 
-    });
+    if (toggleBtn) {
+        toggleBtn.innerHTML = darkMode ? '☀️' : '🌙';
+        toggleBtn.addEventListener('click', function() { 
+            document.body.classList.toggle('dark-mode'); 
+            const isDark = document.body.classList.contains('dark-mode'); 
+            localStorage.setItem('eduku_dark_mode', isDark); 
+            this.innerHTML = isDark ? '☀️' : '🌙';
+            if(document.getElementById('dashboardRoot')) renderDashboard();
+        });
+    }
 }
 
 // Menu Grid
@@ -3982,31 +4031,12 @@ function updateHeaderFromConfig() {
     const cacheBuster = Date.now();
     const instansi1 = cfg.instansi1.nama || 'EduKu';
     const instansi2 = (cfg.instansi2.aktif && cfg.instansi2.nama) ? cfg.instansi2.nama : 'EduKu';
-    document.getElementById('headerInstansi1').innerText = instansi1;
-    document.getElementById('headerInstansi2').innerText = instansi2;
-    const dashFooter = document.getElementById('dashFooterNama');
-    if(dashFooter) dashFooter.innerText = instansi1;
+    // Header lama sudah diganti dashboard - re-render dashboard jika ada
+    if(document.getElementById('dashboardRoot')) { try { renderDashboard(); } catch(e) {} }
     const zakatNama = document.getElementById('zakatNama');
     if(zakatNama) zakatNama.innerText = instansi1;
     
-    const logoIcon = document.getElementById('headerLogo');
-    if (logoIcon) {
-        if (cfg.instansi1.logo && cfg.instansi1.logo !== '') {
-            let logoUrl = cfg.instansi1.logo;
-            if (!logoUrl.startsWith('data:image')) {
-                logoUrl += (logoUrl.includes('?') ? '&' : '?') + 'v=' + cacheBuster;
-            }
-            logoIcon.innerHTML = `<img src="${logoUrl}" style="width:100%; height:100%; object-fit:cover; border-radius:20px;">`;
-        } else if (cfg.instansi2.aktif && cfg.instansi2.logo && cfg.instansi2.logo !== '') {
-            let logoUrl = cfg.instansi2.logo;
-            if (!logoUrl.startsWith('data:image')) {
-                logoUrl += (logoUrl.includes('?') ? '&' : '?') + 'v=' + cacheBuster;
-            }
-            logoIcon.innerHTML = `<img src="${logoUrl}" style="width:100%; height:100%; object-fit:cover; border-radius:20px;">`;
-        } else {
-            logoIcon.innerHTML = '<i class="fas fa-kaaba"></i>';
-        }
-    }
+    // Logo juga dihandle di renderDB_Header() via dashboardRoot
 }
 
 // ==================== DASHBOARD (ringkasan) ====================
@@ -4267,20 +4297,21 @@ function exportDashboardExcel() {
 let lastCalculatedText='', lastCalculatedPrice=0, lastCalculatedPaket='', lastCalculatedTotalJam=0;
 
 function saveEstimasiData() { 
+    const g = (id) => { const el = document.getElementById(id); return el ? el.value : ''; };
     const estimasiData={ 
-        lokasiPaket:document.getElementById('lokasiPaket').value, 
-        totJam:document.getElementById('totJam').value, 
-        jamGratis:document.getElementById('jamGratis').value, 
-        numTL:document.getElementById('numTL').value, 
-        cTiket:document.getElementById('cTiket').value, 
-        cLA:document.getElementById('cLA').value, 
-        cAsuransi:document.getElementById('cAsuransi').value, 
-        cHandling:document.getElementById('cHandling').value, 
-        cAlat:document.getElementById('cAlat').value, 
-        cAplikasi:document.getElementById('cAplikasi').value, 
-        cPIC:document.getElementById('cPIC').value, 
-        cLain:document.getElementById('cLain').value, 
-        profitPct:document.getElementById('profitPct').value 
+        lokasiPaket:g('lokasiPaket'), 
+        totJam:g('totJam'), 
+        jamGratis:g('jamGratis'), 
+        numTL:g('numTL'), 
+        cTiket:g('cTiket'), 
+        cLA:g('cLA'), 
+        cAsuransi:g('cAsuransi'), 
+        cHandling:g('cHandling'), 
+        cAlat:g('cAlat'), 
+        cAplikasi:g('cAplikasi'), 
+        cPIC:g('cPIC'), 
+        cLain:g('cLain'), 
+        profitPct:g('profitPct') 
     }; 
     localStorage.setItem('eduku_estimasi_data',JSON.stringify(estimasiData)); 
 }
@@ -4289,19 +4320,20 @@ function loadEstimasiData() {
     const saved=localStorage.getItem('eduku_estimasi_data'); 
     if(saved){ 
         const data=JSON.parse(saved); 
-        if(data.lokasiPaket) document.getElementById('lokasiPaket').value=data.lokasiPaket; 
-        if(data.totJam) document.getElementById('totJam').value=data.totJam; 
-        if(data.jamGratis) document.getElementById('jamGratis').value=data.jamGratis; 
-        if(data.numTL) document.getElementById('numTL').value=data.numTL; 
-        if(data.cTiket) document.getElementById('cTiket').value=data.cTiket; 
-        if(data.cLA) document.getElementById('cLA').value=data.cLA; 
-        if(data.cAsuransi) document.getElementById('cAsuransi').value=data.cAsuransi; 
-        if(data.cHandling) document.getElementById('cHandling').value=data.cHandling; 
-        if(data.cAlat) document.getElementById('cAlat').value=data.cAlat; 
-        if(data.cAplikasi) document.getElementById('cAplikasi').value=data.cAplikasi; 
-        if(data.cPIC) document.getElementById('cPIC').value=data.cPIC; 
-        if(data.cLain) document.getElementById('cLain').value=data.cLain; 
-        if(data.profitPct) document.getElementById('profitPct').value=data.profitPct; 
+        const s = (id, val) => { const el = document.getElementById(id); if(el && val) el.value = val; };
+        s('lokasiPaket', data.lokasiPaket); 
+        s('totJam', data.totJam); 
+        s('jamGratis', data.jamGratis); 
+        s('numTL', data.numTL); 
+        s('cTiket', data.cTiket); 
+        s('cLA', data.cLA); 
+        s('cAsuransi', data.cAsuransi); 
+        s('cHandling', data.cHandling); 
+        s('cAlat', data.cAlat); 
+        s('cAplikasi', data.cAplikasi); 
+        s('cPIC', data.cPIC); 
+        s('cLain', data.cLain); 
+        s('profitPct', data.profitPct); 
     } 
 }
 
@@ -15002,7 +15034,7 @@ function bukaModalPilihSantri(kelasId) {
     var flt = document.getElementById('filterPilihSantri');
     if (flt) flt.value = 'all';
     
-     // Tutup modal detail dulu
+    // Tutup modal detail dulu
     var detailModal = document.getElementById('modalDetailKelas');
     if (detailModal) detailModal.style.display = 'none';
     
@@ -15534,9 +15566,19 @@ function initGuruMode() {
 function logoutAdmin() {
     if (!confirm('Keluar dari mode Admin?')) return;
     clearEkSession();
-    var splash = document.getElementById('splashScreen');
-    if (splash) { splash.style.display = 'flex'; splash.style.opacity = '1'; }
+    localStorage.removeItem('eduku_mode');
     showToast('Berhasil logout!');
+    // Tampilkan splash dengan pilihan login
+    const splash = document.getElementById('splashScreen');
+    if (splash) {
+        splash.style.display = 'flex';
+        splash.style.opacity = '1';
+        // Pastikan splashChoice muncul (tombol login)
+        const choice = document.getElementById('splashChoice');
+        const loading = document.getElementById('splashLoading');
+        if (choice) choice.style.display = 'block';
+        if (loading) loading.style.display = 'none';
+    }
 }
 
 function logoutGuru() {
@@ -18361,12 +18403,29 @@ localStorage.removeItem('menu_pelanggaran_visible');
 localStorage.removeItem('menu_estimasi_visible');
 localStorage.removeItem('menu_absensi_harian_visible');
 
-// Auto-update homeDate setiap menit
+// Auto-refresh dashboard setiap menit (update jam dan data terbaru)
 setInterval(function() {
     try {
-        var el = document.getElementById('homeDate');
-        if (el && el.textContent === 'Memuat...') {
-            el.innerHTML = new Date().toLocaleDateString('id-ID', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+        // Update jam real-time tanpa re-render seluruh dashboard
+        var jamEl = document.getElementById('dbJam');
+        if(jamEl) {
+            jamEl.textContent = new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'});
+        }
+        // Re-render dashboard penuh setiap 5 menit
+        if(Date.now() % (5*60*1000) < 60000) {
+            if(document.getElementById('dashboardRoot') && document.getElementById('page-home')?.classList.contains('active')) {
+                renderDashboard();
+            }
+        }
+    } catch(e) {}
+}, 60000);
+
+// Update jam setiap detik (hanya elemen jam, ringan)
+setInterval(function() {
+    try {
+        var jamEl = document.getElementById('dbJam');
+        if(jamEl) {
+            jamEl.textContent = new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'});
         }
     } catch(e) {}
 }, 1000);
