@@ -1882,13 +1882,14 @@
     content:''; position:absolute; right:-30px; top:-30px;
     width:160px; height:160px; border-radius:50%;
     background:rgba(255,255,255,0.05);
+    pointer-events:none;
 }
 .db-header-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; }
 .db-logo-row { display:flex; align-items:center; gap:10px; }
 .db-logo-img { width:38px; height:38px; border-radius:10px; background:rgba(255,255,255,0.15); display:flex; align-items:center; justify-content:center; overflow:hidden; }
 .db-instansi h1 { color:white; font-size:16px; font-weight:700; margin:0; line-height:1.2; }
 .db-instansi p  { color:rgba(255,255,255,0.7); font-size:11px; margin:0; }
-.db-actions { display:flex; gap:8px; align-items:center; }
+.db-actions { display:flex; gap:8px; align-items:center; position:relative; z-index:1; }
 .db-btn-icon { background:rgba(255,255,255,0.15); color:white; border:none; width:34px; height:34px; border-radius:50%; font-size:15px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
 .db-greeting { color:rgba(255,255,255,0.85); font-size:12px; margin-bottom:4px; }
 .db-date     { color:white; font-size:14px; font-weight:600; }
@@ -2705,7 +2706,7 @@ body.dark-mode .db-agenda-nama { color:var(--dark) !important; }
         <!-- Aktivasi -->
         <div class="card-premium" style="padding:20px;margin-bottom:16px;">
             <h4 style="margin-bottom:12px;">✏️ Masukkan Kode Aktivasi</h4>
-            <input type="text" id="licenseCodeInput" placeholder="NAVARA-XXXX-XXXX-XXXX"
+            <input type="text" id="licenseCodeInput" placeholder="EDUKU-XXXX-XXXX-XXXX"
                 style="width:100%;padding:12px;border:2px solid var(--gray-300);border-radius:10px;font-size:14px;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">
             <button onclick="activateLicense()" class="btn btn-primary" style="width:100%;">🔓 Aktifkan Sekarang</button>
         </div>
@@ -2776,7 +2777,7 @@ body.dark-mode .db-agenda-nama { color:var(--dark) !important; }
             <div style="color:#166534;line-height:2;">
                 ✅ Jamaah & semua fitur unlimited<br>
                 🖨️ Cetak & Export + watermark EduKu<br>
-                🔒 Cuan Plan max <strong>10x hitung</strong>
+                🧮 Kalkulator: maks <strong>10x hitung</strong>
             </div>
         </div>
         <!-- Tombol Hubungi -->
@@ -3455,6 +3456,14 @@ function showToast(msg) {
 
 // ==================== DASHBOARD CONTROL CENTER ====================
 
+function toggleDashDarkMode() {
+    document.body.classList.toggle('dark-mode');
+    const isDark = document.body.classList.contains('dark-mode');
+    localStorage.setItem('eduku_dark_mode', isDark);
+    // Re-render dashboard supaya icon dan warna konsisten
+    renderDashboard();
+}
+
 function renderDashboard() {
     const root = document.getElementById('dashboardRoot');
     if(!root) return;
@@ -3471,21 +3480,6 @@ function renderDashboard() {
             renderDB_MenuLengkap() +
         '</div>';
 
-    // Pasang event listener dark mode setelah render
-    const dmBtn = document.getElementById('dashDarkBtn');
-    if(dmBtn) dmBtn.onclick = function() {
-        document.body.classList.toggle('dark-mode');
-        const isDark = document.body.classList.contains('dark-mode');
-        localStorage.setItem('eduku_dark_mode', isDark);
-        // Re-render header saja supaya warna dan icon ikut berubah
-        const headerEl = document.querySelector('.db-header');
-        if(headerEl) {
-            this.innerHTML = isDark ? '☀️' : '🌙';
-        }
-        // Re-render full dashboard supaya semua konsisten
-        renderDashboard();
-    };
-
     // Render chart setelah DOM siap
     setTimeout(renderDB_Charts, 100);
 }
@@ -3494,6 +3488,8 @@ function renderDashboard() {
 function renderDB_Header() {
     const cfg = getKonfigurasiProData();
     const i1 = cfg.instansi1 || {};
+    const i2 = cfg.instansi2 || {};
+    const tampilI2 = i2.aktif && i2.nama;
     const now = new Date();
     const hari = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'][now.getDay()];
     const tgl = now.toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
@@ -3514,11 +3510,14 @@ function renderDB_Header() {
                 <div class="db-logo-img">${logoHtml}</div>
                 <div class="db-instansi">
                     <h1>${escapeHtml(i1.nama || 'EduKu')}</h1>
-                    <p>${escapeHtml(i1.alamat || 'Sistem Manajemen Pesantren')}</p>
+                    ${tampilI2
+                        ? `<p style="font-size:10px;opacity:0.8;">${escapeHtml(i2.nama)}</p>`
+                        : `<p>${escapeHtml(i1.alamat || 'Sistem Manajemen Pesantren')}</p>`
+                    }
                 </div>
             </div>
             <div class="db-actions">
-                <button class="db-btn-icon" id="dashDarkBtn">${isDark?'☀️':'🌙'}</button>
+                <button class="db-btn-icon" onclick="toggleDashDarkMode()" id="dashDarkBtn" title="Mode Gelap/Terang">${isDark?'☀️':'🌙'}</button>
                 <button class="db-btn-icon" onclick="logoutAdmin()" title="Keluar">
                     <i class="fas fa-sign-out-alt" style="font-size:14px;"></i>
                 </button>
@@ -4994,7 +4993,7 @@ function getSuratVariables(jamaah, nomorSurat, keperluan) {
         nama: jamaah.nama_lengkap || '-',
         nik: f.nik || '-',
         alamat: f.alamat || '-',
-        no_porsi: f.nis || '-',
+        nis: f.nis || '-',
         nis: f.nis || '-',
         tgl_lahir: f.tgl_lahir || '-',
         tempat_lahir: f.tempat_lahir || '-',
@@ -5579,7 +5578,7 @@ function renderRekapAbsensi() {
 // ============================================
 const _SK = "NAVR2026XK";
 const BATAS_GRATIS = 20;
-const WA_ADMIN = "6281391485440"; // TODO: ganti nomor WA EduKu saat publikasi
+const WA_ADMIN = "6281391485440"; // ⚠️ GANTI dengan nomor WA Anda sebelum publikasi
 
 function _sh(str) {
     let h = 5381;
@@ -5698,43 +5697,15 @@ function updateLicenseBanner() {
     }
 }
 
-// Halaman yang memerlukan Premium
-const PREMIUM_PAGES = []; // Semua halaman bebas - hanya Cuan Plan yang dibatasi via hitung
-const TRIAL_PAGE = 'estimasi';
-const MAX_TRIALS = 10;
-const TRIAL_VERSION = 'v2'; // Naikkan versi kalau MAX_TRIALS berubah
+// Semua halaman dan fitur bebas tanpa batasan
+const PREMIUM_PAGES = [];
+const MAX_TRIALS = Infinity; // Kalkulator tidak dibatasi di EduKu
 
-function getRemainingTrials() {
-    // Cek versi trial — kalau beda versi, reset counter
-    const savedVersion = localStorage.getItem('eduku_trial_version');
-    if(savedVersion !== TRIAL_VERSION) {
-        localStorage.setItem('eduku_trial_estimasi', MAX_TRIALS);
-        localStorage.setItem('eduku_trial_version', TRIAL_VERSION);
-    }
-    return parseInt(localStorage.getItem('eduku_trial_estimasi') ?? MAX_TRIALS);
-}
+function getRemainingTrials() { return Infinity; }
+function useOneTrial() { return Infinity; }
 
-function useOneTrial() {
-    const remaining = getRemainingTrials();
-    const newVal = Math.max(0, remaining - 1);
-    localStorage.setItem('eduku_trial_estimasi', newVal);
-    return newVal;
-}
-
-// Dipanggil saat tombol HITUNG diklik
-function checkTrialHitung() {
-    if(isLicensed()) return true;
-    const remaining = getRemainingTrials();
-    if(remaining > 0) {
-        useOneTrial();
-        const left = getRemainingTrials();
-        showTrialBanner(left);
-        return true;
-    }
-    // Trial habis
-    renderLockedPage('estimasi', true);
-    return false;
-}
+// Kalkulator selalu bisa dipakai tanpa batasan
+function checkTrialHitung() { return true; }
 
 function checkLicenseForPage(pageId) {
     if(!PREMIUM_PAGES.includes(pageId)) return true;
@@ -5778,7 +5749,7 @@ function showTrialBanner(remaining) {
 
 function renderLockedPage(pageId, trialHabis = false) {
     const labels = {
-        estimasi: 'Cuan Plan', kas: 'Kas & Keuangan',
+        estimasi: 'Kalkulator', kas: 'Kas & Keuangan',
         foldervirtual: 'Folder Virtual', datamaster: 'Multi Event', scanqr: 'Scan QR Absensi'
     };
     const icons = { estimasi: '💰', kas: '💳', foldervirtual: '📁', datamaster: '📋', scanqr: '📷' };
@@ -5871,7 +5842,7 @@ function getLicenseInfo() {
 function verifyLicenseCode(code) {
     try {
         const parts = code.toUpperCase().trim().split('-');
-        // Format baru: NAVARA-TYPE-DATE-DEVV-CHCK (5 bagian setelah NAVARA)
+        // Format: NAVARA-TYPE-DATE-DEVV-CHCK (prefix tetap NAVARA untuk backward compat lisensi lama)
         if(parts.length !== 5 || parts[0] !== 'NAVARA') return null;
         const [, typeEnc, expiryEnc, devEnc, checksum] = parts;
         // Verifikasi checksum
@@ -5931,7 +5902,7 @@ function renderLicenseStatus() {
             <div style="margin:10px 0;background:var(--surface-1);border-radius:10px;padding:12px;text-align:left;font-size:13px;color:#444;line-height:2;">
                 ✅ Semua fitur terbuka<br>
                 🖨️ Dokumen: watermark <strong>EduKu</strong><br>
-                🔒 Cuan Plan: sisa <strong>${sisaHitung}x hitung</strong>
+                🧮 Kalkulator: sisa <strong>${sisaHitung}x hitung</strong>
             </div>${deviceBox}`;
     } else {
         const exp = info.expiryDate.toLocaleDateString('id-ID');
@@ -5954,7 +5925,7 @@ function updateLicenseSummary() {
     const info = getLicenseInfo();
     if(!info || info.expired) {
         const sisaHitung = getRemainingTrials();
-        el.textContent = `Gratis · Cuan Plan ${sisaHitung}x hitung · watermark aktif`;
+        el.textContent = `Versi Gratis · watermark aktif`;
         el.style.color = sisaHitung === 0 ? '#ef4444' : '#666';
     } else {
         const exp = info.expiryDate.toLocaleDateString('id-ID');
@@ -11574,7 +11545,7 @@ async function confirmResetAllData() {
     try {
         // Hapus semua localStorage keys lama
         Object.keys(localStorage)
-            .filter(k => k.startsWith('eduku_') || k.startsWith('EduKu') || k.startsWith('navara_') || k.startsWith('Navara'))
+            .filter(k => k.startsWith('eduku_') || k.startsWith('EduKu'))
             .forEach(k => localStorage.removeItem(k));
 
         // Hapus IndexedDB
@@ -11830,7 +11801,7 @@ function getKonfigurasiProData() {
         qr: { enabled: true, text: 'Dokumen Resmi - Divalidasi oleh Sistem EduKu', size: 80 },
         settings: { header_mode: 'both', ttd_mode: 'both', invoice_prefix: 'INV/EDUKU', show_logo: true, show_nama1: true, show_nama2: true, show_alamat: true, show_telp: true, show_email: false, show_web: false, show_npwp: false, show_izin: false, show_pimpinan: false, batas_lansia: 60 }
     };
-    // User gratis → paksa nama instansi & logo = Navara, watermark tetap aktif
+    // User gratis → watermark EduKu tetap aktif
     if(!isLicensed()) {
         if(data.instansi1) { data.instansi1.nama = 'EduKu'; data.instansi1.logo = ''; }
         if(data.instansi2) { data.instansi2.nama = 'EduKu'; data.instansi2.logo = ''; }
@@ -12775,7 +12746,7 @@ const installPopupClosed = localStorage.getItem('eduku_install_popup_closed') ==
 // Service Worker - hanya daftarkan jika bukan dari blob URL
 if ('serviceWorker' in navigator && !location.href.startsWith('blob')) {
     const swCode = `
-        const CACHE_NAME = 'navara-v202605030628';
+        const CACHE_NAME = 'eduku-v20260724';
         const urlsToCache = ['.', 'index.html'];
         self.addEventListener('install', e => {
             e.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache)));
@@ -12813,9 +12784,9 @@ window.addEventListener('appinstalled', () => {
 });
 
 function showInstallPopup() {
-    if (document.getElementById('installPopupNavara')) return;
+    if (document.getElementById('edukuInstallPopup')) return;
     const popup = document.createElement('div');
-    popup.id = 'installPopupNavara';
+    popup.id = 'edukuInstallPopup';
     popup.innerHTML = `<div style="position:fixed; bottom:100px; left:50%; transform:translateX(-50%); width:90%; max-width:360px; background:white; border-radius:24px; padding:20px; box-shadow:0 10px 40px rgba(0,0,0,0.2); z-index:99999; animation:slideUpInstall 0.3s ease;"><div style="display:flex; align-items:center; gap:14px;"><div style="width:52px; height:52px; background:linear-gradient(135deg,var(--primary),#0A3D31); border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:28px;">🎓</div><div style="flex:1;"><div style="font-weight:800; color:var(--primary);">Install EduKu</div><div style="font-size:12px; color:var(--gray);">Akses lebih cepat & offline</div></div><button onclick="closeInstallPopup()" style="background:none; border:none; font-size:20px; cursor:pointer;">✕</button></div><div style="display:flex; gap:10px; margin-top:16px;"><button onclick="closeInstallPopup()" style="flex:1; padding:12px; background:var(--gray-light); border:none; border-radius:40px; font-weight:600; cursor:pointer;">Nanti</button><button onclick="installPWA()" style="flex:2; padding:12px; background:var(--primary); border:none; border-radius:40px; font-weight:600; cursor:pointer; color:white;">📲 Install</button></div></div><style>@keyframes slideUpInstall{from{opacity:0;transform:translateX(-50%) translateY(30px);}to{opacity:1;transform:translateX(-50%) translateY(0);}}</style>`;
     document.body.appendChild(popup);
 }
@@ -12840,7 +12811,7 @@ function closeInstallPopup() {
 }
 
 function hideInstallPopup() {
-    const popup = document.getElementById('installPopupNavara');
+    const popup = document.getElementById('edukuInstallPopup');
     if (popup) popup.remove();
 }
 
@@ -16321,7 +16292,7 @@ function renderGuruSantriList() {
     var fl = [];
     for (var i = 0; i < santri.length; i++) {
         var nama = santri[i].nama_lengkap || santri[i].nama || '';
-        var nis = santri[i].no_porsi || '';
+        var nis = santri[i].nis || santri[i].additional_fields?.nis || '';
         if (!q || nama.toLowerCase().indexOf(q) >= 0 || nis.toLowerCase().indexOf(q) >= 0) {
             fl.push(santri[i]);
         }
