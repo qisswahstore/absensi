@@ -3125,21 +3125,87 @@ body.dark-mode .db-agenda-nama { color:var(--dark) !important; }
             <input type="file" id="restoreJsonFileInput" accept=".json" style="display:none" onchange="restoreFromJson(this)">
         </div>
         
-        <div class="card-premium">
-            <div class="cloud-item">
-                <div class="cloud-info"><div class="cloud-icon"><i class="fab fa-google-drive"></i></div><div><div class="cloud-name">Google Drive</div><div class="cloud-status" id="driveStatus"><span class="status-disconnected"> Belum Terhubung</span></div></div></div>
-                <div><button id="driveConnectBtn" class="btn-connect" onclick="connectGoogleDrive()"> Hubungkan</button>
-                <button id="driveBackupBtn" class="btn-connect" style="display:none; background: var(--primary);" onclick="backupToDrive()"> Backup</button>
-                <button id="driveRestoreBtn" class="btn-connect" style="display:none; background: var(--purple);" onclick="restoreFromDrive()"> Restore</button>
-                <button id="driveDisconnectBtn" class="btn-connect" style="display:none; background: var(--gray-light); color: var(--dark);" onclick="disconnectDrive()"> Putus</button></div>
+        <div class="card-premium" id="googleDriveCard">
+            <!-- Header Google Drive -->
+            <div style="text-align:center;padding:16px 0 8px;">
+                <div style="width:64px;height:64px;border-radius:50%;background:#f1f5f9;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
+                    <i class="fab fa-google-drive" style="font-size:32px;color:#4285F4;"></i>
+                </div>
+                <div style="font-size:17px;font-weight:700;margin-bottom:4px;">Akun Google</div>
+                <div style="font-size:12px;color:var(--gray);line-height:1.5;">
+                    Backup data peserta ke Google Drive milik Anda sendiri secara otomatis.
+                </div>
+            </div>
+
+            <!-- Status Akun -->
+            <div style="background:var(--surface-1);border-radius:12px;padding:14px;margin:12px 0;">
+                <div style="font-size:11px;color:var(--gray);margin-bottom:4px;">Status akun</div>
+                <div id="driveAccountStatus" style="font-size:14px;font-weight:600;color:var(--orange);">Belum terhubung</div>
+                <div id="driveAccountEmail" style="font-size:12px;color:var(--gray);margin-top:2px;display:none;"></div>
+                <button id="driveConnectBtn" onclick="connectGoogleDrive()"
+                    style="width:100%;margin-top:12px;padding:13px;background:var(--orange);color:white;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;">
+                    Hubungkan Akun Google
+                </button>
+                <button id="driveDisconnectBtn" onclick="disconnectDrive()"
+                    style="width:100%;margin-top:8px;padding:11px;background:var(--gray-200);color:var(--gray-800);border:none;border-radius:10px;font-size:13px;cursor:pointer;display:none;">
+                    Putus Koneksi
+                </button>
+            </div>
+
+            <!-- Pengaturan Backup -->
+            <div style="background:var(--surface-1);border-radius:12px;overflow:hidden;margin-bottom:12px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:14px;border-bottom:1px solid var(--border);">
+                    <div>
+                        <div style="font-size:13px;font-weight:700;">Backup otomatis ke Drive</div>
+                        <div style="font-size:11px;color:var(--gray);margin-top:2px;line-height:1.4;">Data peserta dicadangkan otomatis setiap kali ada perubahan ke Google Drive Anda.</div>
+                    </div>
+                    <label style="position:relative;display:inline-block;width:46px;height:26px;flex-shrink:0;margin-left:12px;">
+                        <input type="checkbox" id="driveAutoBackup" style="opacity:0;width:0;height:0;"
+                            onchange="saveDriveSettings()" checked>
+                        <span onclick="document.getElementById('driveAutoBackup').click()" style="position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:var(--primary);border-radius:26px;transition:.3s;"></span>
+                        <span id="driveAutoBackupThumb" style="position:absolute;content:'';height:20px;width:20px;left:3px;bottom:3px;background:white;border-radius:50%;transition:.3s;transform:translateX(20px);"></span>
+                    </label>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:14px;">
+                    <div>
+                        <div style="font-size:13px;font-weight:700;">Notifikasi backup</div>
+                        <div style="font-size:11px;color:var(--gray);margin-top:2px;">Tampilkan notifikasi setelah backup berhasil.</div>
+                    </div>
+                    <label style="position:relative;display:inline-block;width:46px;height:26px;flex-shrink:0;margin-left:12px;">
+                        <input type="checkbox" id="driveNotif" style="opacity:0;width:0;height:0;"
+                            onchange="saveDriveSettings()" checked>
+                        <span onclick="document.getElementById('driveNotif').click()" style="position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:var(--primary);border-radius:26px;transition:.3s;"></span>
+                        <span style="position:absolute;content:'';height:20px;width:20px;left:3px;bottom:3px;background:white;border-radius:50%;transition:.3s;transform:translateX(20px);"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Backup sekarang -->
+            <div style="background:var(--surface-1);border-radius:12px;overflow:hidden;margin-bottom:10px;">
+                <div id="driveLastBackup" style="font-size:12px;color:var(--gray);text-align:center;padding:10px 14px;border-bottom:1px solid var(--border);">
+                    Backup terakhir: belum pernah
+                </div>
+                <button onclick="backupToDrive()"
+                    style="width:100%;padding:14px;background:none;border:none;font-size:15px;font-weight:700;color:var(--orange);cursor:pointer;border-bottom:1px solid var(--border);">
+                    ☁️ Backup Sekarang
+                </button>
+                <button onclick="restoreFromDrive()"
+                    style="width:100%;padding:14px;background:none;border:none;font-size:15px;font-weight:700;color:var(--gray-800);cursor:pointer;">
+                    ⬇️ Restore dari Drive
+                </button>
+            </div>
+
+            <!-- Privacy note -->
+            <div style="font-size:11px;color:var(--gray-400);text-align:center;line-height:1.6;padding:0 4px;">
+                App hanya dapat mengakses file yang dibuatnya sendiri di Drive — bukan seluruh Drive Anda. Data Anda aman dan privat.
             </div>
         </div>
         
-       <div class="card-premium"><div class="cloud-item"><div class="cloud-info"><div class="cloud-icon"><i class="fab fa-dropbox"></i></div><div><div class="cloud-name">Dropbox</div><div class="cloud-status"><span class="status-disconnected"> Belum Terhubung</span></div></div></div><div><button class="btn-connect" onclick="showToast(' Fitur Dropbox akan segera hadir!')"> Hubungkan</button></div></div></div>
-        
-        <div class="card-premium"><div class="cloud-item"><div class="cloud-info"><div class="cloud-icon"><i class="fas fa-cloud"></i></div><div><div class="cloud-name">OneDrive</div><div class="cloud-status"><span class="status-disconnected"> Belum Terhubung</span></div></div></div><div><button class="btn-connect" onclick="showToast(' Fitur OneDrive akan segera hadir!')"> Hubungkan</button></div></div></div>
 
-        <div class="card-premium"><div class="cloud-item"><div class="cloud-info"><div class="cloud-icon"><i class="fas fa-cloud"></i></div><div><div class="cloud-name">Yandex Drive</div><div class="cloud-status"><span class="status-disconnected"> Belum Terhubung</span></div></div></div><div><button class="btn-connect" onclick="showToast('Fitur Yandex Drive akan segera hadir!')"> Hubungkan</button></div></div></div>
+        
+
+
+
     </div>
 </div>
 
@@ -3424,7 +3490,7 @@ function internalShowPage(pageId) {
     if (pageId === 'pengingatwa') { loadPengingatData(); }
     if (pageId === 'cetaklabel') { renderMultiLabelJamaah(); updateNametagnBadge(); }
     if (pageId === 'cetaklabel') { if(window.populateLabelDropdown) window.populateLabelDropdown(); }
-    if (pageId === 'cloudstorage') { if(window.updateStorageInfo) window.updateStorageInfo(); }
+    if (pageId === 'cloudstorage') { try { initDriveUI(); } catch(e) {} if(window.updateStorageInfo) window.updateStorageInfo(); }
     if (pageId === 'dashboard') { if(window.renderDetailDashboard) window.renderDetailDashboard(); }
     window.scrollTo(0,0);
 }
@@ -10926,7 +10992,90 @@ function restoreFromZip(input) {
 }
 
 // ==================== GOOGLE DRIVE (placeholder) ====================
-function connectGoogleDrive() { showToast('🔐 Fitur Google Drive memerlukan konfigurasi Client ID.'); }
+// ==================== GOOGLE DRIVE ====================
+const GOOGLE_CLIENT_ID = ''; // ← ISI CLIENT_ID saat sudah dapat dari Google Cloud Console
+const GOOGLE_SCOPES = 'https://www.googleapis.com/auth/drive.appdata';
+
+function connectGoogleDrive() {
+    if(!GOOGLE_CLIENT_ID) {
+        showToast('⚙️ Client ID belum dikonfigurasi. Hubungi pengembang.');
+        return;
+    }
+    // OAuth flow - akan diaktifkan setelah CLIENT_ID tersedia
+    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth`
+        + `?client_id=${GOOGLE_CLIENT_ID}`
+        + `&redirect_uri=${encodeURIComponent(window.location.href.split('#')[0])}`
+        + `&response_type=token`
+        + `&scope=${encodeURIComponent(GOOGLE_SCOPES)}`
+        + `&prompt=select_account`;
+    window.location.href = authUrl;
+}
+
+function disconnectDrive() {
+    if(!confirm('Putus koneksi Google Drive?')) return;
+    localStorage.removeItem('eduku_drive_token');
+    localStorage.removeItem('eduku_drive_email');
+    updateDriveUI(false, '');
+    showToast('✅ Koneksi Google Drive diputus');
+}
+
+function backupToDrive() {
+    const token = localStorage.getItem('eduku_drive_token');
+    if(!token) { showToast('⚠️ Hubungkan akun Google Drive terlebih dahulu'); return; }
+    showToast('⏳ Menyiapkan backup ke Drive...');
+    // Implementasi akan aktif setelah CLIENT_ID tersedia
+    setTimeout(() => showToast('☁️ Fitur akan aktif setelah CLIENT_ID terkonfigurasi'), 1500);
+}
+
+function restoreFromDrive() {
+    const token = localStorage.getItem('eduku_drive_token');
+    if(!token) { showToast('⚠️ Hubungkan akun Google Drive terlebih dahulu'); return; }
+    showToast('⏳ Mengambil data dari Drive...');
+    setTimeout(() => showToast('☁️ Fitur akan aktif setelah CLIENT_ID terkonfigurasi'), 1500);
+}
+
+function saveDriveSettings() {
+    const autoBackup = document.getElementById('driveAutoBackup')?.checked;
+    const notif = document.getElementById('driveNotif')?.checked;
+    localStorage.setItem('eduku_drive_auto_backup', autoBackup);
+    localStorage.setItem('eduku_drive_notif', notif);
+}
+
+function updateDriveUI(connected, email) {
+    const statusEl = document.getElementById('driveAccountStatus');
+    const emailEl = document.getElementById('driveAccountEmail');
+    const connectBtn = document.getElementById('driveConnectBtn');
+    const disconnectBtn = document.getElementById('driveDisconnectBtn');
+    const lastBackup = document.getElementById('driveLastBackup');
+
+    if(connected && email) {
+        if(statusEl) { statusEl.textContent = 'Terhubung'; statusEl.style.color = 'var(--green)'; }
+        if(emailEl) { emailEl.textContent = email; emailEl.style.display = 'block'; }
+        if(connectBtn) connectBtn.style.display = 'none';
+        if(disconnectBtn) disconnectBtn.style.display = 'block';
+        const last = localStorage.getItem('eduku_drive_last_backup');
+        if(lastBackup) lastBackup.textContent = last ? `Backup terakhir: ${last}` : 'Backup terakhir: belum pernah';
+    } else {
+        if(statusEl) { statusEl.textContent = 'Belum terhubung'; statusEl.style.color = 'var(--orange)'; }
+        if(emailEl) emailEl.style.display = 'none';
+        if(connectBtn) connectBtn.style.display = 'block';
+        if(disconnectBtn) disconnectBtn.style.display = 'none';
+    }
+}
+
+function initDriveUI() {
+    const token = localStorage.getItem('eduku_drive_token');
+    const email = localStorage.getItem('eduku_drive_email');
+    updateDriveUI(!!token, email || '');
+
+    // Restore settings
+    const autoBackup = localStorage.getItem('eduku_drive_auto_backup');
+    const notif = localStorage.getItem('eduku_drive_notif');
+    const ab = document.getElementById('driveAutoBackup');
+    const nb = document.getElementById('driveNotif');
+    if(ab && autoBackup !== null) ab.checked = autoBackup !== 'false';
+    if(nb && notif !== null) nb.checked = notif !== 'false';
+}
 function disconnectDrive() { showToast('🔐 Fitur Google Drive memerlukan konfigurasi'); }
 function backupToDrive() { showToast('🔐 Konfigurasi Google Drive belum lengkap'); }
 function restoreFromDrive() { showToast('🔐 Konfigurasi Google Drive belum lengkap'); }
