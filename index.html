@@ -13628,62 +13628,82 @@ function cetakDariPreviewAlternatif() {
 
 <!-- ===== PAGE MODE GURU ===== -->
 <div id="page-guru" class="page">
-  <div style="padding:16px;padding-top:16px;padding-bottom:24px;">
-    <div style="background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:white;padding:20px;border-radius:16px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:flex-start;">
-      <div>
-        <div style="font-size:13px;opacity:0.8;">Selamat datang,</div>
-        <div style="font-size:20px;font-weight:700;margin:4px 0;" id="guruWelcomeName">Ustadz</div>
-        <div style="font-size:12px;opacity:0.8;" id="guruWelcomeDate"></div>
+  <div style="padding:0 0 80px;">
+
+    <!-- HEADER GURU -->
+    <div style="background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:white;padding:20px 16px 28px;position:relative;overflow:hidden;">
+      <div style="position:absolute;right:-20px;top:-20px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,0.05);pointer-events:none;"></div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;position:relative;z-index:1;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div id="guruFotoWrap" style="width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;overflow:hidden;">👨‍🏫</div>
+          <div>
+            <div style="font-size:12px;opacity:0.8;">Selamat datang,</div>
+            <div style="font-size:18px;font-weight:700;margin:2px 0;" id="guruWelcomeName">Ustadz</div>
+            <div style="font-size:11px;opacity:0.75;" id="guruWelcomeDate"></div>
+          </div>
+        </div>
+        <button onclick="logoutGuru()" style="background:rgba(255,255,255,0.2);color:white;border:none;border-radius:8px;padding:8px 12px;font-size:12px;cursor:pointer;font-weight:600;">Keluar →</button>
       </div>
-      <button onclick="logoutGuru()" style="background:rgba(255,255,255,0.2);color:white;border:none;border-radius:8px;padding:8px 14px;font-size:12px;cursor:pointer;font-weight:600;">Keluar &#x2192;</button>
+      <!-- Stat mini -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px;position:relative;z-index:1;">
+        <div style="background:rgba(255,255,255,0.15);border-radius:10px;padding:10px;text-align:center;">
+          <div style="font-size:18px;font-weight:800;" id="guruStatJadwal">0</div>
+          <div style="font-size:10px;opacity:0.85;">Jadwal Hari Ini</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.15);border-radius:10px;padding:10px;text-align:center;">
+          <div style="font-size:18px;font-weight:800;" id="guruStatAbsen">0</div>
+          <div style="font-size:10px;opacity:0.85;">Sudah Diabsen</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.15);border-radius:10px;padding:10px;text-align:center;">
+          <div style="font-size:18px;font-weight:800;" id="guruStatNilai">0</div>
+          <div style="font-size:10px;opacity:0.85;">Nilai Diinput</div>
+        </div>
+      </div>
     </div>
-    <div style="background:white;border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+
+    <div style="padding:16px;">
+
+    <!-- JADWAL HARI INI -->
+    <div style="background:white;border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-        <div style="font-weight:700;font-size:15px;color:var(--primary);">&#128197; Jadwal Hari Ini</div>
-        <button onclick="bukaJadwalLengkap()" style="background:var(--gray-light);color:var(--primary);border:none;border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;font-weight:600;">Lihat Semua &#8594;</button>
+        <div style="font-weight:700;font-size:15px;color:var(--primary);">📅 Jadwal Hari Ini</div>
+        <button onclick="bukaJadwalLengkap()" style="background:var(--gray-light);color:var(--primary);border:none;border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;font-weight:600;">Semua →</button>
       </div>
       <div id="guruJadwalHariIni"></div>
     </div>
-    <div style="background:white;border-radius:14px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
-      <div style="font-weight:700;font-size:15px;margin-bottom:12px;color:var(--primary);">&#128202; Absensi Saya Hari Ini</div>
+
+    <!-- ABSENSI HARI INI -->
+    <div style="background:white;border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+      <div style="font-weight:700;font-size:15px;margin-bottom:10px;color:var(--primary);">📊 Absensi Saya Hari Ini</div>
       <div id="guruAbsensiList"></div>
-      <button onclick="bukaFormAbsensiPelajaran(null)" style="width:100%;padding:12px;background:var(--primary);color:white;border:none;border-radius:10px;font-weight:700;cursor:pointer;margin-top:12px;font-size:14px;">+ Input Absensi Pelajaran</button>
+      <button onclick="bukaFormAbsensiPelajaran(null)" style="width:100%;padding:11px;background:var(--primary);color:white;border:none;border-radius:10px;font-weight:700;cursor:pointer;margin-top:10px;font-size:13px;">+ Input Absensi Pelajaran</button>
     </div>
 
-    <!-- Input Nilai -->
-    <div style="background:white;border-radius:14px;padding:16px;margin-top:14px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
-      <div style="font-weight:700;font-size:15px;margin-bottom:12px;color:var(--primary);">&#128202; Input Nilai Santri</div>
+    <!-- INPUT NILAI -->
+    <div style="background:white;border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+      <div style="font-weight:700;font-size:15px;margin-bottom:10px;color:var(--primary);">⭐ Input Nilai Santri</div>
       <div id="guruNilaiList" style="margin-bottom:10px;"></div>
-      <button onclick="bukaFormNilaiGuru()" style="width:100%;padding:12px;background:var(--blue);color:white;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-size:14px;">+ Input Nilai</button>
+      <button onclick="bukaFormNilaiGuru()" style="width:100%;padding:11px;background:var(--blue);color:white;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-size:13px;">+ Input Nilai</button>
     </div>
 
-    <!-- Catat Pelanggaran -->
-    <div style="background:white;border-radius:14px;padding:16px;margin-top:14px;box-shadow:0 2px 8px rgba(0,0,0,0.06);border-left:4px solid var(--red);">
-      <div style="display:flex;justify-content:space-between;align-items:center;">
-        <div>
-          <div style="font-weight:700;font-size:15px;color:var(--red);">&#9888;&#65039; Catat Pelanggaran</div>
-          <div style="font-size:12px;color:var(--gray);margin-top:2px;">Catat pelanggaran santri & poin</div>
-        </div>
-        <button onclick="bukaInputPelanggaran()" style="background:var(--red);color:white;border:none;border-radius:10px;padding:10px 16px;font-weight:700;cursor:pointer;font-size:13px;">+ Catat</button>
-      </div>
+    <!-- AKSI CEPAT -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+      <button onclick="bukaInputPelanggaran()" style="background:white;border:none;border-radius:14px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,0.06);cursor:pointer;text-align:left;border-left:4px solid var(--red);">
+        <div style="font-size:20px;margin-bottom:4px;">⚠️</div>
+        <div style="font-weight:700;font-size:13px;color:var(--red);">Catat Pelanggaran</div>
+        <div style="font-size:11px;color:var(--gray);margin-top:2px;">Catat & rekam poin</div>
+      </button>
+      <button onclick="showPage('scanqr')" style="background:white;border:none;border-radius:14px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,0.06);cursor:pointer;text-align:left;border-left:4px solid var(--blue);">
+        <div style="font-size:20px;margin-bottom:4px;">📷</div>
+        <div style="font-weight:700;font-size:13px;color:var(--blue);">Scan QR Kegiatan</div>
+        <div style="font-size:11px;color:var(--gray);margin-top:2px;">Absensi non-harian</div>
+      </button>
     </div>
 
-    <!-- Scan QR Kegiatan -->
-    <div style="background:white;border-radius:14px;padding:16px;margin-top:14px;box-shadow:0 2px 8px rgba(0,0,0,0.06);border-left:4px solid var(--blue);">
-      <div style="display:flex;justify-content:space-between;align-items:center;">
-        <div>
-          <div style="font-weight:700;font-size:15px;color:var(--blue);">&#128247; Scan QR Kegiatan</div>
-          <div style="font-size:12px;color:var(--gray);margin-top:2px;">Absensi acara/kegiatan non-harian</div>
-        </div>
-        <button onclick="showPage('scanqr')" style="background:var(--blue);color:white;border:none;border-radius:10px;padding:10px 16px;font-weight:700;cursor:pointer;font-size:13px;">Buka</button>
-      </div>
-    </div>
-
-    <!-- Rekap Absensi Kelas (hanya jika wali kelas) -->
-    <div id="guruRekapSection" style="display:none;background:white;border-radius:14px;padding:16px;margin-top:14px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
-      <div style="font-weight:700;font-size:15px;margin-bottom:12px;color:var(--primary);">&#128203; Rekap Absensi Kelas</div>
-      <!-- Filter bulan -->
-      <div style="display:flex;gap:8px;margin-bottom:12px;">
+    <!-- REKAP ABSENSI KELAS (hanya wali kelas) -->
+    <div id="guruRekapSection" style="display:none;background:white;border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+      <div style="font-weight:700;font-size:15px;margin-bottom:10px;color:var(--primary);">📋 Rekap Absensi Kelas</div>
+      <div style="display:flex;gap:8px;margin-bottom:10px;">
         <select id="guruRekapBulan" onchange="renderGuruRekap()" style="flex:1;padding:9px;border:2px solid var(--gray-200);border-radius:8px;font-size:13px;"></select>
         <select id="guruRekapJenis" onchange="renderGuruRekap()" style="flex:1;padding:9px;border:2px solid var(--gray-200);border-radius:8px;font-size:13px;">
           <option value="harian">Absensi Harian</option>
@@ -13693,16 +13713,17 @@ function cetakDariPreviewAlternatif() {
       <div id="guruRekapContent"></div>
     </div>
 
-    <!-- Daftar Santri Kelas (hanya jika wali kelas) -->
-    <div id="guruKelasSection" style="display:none;background:white;border-radius:14px;padding:16px;margin-top:14px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-        <div style="font-weight:700;font-size:15px;color:var(--primary);">&#127963; Santri Kelas Saya</div>
+    <!-- DAFTAR SANTRI KELAS (hanya wali kelas) -->
+    <div id="guruKelasSection" style="display:none;background:white;border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div style="font-weight:700;font-size:15px;color:var(--primary);">🏫 Santri Kelas Saya</div>
         <div id="guruKelasNama" style="font-size:12px;color:var(--gray);background:var(--gray-light);padding:4px 10px;border-radius:8px;"></div>
       </div>
       <input type="text" id="guruSearchSantri" oninput="renderGuruSantriList()" placeholder="Cari nama santri..." style="width:100%;padding:9px 12px;border:2px solid var(--gray-200);border-radius:8px;font-size:13px;box-sizing:border-box;margin-bottom:10px;outline:none;">
       <div id="guruSantriList"></div>
     </div>
 
+    </div><!-- end padding -->
   </div>
 </div>
 
@@ -13781,6 +13802,8 @@ function cetakDariPreviewAlternatif() {
         <h3 class="page-h2">Input Absensi Pelajaran</h3>
         <button onclick="document.getElementById('modalAbsensiPelajaran').style.display='none'" class="btn-icon">&#10005;</button>
       </div>
+      <input type="hidden" id="absPelajJadwalId" value="">
+      <input type="hidden" id="absPelajPengajarId" value="">
       <div style="display:grid;gap:10px;margin-bottom:14px;background:var(--surface-1);padding:14px;border-radius:12px;">
         <div class="grid-2col">
           <div><label class="txt-label-sm">Tanggal</label>
@@ -14062,7 +14085,7 @@ function cetakDariPreviewAlternatif() {
   <div class="header-premium header-premium-small">
     <div class="back-header">
       <i class="fas fa-arrow-left" onclick="showPage('home')"></i>
-      <h2>Raport & Rekap Nilai</h2>
+      <h2>📋 Raport & Rekap Nilai</h2>
       <div style="width:30px;"></div>
     </div>
   </div>
@@ -14070,6 +14093,15 @@ function cetakDariPreviewAlternatif() {
     <div class="card-premium">
       <!-- Filter -->
       <div style="display:grid;gap:10px;margin-bottom:16px;">
+        <div class="grid-2col">
+          <select id="raportSemFilter" onchange="renderRaport()" style="padding:10px;border:2px solid var(--gray-200);border-radius:8px;font-size:13px;">
+            <option value="Ganjil">Semester Ganjil</option>
+            <option value="Genap">Semester Genap</option>
+          </select>
+          <select id="raportTahunFilter" onchange="renderRaport()" style="padding:10px;border:2px solid var(--gray-200);border-radius:8px;font-size:13px;">
+            <option value="">Tahun Ajaran</option>
+          </select>
+        </div>
         <select id="raportKelasFilter" onchange="renderRaport()" style="padding:10px;border:2px solid var(--gray-200);border-radius:8px;font-size:14px;">
           <option value="">Semua Kelas</option>
         </select>
@@ -14085,11 +14117,26 @@ function cetakDariPreviewAlternatif() {
           <option value="Praktik">Praktik</option>
         </select>
       </div>
+
+      <!-- Tombol Aksi Batch -->
+      <div style="display:flex;gap:8px;margin-bottom:14px;">
+        <button onclick="cetakRaportSatu()" style="flex:1;padding:10px;background:var(--primary);color:white;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">
+          🖨️ Cetak Raport
+        </button>
+        <button onclick="cetakRaportKelas()" style="flex:1;padding:10px;background:var(--purple);color:white;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">
+          📋 Cetak Satu Kelas
+        </button>
+        <button onclick="exportRaportExcel()" style="flex:1;padding:10px;background:var(--teal);color:white;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">
+          📊 Export Excel
+        </button>
+      </div>
+
       <!-- Raport Content -->
       <div id="raportContent">
         <div class="empty-state">
           <div style="font-size:48px;margin-bottom:12px;">📋</div>
           <div style="font-weight:600;">Pilih peserta untuk melihat raport</div>
+          <div style="font-size:12px;color:var(--gray);margin-top:6px;">Pilih kelas → pilih peserta → raport tampil</div>
         </div>
       </div>
     </div>
@@ -14716,6 +14763,13 @@ function autoFillRuangan() {
     ruanganEl.value = '';
 }
 
+function getKelasIdByNama(namaKelas) {
+    for(var i=0;i<kelasList.length;i++){
+        if(kelasList[i].nama===namaKelas) return String(kelasList[i].id);
+    }
+    return null;
+}
+
 function simpanJadwal() {
     var mapelEl = document.getElementById('fJadwalMapel');
     var mulaiEl = document.getElementById('fJadwalMulai');
@@ -14723,12 +14777,19 @@ function simpanJadwal() {
     var mulai = mulaiEl ? mulaiEl.value : '';
     if (!mapel||!mulai) { showToast('Pelajaran dan jam harus diisi!'); return; }
     var editId = document.getElementById('jadwalEditId'); var id = editId ? editId.value : '';
+    // Simpan juga pengajarId untuk matching yang lebih akurat
+    var pengajarNama = (document.getElementById('fJadwalPengajar')||{value:''}).value.trim();
+    var pengajarId = '';
+    for(var px=0;px<pengajarList.length;px++){
+        if(pengajarList[px].nama===pengajarNama){ pengajarId=String(pengajarList[px].id); break; }
+    }
     var data = { id:id||Date.now(),
         hari: (document.getElementById('fJadwalHari')||{value:'Senin'}).value,
         mulai: mulai,
         selesai: (document.getElementById('fJadwalSelesai')||{value:''}).value,
         mapel: mapel,
-        pengajar: (document.getElementById('fJadwalPengajar')||{value:''}).value.trim(),
+        pengajar: pengajarNama,
+        pengajarId: pengajarId,
         kelas: (document.getElementById('fJadwalKelas')||{value:''}).value.trim(),
         ruangan: (document.getElementById('fJadwalRuangan')||{value:''}).value.trim()
     };
@@ -15031,6 +15092,27 @@ function initRaport(){
     }
 }
 function renderRaport(){
+    // Isi dropdown tahun ajaran
+    var tahunSel = document.getElementById('raportTahunFilter');
+    if(tahunSel && tahunSel.options.length <= 1) {
+        var tahunSet = new Set();
+        nilaiList.forEach(function(n) {
+            if(n.tanggal) {
+                var y = n.tanggal.substring(0,4);
+                if(y) tahunSet.add(y);
+            }
+        });
+        var now = new Date().getFullYear();
+        tahunSet.add(String(now));
+        tahunSet.add(String(now-1));
+        var sorted = Array.from(tahunSet).sort().reverse();
+        tahunSel.innerHTML = '<option value="">Tahun Ajaran</option>';
+        sorted.forEach(function(y) {
+            var label = y + '/' + (parseInt(y)+1);
+            tahunSel.innerHTML += '<option value="'+y+'">'+label+'</option>';
+        });
+    }
+
     var p=getTerm('pesertaDidik');
     var kelasId=(document.getElementById('raportKelasFilter')||{value:''}).value;
     var pf=document.getElementById('raportPesertaFilter');
@@ -15038,7 +15120,6 @@ function renderRaport(){
         var jList=typeof pesertaList!=='undefined'?pesertaList:[];
         var fl=[];
         if (kelasId) {
-            // Gunakan mapping kelas-santri
             fl = getSantriByKelas(kelasId);
         } else {
             fl = jList;
@@ -15048,68 +15129,296 @@ function renderRaport(){
         pf.innerHTML=opts;
     }
     var ct=document.getElementById('raportContent');
-    if(ct)ct.innerHTML='<div class="empty-state"><div style="font-size:48px;">&#128203;</div><div style="font-weight:600;margin-top:10px;">Pilih '+p+' untuk melihat raport</div></div>';
+    if(ct)ct.innerHTML='<div class="empty-state"><div style="font-size:48px;">&#128203;</div><div style="font-weight:600;margin-top:10px;">Pilih '+p+' untuk melihat raport</div><div style="font-size:12px;color:var(--gray);margin-top:6px;">Atau klik "Cetak Satu Kelas" untuk cetak semua sekaligus</div></div>';
 }
+
+function getNilaiFiltered(pesertaId) {
+    var jenisFilter=(document.getElementById('raportJenisFilter')||{value:''}).value;
+    var semFilter=(document.getElementById('raportSemFilter')||{value:''}).value;
+    var tahunFilter=(document.getElementById('raportTahunFilter')||{value:''}).value;
+    return nilaiList.filter(function(n) {
+        if(n.jamaahId != pesertaId) return false;
+        if(jenisFilter && n.jenis !== jenisFilter) return false;
+        if(tahunFilter && n.tanggal && !n.tanggal.startsWith(tahunFilter)) return false;
+        return true;
+    });
+}
+
+function getAbsensiRingkasan(pesertaId) {
+    var harian = getAbsensiHarianData();
+    var hadir=0, alpha=0, sakit=0, izin=0;
+    harian.forEach(function(sesi) {
+        (sesi.data||[]).forEach(function(e) {
+            if(String(e.santriId) !== String(pesertaId)) return;
+            if(e.status==='hadir') hadir++;
+            else if(e.status==='alpha') alpha++;
+            else if(e.status==='sakit') sakit++;
+            else if(e.status==='izin') izin++;
+        });
+    });
+    return {hadir:hadir, alpha:alpha, sakit:sakit, izin:izin, total:hadir+alpha+sakit+izin};
+}
+
+function getPelanggaranTotal(pesertaId) {
+    if(typeof pelanggaranList === 'undefined') return 0;
+    return pelanggaranList.filter(function(p){ return String(p.santriId)===String(pesertaId); })
+        .reduce(function(s,p){ return s+(p.poin||0); }, 0);
+}
+
+function buildRaportHTML(peserta, nilaiFiltered, forPrint) {
+    var cfg = getKonfigurasiProData();
+    var namaPeserta = peserta.nama_lengkap || peserta.nama || '?';
+    var f = peserta.additional_fields || {};
+    var kelasId = getKelasIdBySantri(peserta.id);
+    var kelasNama = kelasId ? getKelasNama(kelasId) : (f.kelas || '-');
+    var waliKelas = kelasId ? getWaliKelasByKelasId(kelasId) : null;
+    var semFilter = (document.getElementById('raportSemFilter')||{value:'Ganjil'}).value;
+    var tahunFilter = (document.getElementById('raportTahunFilter')||{value:''}).value;
+    var tahunLabel = tahunFilter ? tahunFilter+'/'+(parseInt(tahunFilter)+1) : new Date().getFullYear()+'/'+(new Date().getFullYear()+1);
+
+    var byMapel={};
+    nilaiFiltered.forEach(function(n){ var mk=n.mapel||'Umum'; if(!byMapel[mk]) byMapel[mk]=[]; byMapel[mk].push(n); });
+    var clrFn=function(v){return v>=90?'#10b981':v>=75?'#3b82f6':v>=60?'#f59e0b':'#ef4444';};
+    var grdFn=function(v){return v>=90?'A':v>=80?'B':v>=70?'C':v>=60?'D':'E';};
+    var abs = getAbsensiRingkasan(peserta.id);
+    var poinPelanggaran = getPelanggaranTotal(peserta.id);
+
+    var totalNilai=nilaiFiltered.length;
+    var avgNilai=0;
+    if(totalNilai>0) {
+        var sumNilai=nilaiFiltered.reduce(function(s,n){return s+n.nilai;},0);
+        avgNilai=Math.round(sumNilai/totalNilai);
+    }
+
+    var rankNota = avgNilai>=90?'Sangat Baik':avgNilai>=75?'Baik':avgNilai>=60?'Cukup':'Perlu Peningkatan';
+
+    var logoHtml = cfg.instansi1?.logo
+        ? '<img src="'+cfg.instansi1.logo+'" style="height:50px;object-fit:contain;">'
+        : '<div style="font-size:32px;">🎓</div>';
+
+    var html = '<div style="font-family:Arial,sans-serif;max-width:700px;margin:0 auto;background:white;'+(forPrint?'':'border-radius:12px;padding:0;')+'overflow:hidden;">';
+
+    // KOP SURAT
+    html += '<div style="background:linear-gradient(135deg,#0D5C4A,#0a3d31);color:white;padding:20px 24px;display:flex;align-items:center;gap:16px;">'
+          + '<div>'+logoHtml+'</div>'
+          + '<div style="flex:1;">'
+          + '<div style="font-size:18px;font-weight:800;letter-spacing:0.5px;">'+(cfg.instansi1?.nama||'EduKu')+'</div>'
+          + (cfg.instansi2?.aktif&&cfg.instansi2?.nama?'<div style="font-size:13px;opacity:0.85;">'+cfg.instansi2.nama+'</div>':'')
+          + '<div style="font-size:11px;opacity:0.75;margin-top:2px;">'+(cfg.instansi1?.alamat||'')+'</div>'
+          + '</div>'
+          + '<div style="text-align:right;">'
+          + '<div style="font-size:11px;opacity:0.75;">RAPORT SEMESTER</div>'
+          + '<div style="font-size:20px;font-weight:800;">'+semFilter.toUpperCase()+'</div>'
+          + '<div style="font-size:12px;opacity:0.85;">'+tahunLabel+'</div>'
+          + '</div>'
+          + '</div>';
+
+    // INFO SANTRI
+    html += '<div style="padding:16px 24px;background:#f8fafc;border-bottom:2px solid #e2e8f0;display:grid;grid-template-columns:1fr 1fr;gap:8px;">'
+          + '<div><span style="font-size:11px;color:#64748b;">Nama Santri</span><div style="font-weight:700;font-size:15px;">'+namaPeserta+'</div></div>'
+          + '<div><span style="font-size:11px;color:#64748b;">NIS</span><div style="font-weight:700;">'+( peserta.nis || f.nis || '-')+'</div></div>'
+          + '<div><span style="font-size:11px;color:#64748b;">Kelas</span><div style="font-weight:700;">'+kelasNama+'</div></div>'
+          + '<div><span style="font-size:11px;color:#64748b;">Wali Kelas</span><div style="font-weight:700;">'+(waliKelas?waliKelas.nama:'-')+'</div></div>'
+          + '</div>';
+
+    // RINGKASAN NILAI
+    html += '<div style="padding:16px 24px;">';
+    html += '<div style="font-weight:700;font-size:13px;color:#0D5C4A;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px;border-bottom:2px solid #0D5C4A;padding-bottom:4px;">Rekap Nilai</div>';
+
+    if(totalNilai === 0) {
+        html += '<div style="text-align:center;padding:20px;color:#94a3b8;">Belum ada nilai</div>';
+    } else {
+        // Summary badges
+        html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;">'
+              + '<div style="background:#f0fdf4;border-radius:10px;padding:12px;text-align:center;border:2px solid #86efac;">'
+              + '<div style="font-size:24px;font-weight:800;color:'+clrFn(avgNilai)+';">'+avgNilai+'</div>'
+              + '<div style="font-size:11px;color:#64748b;">Rata-rata</div></div>'
+              + '<div style="background:#f8fafc;border-radius:10px;padding:12px;text-align:center;border:2px solid #e2e8f0;">'
+              + '<div style="font-size:24px;font-weight:800;">'+grdFn(avgNilai)+'</div>'
+              + '<div style="font-size:11px;color:#64748b;">Grade</div></div>'
+              + '<div style="background:#f8fafc;border-radius:10px;padding:12px;text-align:center;border:2px solid #e2e8f0;">'
+              + '<div style="font-size:13px;font-weight:700;color:'+clrFn(avgNilai)+';">'+rankNota+'</div>'
+              + '<div style="font-size:11px;color:#64748b;">Keterangan</div></div>'
+              + '</div>';
+
+        // Tabel per mapel
+        html += '<table style="width:100%;border-collapse:collapse;font-size:13px;">'
+              + '<thead><tr style="background:#0D5C4A;color:white;">'
+              + '<th style="padding:8px 10px;text-align:left;">Mata Pelajaran</th>'
+              + '<th style="padding:8px;text-align:center;width:40px;">KKM</th>'
+              + '<th style="padding:8px;text-align:center;width:50px;">Nilai</th>'
+              + '<th style="padding:8px;text-align:center;width:40px;">Grade</th>'
+              + '<th style="padding:8px;text-align:center;width:80px;">Status</th>'
+              + '</tr></thead><tbody>';
+
+        var i=0;
+        for(var mapelNama in byMapel) {
+            var vals=byMapel[mapelNama];
+            var mapelSum=vals.reduce(function(s,v){return s+v.nilai;},0);
+            var mapelAvg=Math.round(mapelSum/vals.length);
+            var mapelData=null;
+            for(var mx=0;mx<mapelList.length;mx++){if(mapelList[mx].nama===mapelNama){mapelData=mapelList[mx];break;}}
+            var kkm=mapelData?mapelData.kkm:75;
+            var lulus=mapelAvg>=kkm;
+            var rowBg = i%2===0?'white':'#f8fafc';
+            html += '<tr style="background:'+rowBg+';">'
+                  + '<td style="padding:8px 10px;font-weight:600;">'+mapelNama+'</td>'
+                  + '<td style="padding:8px;text-align:center;color:#64748b;">'+kkm+'</td>'
+                  + '<td style="padding:8px;text-align:center;font-weight:800;color:'+clrFn(mapelAvg)+';">'+mapelAvg+'</td>'
+                  + '<td style="padding:8px;text-align:center;font-weight:700;">'+grdFn(mapelAvg)+'</td>'
+                  + '<td style="padding:8px;text-align:center;">'
+                  + '<span style="background:'+(lulus?'#dcfce7':'#fee2e2')+';color:'+(lulus?'#166534':'#991b1b')+';padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;">'
+                  + (lulus?'Lulus':'Remedial')+'</span></td></tr>';
+            i++;
+        }
+        html += '</tbody></table>';
+    }
+
+    // KEHADIRAN
+    html += '<div style="margin-top:16px;">';
+    html += '<div style="font-weight:700;font-size:13px;color:#0D5C4A;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;border-bottom:2px solid #0D5C4A;padding-bottom:4px;">Kehadiran</div>';
+    var pctHadir = abs.total > 0 ? Math.round((abs.hadir/abs.total)*100) : 0;
+    html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">'
+          + '<div style="background:#f0fdf4;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:20px;font-weight:800;color:#10b981;">'+abs.hadir+'</div><div style="font-size:11px;color:#64748b;">Hadir</div></div>'
+          + '<div style="background:#fef2f2;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:20px;font-weight:800;color:#ef4444;">'+abs.alpha+'</div><div style="font-size:11px;color:#64748b;">Alpha</div></div>'
+          + '<div style="background:#fff7ed;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:20px;font-weight:800;color:#f59e0b;">'+abs.sakit+'</div><div style="font-size:11px;color:#64748b;">Sakit</div></div>'
+          + '<div style="background:#eff6ff;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:20px;font-weight:800;color:#3b82f6;">'+abs.izin+'</div><div style="font-size:11px;color:#64748b;">Izin</div></div>'
+          + '</div>'
+          + '<div style="text-align:center;margin-top:6px;font-size:12px;color:#64748b;">Persentase kehadiran: <strong style="color:#0D5C4A;">'+pctHadir+'%</strong></div>';
+
+    // PELANGGARAN
+    if(poinPelanggaran > 0) {
+        html += '<div style="margin-top:8px;background:#fef2f2;border-radius:8px;padding:10px;display:flex;align-items:center;gap:8px;">'
+              + '<span style="font-size:18px;">⚠️</span>'
+              + '<div><div style="font-size:13px;font-weight:700;color:#991b1b;">Total Poin Pelanggaran: '+poinPelanggaran+'</div>'
+              + '<div style="font-size:11px;color:#64748b;">Perlu perhatian dan pembinaan</div></div>'
+              + '</div>';
+    }
+    html += '</div>';
+
+    // CATATAN & TTD
+    var tglCetak = new Date().toLocaleDateString('id-ID', {day:'numeric',month:'long',year:'numeric'});
+    var kotaInstansi = cfg.instansi1?.kota || '';
+    html += '<div style="margin-top:20px;display:grid;grid-template-columns:1fr 1fr;gap:24px;">'
+          + '<div><div style="font-size:12px;font-weight:700;margin-bottom:6px;">Catatan Wali Kelas:</div>'
+          + '<div style="border:1px solid #e2e8f0;border-radius:8px;height:60px;padding:8px;font-size:12px;color:#94a3b8;font-style:italic;"></div></div>'
+          + '<div style="text-align:center;">'
+          + '<div style="font-size:11px;color:#64748b;">'+(kotaInstansi||'___')+', '+tglCetak+'</div>'
+          + '<div style="font-size:11px;color:#64748b;margin-top:2px;">Wali Kelas,</div>'
+          + '<div style="height:50px;"></div>'
+          + '<div style="font-weight:700;font-size:13px;border-top:1px solid #333;padding-top:4px;display:inline-block;min-width:120px;">'+(waliKelas?waliKelas.nama:'_________________')+'</div>'
+          + '</div></div>';
+
+    html += '</div></div>';
+    return html;
+}
+
 function renderRaportPeserta(){
     var pesertaId=(document.getElementById('raportPesertaFilter')||{value:''}).value;
-    var jenisFilter=(document.getElementById('raportJenisFilter')||{value:''}).value;
     var ct=document.getElementById('raportContent');
     var p=getTerm('pesertaDidik');
     if(!ct)return;
     if(!pesertaId){renderRaport();return;}
-    var jList=typeof pesertaList!=='undefined'?pesertaList:[];
-    var peserta=null;for(var i=0;i<jList.length;i++){if(jList[i].id==pesertaId){peserta=jList[i];break;}}
+    var peserta=null;
+    for(var i=0;i<pesertaList.length;i++){if(pesertaList[i].id==pesertaId){peserta=pesertaList[i];break;}}
     if(!peserta)return;
-    var namaPeserta=peserta.nama_lengkap||peserta.nama||'?';
-    var fl=[];
-    for(var j=0;j<nilaiList.length;j++){
-        var n=nilaiList[j];
-        if(n.jamaahId!=pesertaId)continue;
-        if(jenisFilter&&n.jenis!==jenisFilter)continue;
-        fl.push(n);
-    }
-    var byMapel={};
-    for(var k=0;k<fl.length;k++){var mk=fl[k].mapel||'Umum';if(!byMapel[mk])byMapel[mk]=[];byMapel[mk].push(fl[k]);}
-    var totalNilai=fl.length;
-    var sumNilai=0;for(var m=0;m<fl.length;m++)sumNilai+=fl[m].nilai;
-    var avgNilai=totalNilai?Math.round(sumNilai/totalNilai):0;
-    var maxNilai=0,minNilai=100;
-    for(var n2=0;n2<fl.length;n2++){if(fl[n2].nilai>maxNilai)maxNilai=fl[n2].nilai;if(fl[n2].nilai<minNilai)minNilai=fl[n2].nilai;}
-    var clrFn=function(v){return v>=90?'#10b981':v>=75?'#3b82f6':v>=60?'#f59e0b':'#ef4444';};
-    var grdFn=function(v){return v>=90?'A':v>=80?'B':v>=70?'C':v>=60?'D':'E';};
-    var html='<div style="background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:white;padding:18px;border-radius:12px;margin-bottom:14px;">'
-        +'<div style="font-weight:700;font-size:17px;">'+namaPeserta+'</div>'
-        +'<div style="font-size:13px;opacity:0.85;">NIS: '+(peserta.nis||'-')+'</div>'
-        +(peserta.kelasId?'<div style="font-size:13px;opacity:0.85;">Kelas: '+getKelasNama(peserta.kelasId)+'</div>':'')
-        +'</div>';
-    if(totalNilai>0){
-        html+='<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px;">'
-            +'<div style="background:var(--surface-1);padding:12px;border-radius:10px;text-align:center;"><div style="font-size:22px;font-weight:800;color:'+clrFn(avgNilai)+'">'+avgNilai+'</div><div class="txt-sub-sm">Rata-rata</div></div>'
-            +'<div style="background:var(--surface-1);padding:12px;border-radius:10px;text-align:center;"><div style="font-size:22px;font-weight:800;">'+grdFn(avgNilai)+'</div><div class="txt-sub-sm">Grade</div></div>'
-            +'<div style="background:var(--surface-1);padding:12px;border-radius:10px;text-align:center;"><div style="font-size:22px;font-weight:800;color:var(--green);">'+maxNilai+'</div><div class="txt-sub-sm">Tertinggi</div></div>'
-            +'<div style="background:var(--surface-1);padding:12px;border-radius:10px;text-align:center;"><div style="font-size:22px;font-weight:800;color:var(--red);">'+minNilai+'</div><div class="txt-sub-sm">Terendah</div></div>'
-            +'</div>';
-        html+='<div style="font-weight:700;margin-bottom:10px;">Detail per Mata Pelajaran:</div>';
-        for(var mapelNama in byMapel){
-            var vals=byMapel[mapelNama];
-            var mapelSum=0;for(var v=0;v<vals.length;v++)mapelSum+=vals[v].nilai;
-            var mapelAvg=Math.round(mapelSum/vals.length);
-            var mapelData=null;for(var mx=0;mx<mapelList.length;mx++){if(mapelList[mx].nama===mapelNama){mapelData=mapelList[mx];break;}}
-            var kkm=mapelData?mapelData.kkm:75;
-            var lulus=mapelAvg>=kkm;
-            html+='<div style="background:white;border:2px solid '+(lulus?'var(--green)':'var(--red)')+';border-radius:12px;padding:14px;margin-bottom:8px;">'
-                +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">'
-                +'<div style="font-weight:700;">'+mapelNama+'</div>'
-                +'<div style="display:flex;align-items:center;gap:8px;">'
-                +'<span style="background:'+clrFn(mapelAvg)+';color:white;padding:4px 10px;border-radius:8px;font-weight:800;">'+mapelAvg+'</span>'
-                +'<span style="font-size:12px;color:'+(lulus?'var(--green)':'var(--red)')+';font-weight:600;">'+(lulus?'Lulus':'Remedial')+'</span>'
-                +'</div></div>'
-                +'<div style="font-size:11px;color:var(--gray-400);">KKM: '+kkm+'</div></div>';
+    var nilaiFiltered = getNilaiFiltered(pesertaId);
+    ct.innerHTML = buildRaportHTML(peserta, nilaiFiltered, false);
+}
+
+function cetakRaportSatu() {
+    var pesertaId=(document.getElementById('raportPesertaFilter')||{value:''}).value;
+    if(!pesertaId) { showToast('Pilih peserta dulu!'); return; }
+    var peserta=null;
+    for(var i=0;i<pesertaList.length;i++){if(pesertaList[i].id==pesertaId){peserta=pesertaList[i];break;}}
+    if(!peserta) return;
+    var nilaiFiltered = getNilaiFiltered(pesertaId);
+    var win = window.open('','_blank');
+    if(!win) { showToast('Izinkan popup untuk cetak!'); return; }
+    win.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Raport '+peserta.nama_lengkap+'</title>'
+        +'<style>body{margin:0;padding:20px;background:#f1f5f9;}@media print{body{padding:0;background:white;}.no-print{display:none;}}</style>'
+        +'</head><body>'
+        +'<div class="no-print" style="text-align:center;margin-bottom:16px;">'
+        +'<button onclick="window.print()" style="padding:10px 28px;background:#0D5C4A;color:white;border:none;border-radius:10px;font-size:14px;cursor:pointer;">🖨️ Cetak</button>'
+        +'<button onclick="window.close()" style="padding:10px 20px;background:#e2e8f0;color:#333;border:none;border-radius:10px;font-size:14px;cursor:pointer;margin-left:8px;">✕ Tutup</button>'
+        +'</div>'
+        + buildRaportHTML(peserta, nilaiFiltered, true)
+        +'</body></html>');
+    win.document.close();
+}
+
+function cetakRaportKelas() {
+    var kelasId=(document.getElementById('raportKelasFilter')||{value:''}).value;
+    if(!kelasId) { showToast('Pilih kelas dulu!'); return; }
+    var santri = getSantriByKelas(kelasId);
+    if(!santri.length) { showToast('Tidak ada santri di kelas ini'); return; }
+    var kelasNama = getKelasNama(kelasId);
+    var win = window.open('','_blank');
+    if(!win) { showToast('Izinkan popup untuk cetak!'); return; }
+    var allHtml = '';
+    santri.forEach(function(peserta, idx) {
+        var nilaiFiltered = getNilaiFiltered(peserta.id);
+        allHtml += (idx>0?'<div style="page-break-before:always;"></div>':'');
+        allHtml += buildRaportHTML(peserta, nilaiFiltered, true);
+    });
+    win.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Raport Kelas '+kelasNama+'</title>'
+        +'<style>body{margin:0;padding:20px;background:#f1f5f9;}@media print{body{padding:0;background:white;}.no-print{display:none;}}</style>'
+        +'</head><body>'
+        +'<div class="no-print" style="text-align:center;margin-bottom:16px;padding:12px;background:white;border-radius:10px;">'
+        +'<div style="font-weight:700;margin-bottom:8px;">📋 Raport Kelas '+kelasNama+' ('+santri.length+' santri)</div>'
+        +'<button onclick="window.print()" style="padding:10px 28px;background:#0D5C4A;color:white;border:none;border-radius:10px;font-size:14px;cursor:pointer;">🖨️ Cetak Semua</button>'
+        +'<button onclick="window.close()" style="padding:10px 20px;background:#e2e8f0;color:#333;border:none;border-radius:10px;font-size:14px;cursor:pointer;margin-left:8px;">✕ Tutup</button>'
+        +'</div>'
+        + allHtml
+        +'</body></html>');
+    win.document.close();
+    showToast('📋 '+santri.length+' raport disiapkan untuk dicetak');
+}
+
+function exportRaportExcel() {
+    var kelasId=(document.getElementById('raportKelasFilter')||{value:''}).value;
+    var kelasNama = kelasId ? getKelasNama(kelasId) : 'Semua Kelas';
+    var santri = kelasId ? getSantriByKelas(kelasId) : pesertaList;
+    if(!santri.length) { showToast('Tidak ada data santri'); return; }
+
+    var semFilter = (document.getElementById('raportSemFilter')||{value:'Ganjil'}).value;
+    var rows = [['Nama Santri','NIS','Kelas','Mata Pelajaran','Rata-rata Nilai','Grade','KKM','Status','% Kehadiran','Poin Pelanggaran']];
+    santri.forEach(function(peserta) {
+        var kelasP = getKelasIdBySantri(peserta.id);
+        var kelasPN = kelasP ? getKelasNama(kelasP) : (peserta.additional_fields?.kelas||'-');
+        var nilaiF = getNilaiFiltered(peserta.id);
+        var abs = getAbsensiRingkasan(peserta.id);
+        var pct = abs.total>0?Math.round((abs.hadir/abs.total)*100):0;
+        var poin = getPelanggaranTotal(peserta.id);
+        var byMapel={};
+        nilaiF.forEach(function(n){var mk=n.mapel||'Umum';if(!byMapel[mk])byMapel[mk]=[];byMapel[mk].push(n);});
+        if(Object.keys(byMapel).length===0) {
+            rows.push([peserta.nama_lengkap||peserta.nama,peserta.nis||'-',kelasPN,'-','-','-','-','-',pct+'%',poin]);
+        } else {
+            var first=true;
+            for(var mk in byMapel) {
+                var avg=Math.round(byMapel[mk].reduce(function(s,v){return s+v.nilai;},0)/byMapel[mk].length);
+                var mapelData=null;for(var mx=0;mx<mapelList.length;mx++){if(mapelList[mx].nama===mk){mapelData=mapelList[mx];break;}}
+                var kkm=mapelData?mapelData.kkm:75;
+                var grd=avg>=90?'A':avg>=80?'B':avg>=70?'C':avg>=60?'D':'E';
+                rows.push([
+                    first?(peserta.nama_lengkap||peserta.nama):'',
+                    first?(peserta.nis||'-'):'',
+                    first?kelasPN:'',
+                    mk, avg, grd, kkm, avg>=kkm?'Lulus':'Remedial',
+                    first?pct+'%':'',
+                    first?poin:''
+                ]);
+                first=false;
+            }
         }
-    } else {
-        html+='<div style="text-align:center;padding:30px;color:var(--gray-400);">Belum ada nilai untuk '+namaPeserta+'</div>';
-    }
-    ct.innerHTML=html;
+    });
+    var wb = XLSX.utils.book_new();
+    var ws = XLSX.utils.aoa_to_sheet(rows);
+    ws['!cols']=[{wch:25},{wch:12},{wch:10},{wch:20},{wch:12},{wch:8},{wch:8},{wch:10},{wch:12},{wch:15}];
+    XLSX.utils.book_append_sheet(wb, ws, 'Raport '+semFilter);
+    XLSX.writeFile(wb, 'Raport_'+kelasNama.replace(/ /g,'_')+'_'+semFilter+'.xlsx');
+    showToast('📊 Excel raport berhasil diexport!');
 }
 
 
@@ -15634,26 +15943,78 @@ function initGuruMode() {
     if(wn) wn.textContent=guru.nama;
     var wd=document.getElementById('guruWelcomeDate');
     if(wd) wd.textContent=tanggalStr;
-    // Jadwal hari ini
+
+    // Stat cards
+    var todayStr=today.toISOString().substr(0,10);
+    var jdHariIni = jadwalList.filter(function(jd){
+        return jd.hari===hariIni && (jd.pengajar===guru.nama || String(jd.pengajarId)===String(guru.id));
+    });
+    var allAbsToday = getAbsensiPelajaranData().filter(function(a){
+        return a.tanggal===todayStr && String(a.pengajarId)===String(guru.id);
+    });
+    var nilaiHariIni = nilaiList.filter(function(n){
+        return n.tanggal===todayStr && String(n.pengajarId)===String(guru.id);
+    });
+    var statJadwal=document.getElementById('guruStatJadwal');
+    var statAbsen=document.getElementById('guruStatAbsen');
+    var statNilai=document.getElementById('guruStatNilai');
+    if(statJadwal) statJadwal.textContent=jdHariIni.length;
+    if(statAbsen) statAbsen.textContent=allAbsToday.length;
+    if(statNilai) statNilai.textContent=nilaiHariIni.length;
+
+
+    // Jadwal hari ini - match by nama ATAU pengajarId
     var jadwalEl=document.getElementById('guruJadwalHariIni');
     if (jadwalEl) {
+        var todayStr2=new Date().toISOString().substr(0,10);
+        var allAbsToday=getAbsensiPelajaranData().filter(function(a){
+            return a.tanggal===todayStr2 && String(a.pengajarId)===String(guru.id);
+        });
+
         var jdHariIni=[];
         for (var i=0;i<jadwalList.length;i++) {
             var jd=jadwalList[i];
-            if (jd.hari===hariIni && (jd.pengajar===guru.nama)) jdHariIni.push(jd);
+            // Match: nama pengajar ATAU pengajarId
+            var match = jd.hari===hariIni && (
+                jd.pengajar===guru.nama ||
+                String(jd.pengajarId)===String(guru.id)
+            );
+            if(match) jdHariIni.push(jd);
         }
         jdHariIni.sort(function(a,b){return (a.mulai||'').localeCompare(b.mulai||'');});
+
         if (!jdHariIni.length) {
             jadwalEl.innerHTML='<div class="empty-state-msg">Tidak ada jadwal hari ini</div>';
         } else {
             var h='';
             for (var j=0;j<jdHariIni.length;j++) {
                 var jd2=jdHariIni[j];
-                h+='<div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--surface-1);border-radius:10px;margin-bottom:8px;border-left:3px solid var(--primary);">'
-                  +'<div style="min-width:50px;text-align:center;"><div style="font-weight:700;color:var(--primary);font-size:13px;">'+(jd2.mulai||'--:--')+'</div></div>'
-                  +'<div style="flex:1;"><div style="font-weight:600;font-size:14px;">'+jd2.mapel+'</div>'
-                  +(jd2.kelas?'<div class="txt-sub">'+jd2.kelas+'</div>':'')+'</div>'
-                  +'<button onclick="bukaAbsensiDariJadwalId('+jd2.id+')" style="background:var(--primary);color:white;border:none;border-radius:8px;padding:8px 12px;font-size:12px;cursor:pointer;font-weight:600;">Absen</button>'
+                // Cek apakah sudah diabsen
+                var sudahAbsen = allAbsToday.some(function(a){
+                    return a.mapel===jd2.mapel && (
+                        !jd2.kelas || a.kelasId===getKelasIdByNama(jd2.kelas) ||
+                        getKelasNama(a.kelasId)===jd2.kelas
+                    );
+                });
+                var hadirCount = 0;
+                if(sudahAbsen) {
+                    var absMatch = allAbsToday.find(function(a){ return a.mapel===jd2.mapel; });
+                    if(absMatch) hadirCount = (absMatch.data||[]).filter(function(e){return e.status==='hadir';}).length;
+                }
+
+                h+='<div style="display:flex;align-items:center;gap:10px;padding:10px;background:'+(sudahAbsen?'#f0fdf4':'var(--surface-1)')+';border-radius:10px;margin-bottom:8px;border-left:3px solid '+(sudahAbsen?'var(--green)':'var(--primary)')+';cursor:pointer;" onclick="bukaAbsensiDariJadwalId('+jd2.id+')">'
+                  +'<div style="min-width:50px;text-align:center;">'
+                  +'<div style="font-weight:700;color:'+(sudahAbsen?'var(--green)':'var(--primary)')+';font-size:13px;">'+(jd2.mulai||'--:--')+'</div>'
+                  +(jd2.selesai?'<div style="font-size:10px;color:var(--gray);">'+jd2.selesai+'</div>':'')
+                  +'</div>'
+                  +'<div style="flex:1;">'
+                  +'<div style="font-weight:600;font-size:14px;">'+jd2.mapel+'</div>'
+                  +(jd2.kelas?'<div class="txt-sub">'+jd2.kelas+(jd2.ruangan?' · '+jd2.ruangan:'')+'</div>':'')
+                  +(sudahAbsen?'<div style="font-size:11px;color:var(--green);margin-top:2px;">✅ Sudah diabsen ('+hadirCount+' hadir)</div>':'')
+                  +'</div>'
+                  +'<button onclick="event.stopPropagation();bukaAbsensiDariJadwalId('+jd2.id+')" '
+                  +'style="background:'+(sudahAbsen?'var(--gray-200)':'var(--primary)')+';color:'+(sudahAbsen?'var(--gray-800)':'white')+';border:none;border-radius:8px;padding:8px 12px;font-size:12px;cursor:pointer;font-weight:600;white-space:nowrap;">'
+                  +(sudahAbsen?'Edit':'Absen')+'</button>'
                   +'</div>';
             }
             jadwalEl.innerHTML=h;
@@ -16493,6 +16854,21 @@ function bukaFormAbsensiPelajaran(jadwal) {
     if(td) td.value=today.toISOString().substr(0,10);
     var tj=document.getElementById('absPelajJam');
     if(tj) tj.value=jadwal&&jadwal.mulai?jadwal.mulai:today.toTimeString().substr(0,5);
+
+    // Simpan jadwalId dan pengajarId untuk referensi saat save
+    var absPelajJadwalId = document.getElementById('absPelajJadwalId');
+    if(absPelajJadwalId) absPelajJadwalId.value = jadwal ? (jadwal.id||'') : '';
+    var absPelajPengajarId = document.getElementById('absPelajPengajarId');
+    if(absPelajPengajarId) {
+        var pId = jadwal ? (jadwal.pengajarId||'') : '';
+        // Kalau tidak ada pengajarId di jadwal, coba dari session guru
+        if(!pId) {
+            var s = getEkSession();
+            if(s && s.role==='guru') pId = s.pengajarId || '';
+        }
+        absPelajPengajarId.value = pId;
+    }
+
     // Populate mapel
     var ms=document.getElementById('absPelajMapel');
     if(ms){
@@ -16594,6 +16970,8 @@ function simpanAbsensiPelajaran(){
     var jam=(document.getElementById('absPelajJam')||{value:''}).value||'';
     var mapel=(document.getElementById('absPelajMapel')||{value:''}).value||'';
     var kelasId=(document.getElementById('absPelajKelas')||{value:''}).value||'';
+    var jadwalId=(document.getElementById('absPelajJadwalId')||{value:''}).value||'';
+    var pengajarIdHidden=(document.getElementById('absPelajPengajarId')||{value:''}).value||'';
     if(!mapel||!kelasId){showToast('Lengkapi mapel dan kelas!');return;}
     var santri=getSantriByKelas(kelasId);
     if(!santri.length){showToast('Belum ada santri di kelas ini!');return;}
@@ -16601,15 +16979,18 @@ function simpanAbsensiPelajaran(){
     for(var i=0;i<santri.length;i++){
         dataAbs.push({santriId:String(santri[i].id),status:_absStatusMap[String(santri[i].id)]||'hadir'});
     }
+    var pengId = guru?String(guru.id):(pengajarIdHidden||'admin');
+    var pengNama = guru?guru.nama:'Admin';
     var record={id:Date.now(),tanggal:tanggal,jam:jam,mapel:mapel,kelasId:kelasId,
-        pengajarId:guru?String(guru.id):'admin',pengajarNama:guru?guru.nama:'Admin',data:dataAbs};
+        jadwalId:jadwalId,
+        pengajarId:pengId, pengajarNama:pengNama, data:dataAbs};
     var allData=getAbsensiPelajaranData();
     allData.push(record);
     saveAbsensiPelajaran(allData);
     _absStatusMap={};
     document.getElementById('modalAbsensiPelajaran').style.display='none';
     var hadir=dataAbs.filter(function(d){return d.status==='hadir';}).length;
-    showToast('Absensi disimpan! Hadir: '+hadir+'/'+dataAbs.length);
+    showToast('✅ Absensi disimpan! Hadir: '+hadir+'/'+dataAbs.length);
     if(isGuruSession()){var g=getCurrentGuru();if(g)initGuruMode();}
 }
 
